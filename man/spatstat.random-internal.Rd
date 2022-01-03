@@ -1,0 +1,104 @@
+\name{spatstat.random-internal} 
+\title{Internal spatstat.random functions}
+
+\alias{change.default.expand}          
+\alias{default.clipwindow}
+\alias{expandwinPerfect}
+\alias{getRandomFieldsModelGen}
+\alias{is.cadlag}
+\alias{is.expandable}
+\alias{is.expandable.rmhmodel}
+\alias{kraever}
+\alias{kraeverRandomFields}
+\alias{MultiPair.checkmatrix}
+\alias{print.rmhcontrol}
+\alias{print.rmhexpand}
+\alias{print.rmhmodel}
+\alias{print.rmhstart}
+\alias{print.rmhInfoList}
+\alias{print.summary.rmhexpand}
+\alias{RandomFieldsSafe}
+\alias{resolve.vargamma.shape}
+\alias{rMaternInhibition}
+\alias{RmhExpandRule}
+\alias{rmhsnoop}
+\alias{rmhResolveControl}
+\alias{rmhResolveExpansion}
+\alias{rmhResolveTypes}
+\alias{rmhSnoopEnv}
+\alias{rmhcontrol.rmhcontrol}
+\alias{rmhcontrol.list}
+\alias{rmhEngine}
+\alias{rmhmodel.rmhmodel}
+\alias{rmhstart.rmhstart}
+\alias{rmhstart.list}
+\alias{rmpoint.I.allim}
+\alias{rpoint.multi}
+\alias{runifpoispp}          
+\alias{runifpoisppOnLines}          
+\alias{spatstatClusterModelInfo}
+\alias{spatstatRmhInfo}
+\alias{summary.rmhexpand}
+
+
+
+%%%%%%%
+\description{
+  Internal spatstat.random functions.
+}
+\usage{
+
+change.default.expand(x, newdefault)
+default.clipwindow(object, epsilon)
+expandwinPerfect(W, expand, amount)
+getRandomFieldsModelGen(model)
+is.cadlag(s)
+is.expandable(x)
+\method{is.expandable}{rmhmodel}(x) 
+kraever(package, fatal)
+kraeverRandomFields()
+MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
+\method{print}{rmhcontrol}(x, \dots)
+\method{print}{rmhexpand}(x, \dots, prefix=TRUE)
+\method{print}{rmhmodel}(x, \dots)
+\method{print}{rmhstart}(x, \dots)
+\method{print}{rmhInfoList}(x, \dots)
+\method{print}{summary.rmhexpand}(x, \dots)
+RandomFieldsSafe()
+resolve.vargamma.shape(\dots, nu.ker, nu.pcf, default)
+rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
+RmhExpandRule(nama)
+\method{rmhcontrol}{rmhcontrol}(\dots) 
+\method{rmhcontrol}{list}(\dots) 
+rmhEngine(InfoList, \dots, verbose, kitchensink, preponly, snoop,
+                           overrideXstart, overrideclip) 
+rmhResolveControl(control, model)
+rmhResolveExpansion(win, control, imagelist, itype)
+rmhResolveTypes(model, start, control)
+rmhsnoop(\dots, Wsim, Wclip, R, xcoords, ycoords, mlevels, mcodes, irep, itype, 
+     proptype, proplocn, propmark, propindx, numerator, denominator,
+     panel.only)
+rmhSnoopEnv(Xinit, Wclip, R)
+\method{rmhmodel}{rmhmodel}(model, \dots) 
+\method{rmhstart}{rmhstart}(start, \dots) 
+\method{rmhstart}{list}(start, \dots) 
+rmpoint.I.allim(n, f, types)
+rpoint.multi(n, f, fmax, marks, win, giveup, verbose, warn, nsim, drop)
+runifpoispp(lambda, win, \dots, nsim, drop)
+runifpoisppOnLines(lambda, L, nsim, drop)
+spatstatClusterModelInfo(name, onlyPCP)
+spatstatRmhInfo(cifname)
+\method{summary}{rmhexpand}(object, \dots)
+
+
+}
+\details{
+  These internal \pkg{spatstat.random} functions should not be called
+  directly by the user. Their names and capabilities may change
+  without warning from one version of \pkg{spatstat.random} to the next.
+}
+\value{
+The return values of these functions are not documented,
+and may change without warning.
+}
+\keyword{internal}

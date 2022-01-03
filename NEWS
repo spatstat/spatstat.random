@@ -1,0 +1,23 @@
+
+        CHANGES IN spatstat.random VERSION 2.0-0
+
+OVERVIEW
+
+    o Package initialised
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o spatstat.random
+    The 'spatstat.core' package will be divided into two packages,
+    called 'spatstat.random' and 'spatstat.core'.
+    The new 'spatstat.random' package consists of functions for
+    generating random point patterns, and other random spatial data,
+    that were originally in 'spatstat.core'.
+    Currently 'spatstat.core' is unchanged while we stabilise and test
+    the new package 'spatstat.random'.
+
+
+
+    
+    
+    
