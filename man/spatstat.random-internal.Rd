@@ -2,9 +2,15 @@
 \title{Internal spatstat.random functions}
 
 \alias{change.default.expand}          
+\alias{datagen.runifpointOnLines}
+\alias{datagen.runifpoisppOnLines}
+\alias{datagen.rpoisppOnLines}
 \alias{default.clipwindow}
 \alias{expandwinPerfect}
+\alias{fakeNeyScot}
 \alias{getRandomFieldsModelGen}
+\alias{handle.rshift.args}
+\alias{HermiteCoefs}
 \alias{is.cadlag}
 \alias{is.expandable}
 \alias{is.expandable.rmhmodel}
@@ -18,6 +24,7 @@
 \alias{print.rmhInfoList}
 \alias{print.summary.rmhexpand}
 \alias{RandomFieldsSafe}
+\alias{reheat}
 \alias{resolve.vargamma.shape}
 \alias{rMaternInhibition}
 \alias{RmhExpandRule}
@@ -38,7 +45,10 @@
 \alias{runifpoisppOnLines}          
 \alias{spatstatClusterModelInfo}
 \alias{spatstatRmhInfo}
+\alias{summarise.trend}
 \alias{summary.rmhexpand}
+\alias{thinjump}
+\alias{update.rmhstart}
 
 
 
@@ -49,9 +59,16 @@
 \usage{
 
 change.default.expand(x, newdefault)
+datagen.runifpointOnLines(n, L)
+datagen.runifpoisppOnLines(lambda, L)
+datagen.rpoisppOnLines(lambda, L, lmax, \dots, check)
 default.clipwindow(object, epsilon)
 expandwinPerfect(W, expand, amount)
+fakeNeyScot(Y, lambda, win, saveLambda, saveparents)
 getRandomFieldsModelGen(model)
+handle.rshift.args(W, \dots, radius, width, height,
+                   edge, clip, edgedefault)
+HermiteCoefs(order)
 is.cadlag(s)
 is.expandable(x)
 \method{is.expandable}{rmhmodel}(x) 
@@ -65,6 +82,7 @@ MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
 \method{print}{rmhInfoList}(x, \dots)
 \method{print}{summary.rmhexpand}(x, \dots)
 RandomFieldsSafe()
+reheat(model, invtemp)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, default)
 rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
 RmhExpandRule(nama)
@@ -88,7 +106,10 @@ runifpoispp(lambda, win, \dots, nsim, drop)
 runifpoisppOnLines(lambda, L, nsim, drop)
 spatstatClusterModelInfo(name, onlyPCP)
 spatstatRmhInfo(cifname)
+summarise.trend(trend, w, a)
 \method{summary}{rmhexpand}(object, \dots)
+thinjump(n, p)
+\method{update}{rmhstart}(object, \dots)
 
 
 }
