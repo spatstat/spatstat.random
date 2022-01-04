@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.26 $ $Date: 2022/01/03 06:04:34 $
+##   $Revision: 1.27 $ $Date: 2022/01/04 05:30:06 $
 
 
 .Spatstat.ClusterModelInfoTable <- 

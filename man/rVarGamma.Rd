@@ -9,7 +9,7 @@
  rVarGamma(kappa, nu, scale, mu, win = owin(), 
            thresh = 0.001, nsim=1, drop=TRUE,
            saveLambda=FALSE, expand = NULL, ...,
-           poisthresh=1e-6, saveparents=TRUE)
+           poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE)
 }
 \arguments{
   \item{kappa}{
@@ -64,6 +64,14 @@
   \item{poisthresh}{
     Numerical threshold below which the model will be treated
     as a Poisson process. See Details.
+  }
+  \item{nonempty}{
+    Logical. If \code{TRUE} (the default), a more efficient algorithm is
+    used, in which parents are generated conditionally on having at
+    least one offspring point. If \code{FALSE}, parents are generated
+    even if they have no offspring. Both choices are valid; the default
+    is recommended unless you need to simulate all the parent points
+    for some other purpose.
   }
   \item{saveparents}{
     Logical value indicating whether to save the locations of the

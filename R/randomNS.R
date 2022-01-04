@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.28 $  $Date: 2021/12/23 04:48:50 $
+##   $Revision: 1.30 $  $Date: 2022/01/04 05:30:06 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -178,7 +178,7 @@ rMatClust <- local({
   rMatClust <- 
   function(kappa, scale, mu, win = owin(c(0,1),c(0,1)),
            nsim=1, drop=TRUE, saveLambda=FALSE, expand = scale, ...,
-           poisthresh=1e-6, saveparents=TRUE) {
+           poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
     ## Matern Cluster Process with Poisson (mu) offspring distribution
     ## Catch old scale syntax (r)
     if(missing(scale)) scale <- list(...)$r
@@ -203,6 +203,7 @@ rMatClust <- local({
 
     result <- rNeymanScott(kappa, scale, list(mu, rundisk), win, radius=scale,
                            nsim=nsim, drop=FALSE,
+                           nonempty=nonempty,
                            saveparents = saveparents || saveLambda)
     if(saveLambda){
       for(i in 1:nsim) {
@@ -229,7 +230,7 @@ rThomas <- local({
   rThomas <-
       function(kappa, scale, mu, win = owin(c(0,1),c(0,1)), nsim=1, drop=TRUE, 
                saveLambda=FALSE, expand = 4*scale, ...,
-               poisthresh=1e-6, saveparents=TRUE) {
+               poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
       ## Thomas process with Poisson(mu) number of offspring
       ## at isotropic Normal(0,sigma^2) displacements from parent
       ##
@@ -261,6 +262,7 @@ rThomas <- local({
       result <- rNeymanScott(kappa, expand, list(mu, gaus),
                              win, sigma=scale,
                              nsim=nsim, drop=FALSE,
+                             nonempty=nonempty,
                              saveparents = saveparents || saveLambda)  
       if(saveLambda){
         for(i in 1:nsim) {
@@ -296,7 +298,7 @@ rCauchy <- local({
   ## main function
   rCauchy <- function (kappa, scale, mu, win = owin(), thresh = 0.001,
                        nsim=1, drop=TRUE, saveLambda=FALSE, expand = NULL,
-                       ..., poisthresh=1e-6, saveparents=TRUE) {
+                       ..., poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
     ## scale / omega: scale parameter of Cauchy kernel function
     ## eta: scale parameter of Cauchy pair correlation function
 
@@ -335,6 +337,7 @@ rCauchy <- local({
     result <- rNeymanScott(kappa, expand,
                            list(mu, rnmix.invgam),
                            win, rate = scale^2/2, nsim=nsim, drop=FALSE,
+                           nonempty=nonempty,
                            saveparents = saveparents || saveLambda)
     ## correction from Abdollah: the rate is beta = omega^2 / 2 = eta^2 / 8.
     if(saveLambda){
@@ -370,10 +373,11 @@ rVarGamma <- local({
   }
 
   ## main function
-  rVarGamma <- function (kappa, nu, scale, mu, win = owin(),
-                         thresh = 0.001, nsim=1, drop=TRUE, saveLambda=FALSE,
-                         expand = NULL, ..., poisthresh=1e-6,
-                         saveparents=TRUE) {
+  rVarGamma <- function(kappa, nu, scale, mu, win = owin(),
+                        thresh = 0.001, nsim=1, drop=TRUE, saveLambda=FALSE,
+                        expand = NULL, ..., poisthresh=1e-6,
+                        nonempty = TRUE,
+                        saveparents=TRUE) {
     ## nu / nu.ker: smoothness parameter of Variance Gamma kernel function
     ## scale / omega: scale parameter of kernel function
     ## Catch old nu.ker/nu.pcf syntax and resolve nu-value.
@@ -422,6 +426,7 @@ rVarGamma <- local({
                            shape = nu + 1,
                            rate = 1/(2 * scale^2),
                            nsim=nsim, drop=FALSE,
+                           nonempty = nonempty,
                            saveparents = saveparents || saveLambda)
     if(saveLambda){
       for(i in 1:nsim) {

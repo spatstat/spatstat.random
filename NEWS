@@ -3,18 +3,38 @@
 
 OVERVIEW
 
-    o Package initialised
+    o We thank Dominic Schuhmacher for contributions.
+
+    o This is a new package containing code removed from spatstat.core
+
+    o Bug fixes in rmh visual debugger.
+
+    o Minor improvements
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
     o spatstat.random
-    The 'spatstat.core' package will be divided into two packages,
+    The 'spatstat.core' package has been divided into two packages,
     called 'spatstat.random' and 'spatstat.core'.
     The new 'spatstat.random' package consists of functions for
     generating random point patterns, and other random spatial data,
     that were originally in 'spatstat.core'.
-    Currently 'spatstat.core' is unchanged while we stabilise and test
-    the new package 'spatstat.random'.
+
+    o rMatClust, rThomas, rCauchy, rVarGamma
+    New argument 'nonempty'
+    
+BUG FIXES
+
+    o rmh
+    The visual debugger did not display accepted births and deaths correctly.
+    [Spotted by Dominic Schuhmacher.]
+    Fixed.
+
+    o rmh
+    The visual debugger exited prematurely sometimes,
+    if the current state was the empty point pattern.
+    [Spotted by Dominic Schuhmacher.]
+    Fixed.
 
 
 

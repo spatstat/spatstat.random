@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.104 $   $Date: 2021/04/17 03:29:58 $
+##    $Revision: 4.105 $   $Date: 2022/01/04 05:30:06 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)

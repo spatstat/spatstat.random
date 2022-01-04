@@ -347,6 +347,7 @@ trend corresponding to a particular type, there is still a component
   \code{\link{ppp}},
   \code{\link[spatstat.core]{ppm}}
   
+  Interactions: \rmhInteractionsList.
 }
 \section{Other models}{
   In theory, any finite point process model can be simulated using

@@ -78,8 +78,9 @@
   See \code{\link[spatstat.core]{reach.kppm}} and \code{\link[spatstat.core]{reach.dppm}}.
 }
 \seealso{
+    \code{\link[spatstat.core]{reach.ppm}}
 
-    \code{\link{rmhmodel}}
+     \code{\link{rmhmodel}}
 
     See \code{\link[spatstat.core]{reach.kppm}} and \code{\link[spatstat.core]{reach.dppm}}
     for other types of point process models.

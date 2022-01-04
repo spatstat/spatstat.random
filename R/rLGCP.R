@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.23 $    $Date: 2021/04/07 01:17:38 $
+#'  $Revision: 1.24 $    $Date: 2022/01/04 05:30:06 $
 #'
 
 rLGCP <- local({
