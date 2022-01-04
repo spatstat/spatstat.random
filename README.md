@@ -1,10 +1,14 @@
 # spatstat.random
 
-## EXPERIMENTAL: Random Generation and Simulation for the spatstat family
+## Random Generation and Simulation for the spatstat family
 
-This package `spatstat.random` is an EXPERIMENTAL sub-package
-of `spatstat.core`.
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/spatstat.random)](http://cran.r-project.org/web/packages/spatstat.random) 
+[![GitHub R package version](https://img.shields.io/github/r-package/v/spatstat/spatstat.random)](https://github.com/spatstat/spatstat.random)
 
+The original `spatstat` package has been split into
+several sub-packages.
+
+This package `spatstat.random` is one of these packages.
 It contains the functions for generating
 random spatial patterns of points according to many simple rules
 (complete spatial randomness, Poisson, binomial, random grid,
@@ -19,3 +23,6 @@ alternating Gibbs sampler).
 It also generates random spatial patterns of line segments,
 random tessellations, and random images (random noise, random mosaics).
 
+The reorganisation of `spatstat` into a family of packages is described
+on the GitHub repository
+[spatstat/spatstat](https://github.com/spatstat/spatstat).
