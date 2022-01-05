@@ -386,24 +386,11 @@ if(ALWAYS) {
 #
 # test decisions about expansion of simulation window
 #
-#  $Revision: 1.7 $  $Date: 2020/05/01 02:42:58 $
+#  $Revision: 1.8 $  $Date: 2022/01/05 02:06:32 $
 #
 
 local({
   if(FULLTEST) {
-    if(exists("ppm")) {
-      ## check expansion in rmhmodel.ppm
-      fit <- ppm(cells ~x)
-      mod <- rmhmodel(fit)
-      is.expandable(mod)
-      wsim <- as.rectangle(mod$trend)
-      ## work around changes in 'unitname'
-      wcel <- as.owin(cells)
-      unitname(wcel) <- unitname(cells)
-      ## test
-      if(!identical(wsim, wcel))
-        stop("Expansion occurred improperly in rmhmodel.ppm")
-    }
     ## rmhexpand class 
     a <- summary(rmhexpand(area=2))
     print(a)
@@ -419,9 +406,9 @@ local({
 #
 #  tests/rmhMulti.R
 #
-#  tests of rmh, running multitype point processes
+#  tests of rmh.default, running multitype point processes
 #
-#   $Revision: 1.16 $  $Date: 2020/05/01 05:29:42 $
+#   $Revision: 1.17 $  $Date: 2022/01/05 02:07:32 $
 
 local({
   if(!exists("nr"))  nr <- 2e3
@@ -674,9 +661,9 @@ reset.spatstat.options()
 #
 #   tests/rmhWeird.R
 #
-#   $Revision: 1.4 $  $Date: 2020/05/01 05:29:42 $
+#   $Revision: 1.5 $  $Date: 2022/01/05 02:08:29 $
 #
-# strange boundary cases
+#   Test strange boundary cases in rmh.default
 
 local({
    if(!exists("nv"))  nv <- 0
@@ -753,25 +740,8 @@ local({
 
 if(ALWAYS) { # involves C code
 local({
-  if(exists("ppm")) {
-    ## ......... rmhmodel.ppm .......................
-    fit1 <- ppm(redwood ~1,
-                Hybrid(A=Strauss(0.02), B=Geyer(0.1, 2), C=Geyer(0.15, 1)))
-    m1 <- rmhmodel(fit1)
-    m1
-    reach(m1)
+    
 
-    ## Test of handling 'IsOffset' 
-    fit2 <- ppm(cells ~1, Hybrid(H=Hardcore(0.05), G=Geyer(0.15, 2)))
-    m2 <- rmhmodel(fit2)
-    ## also test C code for hybrid interaction with hard core
-    fakecells <- rmh(fit2, nrep=1e4)
-
-    ## Test of handling Poisson components
-    fit3 <- ppm(cells ~1, Hybrid(P=Poisson(), S=Strauss(0.05)))
-    X3 <- rmh(fit3, control=list(nrep=1e3,expand=1), verbose=FALSE)
-  }
-  
   # ............ rmhmodel.default ............................
 
    modH <- list(cif=c("strauss","geyer"),
@@ -799,9 +769,10 @@ local({
    rmodPP <- rmhmodel(modPP)
    rmodPP
    reach(rmodPP)
-  
+
 })
 }
+
 #'
 #'   tests/rmhsnoopy.R
 #'
@@ -811,18 +782,14 @@ local({
 
 if(ALWAYS) { # may depend on platform
 local({
-  ## fit a model and prepare to simulate
   R <- 0.1
-  if(exists("ppm")) {
-    model <- ppm(amacrine ~ marks + x, Strauss(R))
-  } else {
-    W <- Window(amacrine)
-    t1 <- as.im(function(x,y){exp(8.2+0.22*x)}, W)
-    t2 <- as.im(function(x,y){exp(8.3+0.22*x)}, W)
-    model <- rmhmodel(cif="strauss",
-                      trend=solist(off=t1, on=t2),
-                      par=list(gamma=0.47, r=R, beta=c(off=1, on=1)))
-  }
+  ## define a model and prepare to simulate
+  W <- Window(amacrine)
+  t1 <- as.im(function(x,y){exp(8.2+0.22*x)}, W)
+  t2 <- as.im(function(x,y){exp(8.3+0.22*x)}, W)
+  model <- rmhmodel(cif="strauss",
+                    trend=solist(off=t1, on=t2),
+                    par=list(gamma=0.47, r=R, beta=c(off=1, on=1)))
   siminfo <- rmh(model, preponly=TRUE)
   Wsim <- siminfo$control$internal$w.sim
   Wclip <- siminfo$control$internal$w.clip
