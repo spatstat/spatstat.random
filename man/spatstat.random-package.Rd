@@ -15,20 +15,55 @@
   Its main focus is the analysis of
   spatial patterns of points in two-dimensional space.
 
-  The original \pkg{spatstat} package
-  has now been split into several
-  sub-packages.
-
-  This sub-package \pkg{spatstat.random} contains all the main
-  user-level functions
-  from the original \pkg{spatstat} package
-  that perform random generation of spatial patterns
-  and simulation of random point processes.
-
-  (The main exception is that functions for linear networks
+  This sub-package \pkg{spatstat.random} contains the
+  functions that perform random generation of spatial patterns
+  and simulation of random point processes:
+  \itemize{
+    \item
+    generating random spatial patterns of points
+    according to many simple rules
+    (complete spatial randomness, Poisson, binomial, random grid,
+    systematic, cell);
+    \item
+    randomised alteration of spatial patterns (thinning, random shifting,
+    jittering, random labelling);
+    \item
+    simulated realisations of random point processes
+    (simple sequential inhibition,
+    \Matern inhibition models,
+    \Matern cluster process,
+    Neyman-Scott cluster processes,
+    log-Gaussian Cox processes,
+    product shot noise cluster processes);
+    \item
+    simulation of Gibbs point processes
+    (Metropolis-Hastings birth-death-shift algorithm,
+    perfect simulation/ dominated coupling from the past,
+    alternating Gibbs sampler);
+    \item
+    generating random spatial patterns of line segments;
+    \item
+    generating random tessellations;
+    \item
+    generating random images (random noise, random mosaics).
+  }
+  (Functions for linear networks
   are in the separate sub-package \pkg{spatstat.linnet}.)
 }
 \section{Structure of the spatstat family}{  
+  The \pkg{spatstat} family of packages
+  is designed to support a complete statistical analysis
+  of spatial data. It supports
+  \itemize{
+    \item creation, manipulation and plotting of point patterns;
+    \item exploratory data analysis;
+    \item spatial random sampling;
+    \item simulation of point process models;
+    \item parametric model-fitting;
+    \item non-parametric smoothing and regression;
+    \item formal inference (hypothesis tests, confidence intervals);
+    \item model diagnostics.
+  }
   The orginal \pkg{spatstat} package grew to be very large.
   It has now been divided into several \bold{sub-packages}:
   \itemize{
@@ -69,23 +104,7 @@
   The extension packages must be installed separately
   and loaded explicitly if needed. They also have separate documentation.
 }
-\section{Overview of Functionality in \pkg{spatstat.random}}{
-  The \pkg{spatstat} family of packages
-  is designed to support a complete statistical analysis
-  of spatial data. It supports
-  \itemize{
-    \item creation, manipulation and plotting of point patterns;
-    \item exploratory data analysis;
-    \item spatial random sampling;
-    \item simulation of point process models;
-    \item parametric model-fitting;
-    \item non-parametric smoothing and regression;
-    \item formal inference (hypothesis tests, confidence intervals);
-    \item model diagnostics.
-  }
-  For an overview, see the help file for \code{"spatstat-package"}
-  in the \pkg{spatstat} package. 
-
+\section{Functionality in \pkg{spatstat.random}}{
   Following is a list of the functionality provided in the
   \pkg{spatstat.random} package only.
   

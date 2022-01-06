@@ -24,7 +24,8 @@ Neyman-Scott cluster processes, log-Gaussian Cox processes,
 product shot noise cluster processes)
 
 - simulation of Gibbs point processes
-(Metropolis-Hastings birth-death-shift algorithm,
+(Metropolis-Hastings birth-death-shift algorithm;
+perfect simulation/ dominated coupling from the past;
 alternating Gibbs sampler)
 
 - generating random spatial patterns of line segments
