@@ -2,9 +2,10 @@
 
 ## ................  Import packages ..................
 
-## import(stats,graphics,grDevices,utils,methods)
+## import(graphics,grDevices) not needed
 import(stats,utils,methods)
-import(spatstat.utils,spatstat.data,spatstat.sparse,spatstat.geom)
+import(spatstat.utils,spatstat.data,spatstat.geom)
+## import(spatstat.sparse) currently not needed
 
 importFrom("grDevices", "xy.coords")
 
