@@ -2,7 +2,6 @@
 
 ## ................  Import packages ..................
 
-## import(graphics,grDevices) not needed
 import(stats,utils,methods)
 import(spatstat.utils,spatstat.data,spatstat.geom)
 ## import(spatstat.sparse) currently not needed
@@ -84,6 +83,7 @@ export("reach")
 export("reach.rmhmodel")
 export("reheat")
 export("resolve.vargamma.shape")
+export("retrieve.param")
 export("rGaussPoisson")
 export("rHardcore")
 export("rjitter.psp")

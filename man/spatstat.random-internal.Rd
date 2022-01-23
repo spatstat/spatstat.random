@@ -26,6 +26,7 @@
 \alias{RandomFieldsSafe}
 \alias{reheat}
 \alias{resolve.vargamma.shape}
+\alias{retrieve.param}
 \alias{rMaternInhibition}
 \alias{RmhExpandRule}
 \alias{rmhsnoop}
@@ -84,6 +85,7 @@ MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
 RandomFieldsSafe()
 reheat(model, invtemp)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, default)
+retrieve.param(desired, aliases, \dots, par)
 rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
 RmhExpandRule(nama)
 \method{rmhcontrol}{rmhcontrol}(\dots) 

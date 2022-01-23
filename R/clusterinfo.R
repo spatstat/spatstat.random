@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.27 $ $Date: 2022/01/04 05:30:06 $
+##   $Revision: 1.29 $ $Date: 2022/01/23 08:13:44 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -44,29 +44,16 @@
              2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
          },
          ## Practical range of clusters
-         range = function(...){
-             dots <- list(...)
-             par <- dots$par
-             # Choose the first of the possible supplied values for scale:
-             scale <- c(dots$scale, dots$par[["scale"]],
-                        dots$sigma, dots$par[["sigma"]])[1L]
-             if(is.null(scale))
-               stop(paste("Argument ", sQuote("scale"), " must be given."),
-                    call.=FALSE)
-             thresh <- dots$thresh
-             if(!is.null(thresh)){
-               ## The squared length of isotropic Gaussian (sigma)
-               ## is exponential with mean 2 sigma^2
-               rmax <- scale * sqrt(2 * qexp(thresh, lower.tail=FALSE))
-               ## old code
-               ##  ddist <- .Spatstat.ClusterModelInfoTable$Thomas$ddist
-               ##  kernel0 <- clusterkernel("Thomas", scale = scale)(0,0)
-               ##  f <- function(r) ddist(r, scale = scale)-thresh*kernel0
-               ##  rmax <- uniroot(f, lower = scale, upper = 1000 * scale)$root
-             } else{
-                 rmax <- 4*scale
-             }
-             return(rmax)
+         range = function(..., thresh=NULL){
+           scale <- retrieve.param("scale", "sigma", ...)
+           if(!is.null(thresh)){
+             ## The squared length of isotropic Gaussian (sigma)
+             ## is exponential with mean 2 sigma^2
+             rmax <- scale * sqrt(2 * qexp(thresh, lower.tail=FALSE))
+           } else {
+             rmax <- 4*scale
+           }
+           return(rmax)
          },
          kernel = function(par, rvals, ...) {
              scale <- sqrt(par[2L])
@@ -143,17 +130,12 @@
              ifelse(r>scale, 0, 2 * r / scale^2)
          },
          ## Practical range of clusters
-         range = function(...){
-             dots <- list(...)
-             par <- dots$par
-             # Choose the first of the possible supplied values for scale:
-             scale <- c(dots$scale, dots$par[["scale"]], dots$R, dots$par[["R"]])[1L]
-             if(is.null(scale))
-               stop(paste("Argument ", sQuote("scale"), " must be given."),
-                    call.=FALSE)
-           if(!is.null(dots$thresh))
-               warning("Argument ", sQuote("thresh"), " is ignored for Matern Cluster model")
-             return(scale)
+         range = function(..., thresh=NULL){
+           scale <- retrieve.param("scale", "R", ...)
+           if(!is.null(thresh))
+             warning("Argument", sQuote("thresh"),
+                     "is ignored for Matern Cluster model")
+           return(scale)
          },
          checkclustargs = function(margs, old = TRUE, ...) list(),
          resolvedots = function(...){
@@ -288,23 +270,13 @@
              r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
          },
          ## Practical range of clusters
-         range = function(...){
-             dots <- list(...)
-             # Choose the first of the possible supplied values for scale:
-             scale <- c(dots$scale, dots$par[["scale"]])[1L]
-             if(is.null(scale))
-               stop(paste("Argument ", sQuote("scale"), " must be given."),
-                    call.=FALSE)
-             thresh <- dots$thresh %orifnull% 0.01
-             ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
-             ## solve for integral = 1-thresh:
-             rmax <- scale * sqrt(1/thresh^2 - 1)
-             ## old code
-             ## ddist <- .Spatstat.ClusterModelInfoTable$Cauchy$ddist
-             ## kernel0 <- clusterkernel("Cauchy", scale = scale)(0,0)
-             ## f <- function(r) ddist(r, scale = scale)-thresh*kernel0
-             ## rmax <- uniroot(f, lower = scale, upper = 1000 * scale)$root
-             return(rmax)
+         range = function(..., thresh=0.01){
+           thresh <- as.numeric(thresh %orifnull% 0.01)
+           scale <- retrieve.param("scale", character(0), ...)
+           ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
+           ## solve for integral = 1-thresh:
+           rmax <- scale * sqrt(1/thresh^2 - 1)
+           return(rmax)
          },
          kernel = function(par, rvals, ...) {
              scale <- sqrt(par[2L])/2
@@ -406,32 +378,22 @@
              numer/denom
          },
          ## Practical range of clusters
-         range = function(...){
-             dots <- list(...)
-             # Choose the first of the possible supplied values for scale:
-             scale <- c(dots$scale, dots$par[["scale"]])[1L]
-             if(is.null(scale))
-               stop(paste("Argument ", sQuote("scale"), " must be given."),
-                    call.=FALSE)
-             # Find value of nu:
-             extra <- .Spatstat.ClusterModelInfoTable$VarGamma$resolvedots(...)
-             nu <- .Spatstat.ClusterModelInfoTable$VarGamma$checkclustargs(extra$margs, old=FALSE)$nu
-             if(is.null(nu))
-               stop(paste("Argument ", sQuote("nu"), " must be given."),
-                    call.=FALSE)
-             thresh <- dots$thresh
-             if(is.null(thresh))
-                 thresh <- .001
-             ddist <- .Spatstat.ClusterModelInfoTable$VarGamma$ddist
-             f1 <- function(rmx) {
-               integrate(ddist, 0, rmx, scale=scale, nu=nu)$value - (1 - thresh)
-             }
-             f <- Vectorize(f1)
-             ## old code
-             ## kernel0 <- clusterkernel("VarGamma", scale = scale, nu = nu)(0,0)
-             ## f <- function(r) ddist(r, scale = scale, nu = nu) - thresh*kernel0
-             rmax <- uniroot(f, lower = scale, upper = 1000 * scale)$root
-             return(rmax)
+         range = function(..., thresh=0.001){
+           thresh <- as.numeric(thresh %orifnull% 0.001)
+           scale <- retrieve.param("scale", character(0), ...)
+           ## Find value of nu:
+           extra <- .Spatstat.ClusterModelInfoTable$VarGamma$resolvedots(...)
+           nu <- .Spatstat.ClusterModelInfoTable$VarGamma$checkclustargs(extra$margs, old=FALSE)$nu
+           if(is.null(nu))
+             stop(paste("Argument ", sQuote("nu"), " must be given."),
+                  call.=FALSE)
+           ddist <- .Spatstat.ClusterModelInfoTable$VarGamma$ddist
+           f1 <- function(rmx) {
+             integrate(ddist, 0, rmx, scale=scale, nu=nu)$value - (1 - thresh)
+           }
+           f <- Vectorize(f1)
+           rmax <- uniroot(f, lower = scale, upper = 1000 * scale)$root
+           return(rmax)
          },
          ## kernel function in polar coordinates (no angular argument).
          kernel = function(par, rvals, ..., margs) {
@@ -715,6 +677,31 @@ spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
 }
 
 ## ................. helper functions (user-callable) ....................
+
+## The following function simplifies code maintenance
+## (due to changes in subscripting behaviour in recent versions of R)
+
+retrieve.param <- function(desired, aliases, ..., par=NULL) {
+  ## Retrieve the parameter named <desired> (or one of its <aliases>)
+  ## from (...) or from 'par'
+  dots <- list(...)
+  par  <- as.list(par) # may be empty
+  dnames <- names(dots)
+  pnames <- names(par)
+  for(key in c(desired, aliases)) {
+    if(key %in% dnames) return(dots[[key]])
+    if(key %in% pnames) return(par[[key]])
+  }
+  ## failed
+  nali <- length(aliases)
+  mess <- paste("Expecting argument", sQuote(desired),
+                if(nali == 0) NULL else
+                paste(ngettext(nali, "or alias", "or aliases"),
+                      commasep(sQuote(aliases), " or ")))
+  message(mess)
+  stop(paste0("Argument ", sQuote(desired), " must be given ", alia),
+       call.=FALSE)
+}
 
 resolve.vargamma.shape <- function(...,
                                    nu.ker=NULL, nu.pcf=NULL, default = FALSE) {
