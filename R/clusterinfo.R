@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.29 $ $Date: 2022/01/23 08:13:44 $
+##   $Revision: 1.31 $ $Date: 2022/01/23 10:43:10 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -18,22 +18,23 @@
          parnames = c("kappa", "sigma2"),
          clustargsnames = NULL,
          checkpar = function(par, old = TRUE, ...){
-             if(is.null(par))
-               par <- c(kappa=1,scale=1)
-             if(any(par<=0))
-               stop("par values must be positive.", call.=FALSE)
-             nam <- check.named.vector(par, c("kappa","sigma2"),
-                                       onError="null")
-             if(is.null(nam)) {
-               check.named.vector(par, c("kappa","scale"))
-               names(par)[2L] <- "sigma2"
-               par[2L] <- par[2L]^2
-             }
-             if(!old){
-               names(par)[2L] <- "scale"
-               par[2L] <- sqrt(par[2L])
-             }
-             return(par)
+           ## 'par' is in either format
+           if(is.null(par))
+             par <- c(kappa=1,scale=1)
+           if(any(par<=0))
+             stop("par values must be positive.", call.=FALSE)
+           nam <- check.named.vector(par, c("kappa","sigma2"),
+                                     onError="null")
+           if(is.null(nam)) {
+             check.named.vector(par, c("kappa","scale"))
+             names(par)[2L] <- "sigma2"
+             par[2L] <- par[2L]^2
+           }
+           if(!old){
+             names(par)[2L] <- "scale"
+             par[2L] <- sqrt(par[2L])
+           }
+           return(par)
          },
          checkclustargs = function(margs, old = TRUE, ...) list(),
          resolvedots = function(...){
@@ -41,11 +42,13 @@
          },
          # density function for the distance to offspring
          ddist = function(r, scale, ...) {
-             2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
+           ## 'scale' is generic format
+           2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
          },
          ## Practical range of clusters
-         range = function(..., thresh=NULL){
-           scale <- retrieve.param("scale", "sigma", ...)
+         range = function(..., par=NULL, thresh=NULL){
+           ## 'par' is in generic format
+           scale <- retrieve.param("scale", "sigma", ..., par=par)
            if(!is.null(thresh)){
              ## The squared length of isotropic Gaussian (sigma)
              ## is exponential with mean 2 sigma^2
@@ -56,24 +59,28 @@
            return(rmax)
          },
          kernel = function(par, rvals, ...) {
-             scale <- sqrt(par[2L])
-             dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
+           ## 'par' is in idiosyncratic ('old') format
+           scale <- sqrt(par[2L])
+           dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
          },
          isPCP=TRUE,
          ## K-function
          K = function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            pi*rvals^2+(1-exp(-rvals^2/(4*par[2L])))/par[1L]
          },
          ## pair correlation function
          pcf= function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            1 + exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L] * par[2L])
          },
          ## gradient of pcf (contributed by Chiara Fend)
          Dpcf= function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0)){
              dsigma2 <- rep.int(Inf, length(rvals))
              dkappa <- rep.int(Inf, length(rvals))
@@ -87,6 +94,7 @@
          },
          ## sensible starting parameters
          selfstart = function(X) {
+           ## return 'par' in idiosyncratic ('old') format
            kappa <- intensity(X)
            sigma2 <- 4 * mean(nndist(X))^2
            c(kappa=kappa, sigma2=sigma2)
@@ -111,7 +119,8 @@
          parnames = c("kappa", "R"),
          clustargsnames = NULL,
          checkpar = function(par, old = TRUE, ...){
-             if(is.null(par))
+           ## 'par' is in either format
+           if(is.null(par))
                  par <- c(kappa=1,scale=1)
              if(any(par<=0))
                  stop("par values must be positive.", call.=FALSE)
@@ -127,11 +136,13 @@
          },
          # density function for the distance to offspring
          ddist = function(r, scale, ...) {
-             ifelse(r>scale, 0, 2 * r / scale^2)
+           ## 'scale' is generic format
+           ifelse(r>scale, 0, 2 * r / scale^2)
          },
          ## Practical range of clusters
-         range = function(..., thresh=NULL){
-           scale <- retrieve.param("scale", "R", ...)
+         range = function(..., par=NULL, thresh=NULL){
+           ## 'par' is in generic format
+           scale <- retrieve.param("scale", "R", ..., par=par)
            if(!is.null(thresh))
              warning("Argument", sQuote("thresh"),
                      "is ignored for Matern Cluster model")
@@ -142,11 +153,13 @@
            return(list(...))
          },
          kernel = function(par, rvals, ...) {
-             scale <- par[2L]
-             ifelse(rvals>scale, 0, 1/(pi*scale^2))
+           ## 'par' is in idiosyncratic ('old') format
+           scale <- par[2L]
+           ifelse(rvals>scale, 0, 1/(pi*scale^2))
          },
          isPCP=TRUE,
          K = function(par,rvals, ..., funaux){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            kappa <- par[1L]
@@ -156,6 +169,7 @@
            return(y)
          },
          pcf= function(par,rvals, ..., funaux){
+           ## 'par' is in idiosyncratic ('old') format
              if(any(par <= 0))
                return(rep.int(Inf, length(rvals)))
              kappa <- par[1L]
@@ -165,6 +179,7 @@
              return(y)
          },
          Dpcf= function(par,rvals, ..., funaux){
+           ## 'par' is in idiosyncratic ('old') format
            kappa <- par[1L]
            R <- par[2L]
            g <- funaux$g
@@ -221,6 +236,7 @@
            }),
          ## sensible starting paramters
          selfstart = function(X) {
+           ## return 'par' in idiosyncratic ('old') format
            kappa <- intensity(X)
            R <- 2 * mean(nndist(X)) 
            c(kappa=kappa, R=R)
@@ -245,7 +261,8 @@
          parnames = c("kappa", "eta2"),
          clustargsnames = NULL,
          checkpar = function(par, old = TRUE, ...){
-             if(is.null(par))
+           ## 'par' is in either format
+           if(is.null(par))
                  par <- c(kappa=1,scale=1)
              if(any(par<=0))
                  stop("par values must be positive.", call.=FALSE)
@@ -267,33 +284,39 @@
          },
          # density function for the distance to offspring
          ddist = function(r, scale, ...) {
-             r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
+           ## 'scale' is generic format
+           r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
          },
          ## Practical range of clusters
-         range = function(..., thresh=0.01){
+         range = function(..., par=NULL, thresh=0.01){
+           ## 'par' is in generic format
            thresh <- as.numeric(thresh %orifnull% 0.01)
-           scale <- retrieve.param("scale", character(0), ...)
+           scale <- retrieve.param("scale", character(0), ..., par=par)
            ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
            ## solve for integral = 1-thresh:
            rmax <- scale * sqrt(1/thresh^2 - 1)
            return(rmax)
          },
          kernel = function(par, rvals, ...) {
-             scale <- sqrt(par[2L])/2
-             1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
+           ## 'par' is in idiosyncratic ('old') format
+           scale <- sqrt(par[2L])/2
+           1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
          },
          isPCP=TRUE,
          K = function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
          },
          pcf= function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
          },
          Dpcf= function(par,rvals, ...){
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0)){
              dkappa <- rep.int(Inf, length(rvals))
              deta2 <- rep.int(Inf, length(rvals))
@@ -306,6 +329,7 @@
            return(out)
          },
          selfstart = function(X) {
+           ## return 'par' in idiosyncratic ('old') format
            kappa <- intensity(X)
            eta2 <- 4 * mean(nndist(X))^2
            c(kappa = kappa, eta2 = eta2)
@@ -333,7 +357,8 @@
          parnames = c("kappa", "eta"),
          clustargsnames = "nu",
          checkpar = function(par, old = TRUE, ...){
-             if(is.null(par))
+           ## 'par' is in either format
+           if(is.null(par))
                  par <- c(kappa=1,scale=1)
              if(any(par<=0))
                  stop("par values must be positive.", call.=FALSE)
@@ -372,15 +397,17 @@
          },
          # density function for the distance to offspring
          ddist = function(r, scale, nu, ...) {
-             numer <- ((r/scale)^(nu+1)) * besselK(r/scale, nu)
-             numer[r==0] <- 0
-             denom <- (2^nu) * scale * gamma(nu + 1)
-             numer/denom
+           ## 'scale' is generic format
+           numer <- ((r/scale)^(nu+1)) * besselK(r/scale, nu)
+           numer[r==0] <- 0
+           denom <- (2^nu) * scale * gamma(nu + 1)
+           numer/denom
          },
          ## Practical range of clusters
-         range = function(..., thresh=0.001){
+         range = function(..., par=NULL, thresh=0.001){
+           ## 'par' is in generic format
            thresh <- as.numeric(thresh %orifnull% 0.001)
-           scale <- retrieve.param("scale", character(0), ...)
+           scale <- retrieve.param("scale", character(0), ..., par=par)
            ## Find value of nu:
            extra <- .Spatstat.ClusterModelInfoTable$VarGamma$resolvedots(...)
            nu <- .Spatstat.ClusterModelInfoTable$VarGamma$checkclustargs(extra$margs, old=FALSE)$nu
@@ -397,6 +424,7 @@
          },
          ## kernel function in polar coordinates (no angular argument).
          kernel = function(par, rvals, ..., margs) {
+           ## 'par' is in idiosyncratic ('old') format
              scale <- as.numeric(par[2L])
              nu <- margs$nu
              if(is.null(nu))
@@ -417,6 +445,7 @@
              return(x * (1 + numer/denom))
            }
            vargammaK <- function(par,rvals, ..., margs){
+             ## 'par' is in idiosyncratic ('old') format
              ## margs = list(.. nu.pcf.. ) 
              if(any(par <= 0))
                return(rep.int(Inf, length(rvals)))
@@ -453,6 +482,7 @@
            vargammaK
            }), ## end of 'local'
          pcf= function(par,rvals, ..., margs){
+           ## 'par' is in idiosyncratic ('old') format
            ## margs = list(..nu.pcf..)
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
@@ -478,6 +508,7 @@
          },
          ## sensible starting values
          selfstart = function(X) {
+           ## return 'par' in idiosyncratic ('old') format
            kappa <- intensity(X)
            eta <- 2 * mean(nndist(X))
            c(kappa=kappa, eta=eta)
@@ -501,7 +532,8 @@
          printmodelname = function(...) "log-Gaussian Cox process", # Used by print.kppm
          parnames = c("sigma2", "alpha"),
          checkpar = function(par, old = TRUE, ...){
-             if(is.null(par))
+           ## 'par' is in either format
+           if(is.null(par))
                  par <- c(var=1,scale=1)
              if(any(par<=0))
                  stop("par values must be positive.", call.=FALSE)
@@ -550,6 +582,7 @@
          isPCP=FALSE,
          ## calls relevant covariance function from RandomFields package
          K = function(par, rvals, ..., model, margs) {
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            if(model == "exponential") {
@@ -594,6 +627,7 @@
            return(th)
          },
          pcf= function(par, rvals, ..., model, margs) {
+           ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
            if(model == "exponential") {
@@ -614,6 +648,7 @@
            return(gtheo)
          },
          Dpcf= function(par,rvals, ..., model){
+           ## 'par' is in idiosyncratic ('old') format
            if(!identical(model, "exponential")) {
              stop("Gradient of the pcf not available for this model.")
            } 
@@ -637,6 +672,7 @@
          },
          ## sensible starting values
          selfstart = function(X) {
+           ## return 'par' in idiosyncratic ('old') format
            alpha <- 2 * mean(nndist(X))
            c(sigma2=1, alpha=alpha)
          },
@@ -682,7 +718,7 @@ spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
 ## (due to changes in subscripting behaviour in recent versions of R)
 
 retrieve.param <- function(desired, aliases, ..., par=NULL) {
-  ## Retrieve the parameter named <desired> (or one of its <aliases>)
+  ## Retrieve the generic parameter named <desired> (or one of its <aliases>)
   ## from (...) or from 'par'
   dots <- list(...)
   par  <- as.list(par) # may be empty
@@ -694,13 +730,13 @@ retrieve.param <- function(desired, aliases, ..., par=NULL) {
   }
   ## failed
   nali <- length(aliases)
-  mess <- paste("Expecting argument", sQuote(desired),
-                if(nali == 0) NULL else
-                paste(ngettext(nali, "or alias", "or aliases"),
-                      commasep(sQuote(aliases), " or ")))
-  message(mess)
-  stop(paste0("Argument ", sQuote(desired), " must be given ", alia),
-       call.=FALSE)
+  if(nali == 0) {
+    explain <- NULL
+  } else {
+    explain <- paste("also tried", ngettext(nali, "alias", "aliases"), commasep(sQuote(aliases)))
+  }
+  mess <- paste("Unable to retrieve argument", sQuote(desired), paren(explain))
+  stop(mess, call.=FALSE)
 }
 
 resolve.vargamma.shape <- function(...,
