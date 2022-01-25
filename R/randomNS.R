@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.30 $  $Date: 2022/01/04 05:30:06 $
+##   $Revision: 1.31 $  $Date: 2022/01/25 12:22:52 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -76,9 +76,12 @@ rNeymanScott <-
 
   resultlist <- vector(mode="list", length=nsim)
   for(i in 1:nsim) {
+
+    if(i > 1) gc(FALSE)
+
     parents <- parentlist[[i]]
-    
     np <- npoints(parents)
+    
     ## generate cluster sizes
     if(np == 0) {
       ## no parents - empty pattern

@@ -1,9 +1,15 @@
 
-        CHANGES IN spatstat.random VERSION 2.0-0.003
+        CHANGES IN spatstat.random VERSION 2.0-0.006
 
 OVERVIEW
 
     o Internal repairs.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rMatClust, rThomas, rCauchy, rVarGamma
+    If nsim > 1, garbage collection is performed before each simulation
+    to reduce memory usage.
 
         CHANGES IN spatstat.random VERSION 2.0-0
 
@@ -28,7 +34,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
     o rMatClust, rThomas, rCauchy, rVarGamma
     New argument 'nonempty'
-    
+
 BUG FIXES
 
     o rmh
