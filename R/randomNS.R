@@ -77,7 +77,7 @@ rNeymanScott <-
   resultlist <- vector(mode="list", length=nsim)
   for(i in 1:nsim) {
 
-    if(i > 1) gc(FALSE)
+    ## if(i > 1) gc(FALSE)
 
     parents <- parentlist[[i]]
     np <- npoints(parents)

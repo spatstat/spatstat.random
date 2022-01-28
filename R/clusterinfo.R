@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.31 $ $Date: 2022/01/23 10:43:10 $
+##   $Revision: 1.32 $ $Date: 2022/01/28 11:10:54 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -144,8 +144,8 @@
            ## 'par' is in generic format
            scale <- retrieve.param("scale", "R", ..., par=par)
            if(!is.null(thresh))
-             warning("Argument", sQuote("thresh"),
-                     "is ignored for Matern Cluster model")
+             warn.once("thresh.Matern",
+                       "Argument", sQuote("thresh"), "is ignored for Matern Cluster model")
            return(scale)
          },
          checkclustargs = function(margs, old = TRUE, ...) list(),
