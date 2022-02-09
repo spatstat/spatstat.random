@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.32 $ $Date: 2022/01/28 11:10:54 $
+##   $Revision: 1.34 $ $Date: 2022/02/09 08:28:07 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -554,7 +554,34 @@
            cmod <- dots$covmodel
            model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
            margs <- NULL
-           if(!identical(model, "exponential")) {
+           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
+             ## avoid RandomFields package
+             ## extract shape parameters and validate them
+             switch(model,
+                    fastStable = {
+                      stuff <- cmod %orifnull% dots
+                      ok <- "alpha" %in% names(stuff)
+                      if(!ok) stop("Parameter 'alpha' is required")
+                      margs <- stuff["alpha"]
+                      with(margs, {
+                        check.1.real(alpha)
+                        stopifnot(0 < alpha && alpha <= 2)
+                      })
+                    },
+                    fastGencauchy = {
+                      stuff <- cmod %orifnull% dots
+                      ok <- c("alpha", "beta") %in% names(stuff)
+                      if(!ok[1]) stop("Parameter 'alpha' is required")
+                      if(!ok[2]) stop("Parameter 'beta' is required")
+                      margs <- stuff[c("alpha", "beta")]
+                      with(margs, {
+                        check.1.real(alpha)
+                        check.1.real(beta)
+                        stopifnot(0 < alpha && alpha <= 2)
+                        stopifnot(beta > 0)
+                      })
+                    })
+           } else {
              ## get the 'model generator' 
              modgen <- getRandomFieldsModelGen(model)
              attr(model, "modgen") <- modgen
@@ -585,42 +612,61 @@
            ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
-           if(model == "exponential") {
+           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
              ## For efficiency and to avoid need for RandomFields package
-             integrand <- function(r,par,...) 2*pi*r*exp(par[1L]*exp(-r/par[2L]))
+             switch(model,
+                    exponential = {
+                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-r/par[2L])) }
+                    },
+                    fastGauss = {
+                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^2)) }
+                    },
+                    fastStable = {
+                      alpha <- margs[["alpha"]]
+                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^alpha)) }
+                    },
+                    fastGencauchy = {
+                      alpha <- margs[["alpha"]]
+                      beta  <- margs[["beta"]]
+                      integrand <- function(r) { 2*pi*r*exp(par[1L] * (1 + (r/par[2L])^alpha)^(-beta/alpha)) }
+                    })
            } else {
+             ## Use RandomFields package
              kraeverRandomFields()
-             integrand <- function(r,par,model,margs) {
-               modgen <- attr(model, "modgen")
-               if(length(margs) == 0) {
-                 mod <- modgen(var=par[1L], scale=par[2L])
-               } else {
-                 mod <- do.call(modgen,
-                                append(list(var=par[1L], scale=par[2L]),
-                                       margs))
-               }
-               2*pi *r *exp(RandomFields::RFcov(model=mod, x=r))
+             modgen <- attr(model, "modgen")
+             ## create the model with the specified parameters
+             if(length(margs) == 0) {
+               mod <- modgen(var=par[1L], scale=par[2L])
+             } else {
+               mod <- do.call(modgen,
+                              append(list(var=par[1L], scale=par[2L]),
+                                     margs))
              }
+             integrand <- function(r) { 2*pi*r*exp(RandomFields::RFcov(model=mod, x=r)) }
            }
-           nr <- length(rvals)
-           th <- numeric(nr)
            if(spatstat.options("fastK.lgcp")) {
-             ## integrate using Simpson's rule
-             fvals <- integrand(r=rvals, par=par, model=model, margs=margs)
-             th[1L] <- rvals[1L] * fvals[1L]/2
-             if(nr > 1)
-               for(i in 2:nr)
-                 th[i] <- th[i-1L] +
-                   (rvals[i] - rvals[i-1L]) * (fvals[i] + fvals[i-1L])/2
+             ## indefinite integration using Simpson's rule
+             ## First make a finer sequence of r values
+             maxblow <- floor(.Machine$integer.max/length(rvals))
+             delta <- mean(diff(rvals))/min(16, maxblow)
+             fs <- fillseq(rvals, delta)
+             rfine <- fs$xnew
+             inject <- fs$i
+             ## Evaluate integrand on finer sequence
+             y <- integrand(r=rfine)
+             ny <- length(y)
+             ## Simpson's Rule
+             th <- cumsum(diff(c(0, rfine)) * (y + c(0, y[-ny]))/2)
+             ## extract values of indefinite integral for original r sequence
+             th <- th[inject]
            } else {
-             ## integrate using 'integrate'
+             ## indefinite integration using 'integrate' on each interval
+             nr <- length(rvals)
+             th <- numeric(nr)
              th[1L] <- if(rvals[1L] == 0) 0 else 
-             integrate(integrand,lower=0,upper=rvals[1L],
-                       par=par,model=model,margs=margs)$value
+             integrate(integrand,lower=0,upper=rvals[1L])
              for (i in 2:length(rvals)) {
-               delta <- integrate(integrand,
-                                  lower=rvals[i-1L],upper=rvals[i],
-                                  par=par,model=model,margs=margs)
+               delta <- integrate(integrand, lower=rvals[i-1L], upper=rvals[i])
                th[i]=th[i-1L]+delta$value
              }
            }
@@ -630,12 +676,29 @@
            ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
-           if(model == "exponential") {
+           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
              ## For efficiency and to avoid need for RandomFields package
-             gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
+             switch(model,
+                    exponential = {
+                      gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
+                    },
+                    fastGauss = {
+                      gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^2))
+                    },
+                    fastStable = {
+                      alpha <- margs[["alpha"]]
+                      gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^alpha))
+                    },
+                    fastGencauchy = {
+                      alpha <- margs[["alpha"]]
+                      beta  <- margs[["beta"]]
+                      gtheo <- exp(par[1L] * (1 + (rvals/par[2L])^alpha)^(-beta/alpha))
+                    })
            } else {
+             ## use RandomFields
              kraeverRandomFields()
              modgen <- attr(model, "modgen")
+             ## create the model with the specified parameters
              if(length(margs) == 0) {
                mod <- modgen(var=par[1L], scale=par[2L])
              } else {
@@ -643,6 +706,7 @@
                               append(list(var=par[1L], scale=par[2L]),
                                      margs))
              }
+             ## calculate pcf
              gtheo <- exp(RandomFields::RFcov(model=mod, x=rvals))
            }
            return(gtheo)
