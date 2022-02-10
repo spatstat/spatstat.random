@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.34 $ $Date: 2022/02/09 08:28:07 $
+##   $Revision: 1.35 $ $Date: 2022/02/10 00:06:56 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -554,10 +554,13 @@
            cmod <- dots$covmodel
            model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
            margs <- NULL
-           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
+           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
+              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
              ## avoid RandomFields package
              ## extract shape parameters and validate them
              switch(model,
+                    stable = ,
                     fastStable = {
                       stuff <- cmod %orifnull% dots
                       ok <- "alpha" %in% names(stuff)
@@ -568,6 +571,7 @@
                         stopifnot(0 < alpha && alpha <= 2)
                       })
                     },
+                    gencauchy = ,
                     fastGencauchy = {
                       stuff <- cmod %orifnull% dots
                       ok <- c("alpha", "beta") %in% names(stuff)
@@ -612,19 +616,24 @@
            ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
-           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
+           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) || 
+              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
              ## For efficiency and to avoid need for RandomFields package
              switch(model,
                     exponential = {
                       integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-r/par[2L])) }
                     },
+                    gauss = ,
                     fastGauss = {
                       integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^2)) }
                     },
+                    stable = ,
                     fastStable = {
                       alpha <- margs[["alpha"]]
                       integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^alpha)) }
                     },
+                    gencauchy = ,
                     fastGencauchy = {
                       alpha <- margs[["alpha"]]
                       beta  <- margs[["beta"]]
