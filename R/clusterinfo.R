@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.35 $ $Date: 2022/02/10 00:06:56 $
+##   $Revision: 1.36 $ $Date: 2022/02/11 08:22:25 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -12,7 +12,7 @@
          ## Thomas process: old par = (kappa, sigma2) (internally used everywhere)
          ## Thomas process: new par = (kappa, scale) (officially recommended for input/output)
          modelname = "Thomas process", # In modelname field of mincon fv obj.
-         descname = "Thomas process", # In desc field of mincon fv obj.
+         descname = "Thomas process", # In desc field of mincon fvb obj.
          modelabbrev = "Thomas process", # In fitted obj.
          printmodelname = function(...) "Thomas process", # Used by print.kppm
          parnames = c("kappa", "sigma2"),
@@ -654,7 +654,7 @@
              integrand <- function(r) { 2*pi*r*exp(RandomFields::RFcov(model=mod, x=r)) }
            }
            if(spatstat.options("fastK.lgcp")) {
-             ## indefinite integration using Simpson's rule
+             ## indefinite integration using trapezoidal rule
              ## First make a finer sequence of r values
              maxblow <- floor(.Machine$integer.max/length(rvals))
              delta <- mean(diff(rvals))/min(16, maxblow)
@@ -664,7 +664,7 @@
              ## Evaluate integrand on finer sequence
              y <- integrand(r=rfine)
              ny <- length(y)
-             ## Simpson's Rule
+             ## trapezoidal rule
              th <- cumsum(diff(c(0, rfine)) * (y + c(0, y[-ny]))/2)
              ## extract values of indefinite integral for original r sequence
              th <- th[inject]
@@ -685,19 +685,24 @@
            ## 'par' is in idiosyncratic ('old') format
            if(any(par <= 0))
              return(rep.int(Inf, length(rvals)))
-           if(model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) {
+           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
+              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
              ## For efficiency and to avoid need for RandomFields package
              switch(model,
                     exponential = {
                       gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
                     },
+                    gauss = ,
                     fastGauss = {
                       gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^2))
                     },
+                    stable = ,
                     fastStable = {
                       alpha <- margs[["alpha"]]
                       gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^alpha))
                     },
+                    gencauchy = ,
                     fastGencauchy = {
                       alpha <- margs[["alpha"]]
                       beta  <- margs[["beta"]]
