@@ -1,9 +1,17 @@
 
-        CHANGES IN spatstat.random VERSION 2.0-0.011
+        CHANGES IN spatstat.random VERSION 2.0-0.012
 
 OVERVIEW
 
+    o Indefinite integral.
+
     o Internal repairs and improvements.
+
+NEW FUNCTIONS
+
+    o indefinteg
+    Numerically computes the indefinite integral of a function.
+
 
         CHANGES IN spatstat.random VERSION 2.0-0
 

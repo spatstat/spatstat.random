@@ -3,7 +3,7 @@
 ##   Lookup table of explicitly-known K functions and pcf
 ##   and algorithms for computing sensible starting parameters
 ##
-##   $Revision: 1.36 $ $Date: 2022/02/11 08:22:25 $
+##   $Revision: 1.37 $ $Date: 2022/02/11 13:23:47 $
 
 
 .Spatstat.ClusterModelInfoTable <- 
@@ -653,32 +653,9 @@
              }
              integrand <- function(r) { 2*pi*r*exp(RandomFields::RFcov(model=mod, x=r)) }
            }
-           if(spatstat.options("fastK.lgcp")) {
-             ## indefinite integration using trapezoidal rule
-             ## First make a finer sequence of r values
-             maxblow <- floor(.Machine$integer.max/length(rvals))
-             delta <- mean(diff(rvals))/min(16, maxblow)
-             fs <- fillseq(rvals, delta)
-             rfine <- fs$xnew
-             inject <- fs$i
-             ## Evaluate integrand on finer sequence
-             y <- integrand(r=rfine)
-             ny <- length(y)
-             ## trapezoidal rule
-             th <- cumsum(diff(c(0, rfine)) * (y + c(0, y[-ny]))/2)
-             ## extract values of indefinite integral for original r sequence
-             th <- th[inject]
-           } else {
-             ## indefinite integration using 'integrate' on each interval
-             nr <- length(rvals)
-             th <- numeric(nr)
-             th[1L] <- if(rvals[1L] == 0) 0 else 
-             integrate(integrand,lower=0,upper=rvals[1L])
-             for (i in 2:length(rvals)) {
-               delta <- integrate(integrand, lower=rvals[i-1L], upper=rvals[i])
-               th[i]=th[i-1L]+delta$value
-             }
-           }
+           ## compute indefinite integral
+           imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
+           th <- indefinteg(integrand, rvals, start=0, method=imethod)
            return(th)
          },
          pcf= function(par, rvals, ..., model, margs) {
