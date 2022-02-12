@@ -101,7 +101,7 @@ if(require(spatstat.core)) {
   default.expand(fit)
 }
   mod <- rmhmodel(cif="strauss", par=list(beta=100, gamma=0.5, r=0.07))
-  default.expand(fit)
+  default.expand(mod)
 }
 \author{
   \adrian
