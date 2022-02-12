@@ -651,7 +651,16 @@
                               append(list(var=par[1L], scale=par[2L]),
                                      margs))
              }
-             integrand <- function(r) { 2*pi*r*exp(RandomFields::RFcov(model=mod, x=r)) }
+             ## Encode integrand 
+             ## RandomFields does not like evaluating covariance at r=0
+             integrand <- function(r) {
+               z <- numeric(length(r))
+               if(any(ok <- (r != 0))) {
+                 rok <- r[ok]
+                 z[ok] <- 2*pi*rok*exp(RandomFields::RFcov(model=mod, x=rok))
+               }
+               return(z)
+             }
            }
            ## compute indefinite integral
            imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
