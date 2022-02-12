@@ -9,7 +9,7 @@
 \usage{
   indefinteg(f, x, \dots,
              method=c("trapezoid", "quadrature"),
-             start=min(x), nfine=8192) 
+             lower=min(x), nfine=8192) 
 }
 \arguments{
   \item{f}{
@@ -26,7 +26,7 @@
   \item{method}{
     String (partially matched) specifying how to compute the integrals.
   }
-  \item{start}{
+  \item{lower}{
     Lower limit of integration. A single number.
   }
   \item{nfine}{
@@ -39,6 +39,14 @@
   is computed numerically at each of the desired values \code{x}.
   The lower limit of integration is taken to be \code{min(x)}.
 
+  The result is a numeric vector \code{y} of the same length as
+  \code{x}, with entries
+  \deqn{
+    y_i = \int_{\mbox{lower}}^{x_i} f(t) dt
+  }{
+    y[i] = integral[lower]^(x[i]) f(t) dt
+  }
+
   If \code{method='trapezoid'} (the default),
   the integrals are computed rapidly using the trapezoid rule.
   If \code{method='quadrature'} the integrals are computed
@@ -48,7 +56,7 @@
   If \code{method='trapezoid'} 
   the function \code{f} is first evaluated 
   on a finer grid of values of the function argument.
-  The fine grid contains at least \code{nfine} sample points.
+  The fine grid contains \code{nfine} sample points.
   The values of the indefinite integral on the fine grid
   are computed using the trapezoidal approximation.
   Finally the values of the indefinite integral are extracted at
