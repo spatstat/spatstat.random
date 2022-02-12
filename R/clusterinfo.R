@@ -655,7 +655,7 @@
            }
            ## compute indefinite integral
            imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
-           th <- indefinteg(integrand, rvals, start=0, method=imethod)
+           th <- indefinteg(integrand, rvals, from=0, method=imethod)
            return(th)
          },
          pcf= function(par, rvals, ..., model, margs) {
