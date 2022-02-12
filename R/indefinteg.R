@@ -3,16 +3,24 @@
 #'
 #'   Indefinite integral
 #'
-#'   $Revision: 1.5 $ $Date: 2022/02/11 13:57:28 $
+#'   $Revision: 1.8 $ $Date: 2022/02/12 02:56:33 $
 
-indefinteg <- function (f, x, ..., method=c("trapezoid", "quadrature"), lower=min(x), nfine=8192) {
+indefinteg <- function (f, x, ...,
+                        method=c("trapezoid", "quadrature"),
+                        lower=min(x), nfine=8192) {
   method <- match.arg(method)
+  if(length(x) == 0) return(numeric(0))
+  adjust <- !missing(lower)
+  if(method == "trapezoid" && (any(is.infinite(x)) ||
+                               (adjust && is.infinite(lower)) ||
+                               (diff(ra <- range(x)) < sqrt(.Machine$double.eps)))) {
+    method <- "quadrature"
+  }
   switch(method,
          trapezoid = {
            ## indefinite integral using trapezoidal rule
            ## Determine range for numerical calculation
-           ra <- range(x)
-           if(adjust <- !missing(lower)) {
+           if(adjust) {
              check.1.real(lower)
              raplus <- ra + c(-1,1) * diff(ra)/2
              included <- inside.range(lower, raplus)
