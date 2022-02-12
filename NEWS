@@ -1,11 +1,11 @@
 
-        CHANGES IN spatstat.random VERSION 2.0-0.015
+        CHANGES IN spatstat.random VERSION 2.1-0
 
 OVERVIEW
 
     o Indefinite integral.
 
-    o Internal repairs and improvements.
+    o Internal repairs, code acceleration, and improvements.
 
 NEW FUNCTIONS
 
