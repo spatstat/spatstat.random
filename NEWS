@@ -1,4 +1,16 @@
 
+        CHANGES IN spatstat.random VERSION 2.1-0.002
+
+OVERVIEW
+
+    o Bug fix.
+
+BUG FIXES
+
+    o Internal code
+    Fix a bug in internal code that causes bug in spatstat.core::kppm
+
+
         CHANGES IN spatstat.random VERSION 2.1-0
 
 OVERVIEW

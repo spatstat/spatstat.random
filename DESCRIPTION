@@ -1,6 +1,6 @@
 Package: spatstat.random
-Version: 2.1-0
-Date: 2022-02-12
+Version: 2.1-0.002
+Date: 2022-02-17
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 
                     role = c("aut", "cre"),
@@ -27,6 +27,7 @@ Maintainer: Adrian Baddeley <Adrian.Baddeley@curtin.edu.au>
 Depends: R (>= 3.5.0), spatstat.data (>= 2.1-0), spatstat.geom (>= 2.3-0), stats, utils, methods, grDevices
 Imports: spatstat.utils (>= 2.2-0)
 Suggests: spatial, RandomFields (>= 3.1.24.1), RandomFieldsUtils(>= 0.3.3.1), spatstat.linnet (>= 2.0-0), spatstat.core (>= 2.3-2), spatstat (>= 2.0-0)
+Additional_repositories: https://spatstat.r-universe.dev
 Description: Functionality for random generation of spatial data in the 'spatstat' family of packages.
 	     Generates random spatial patterns of points according to many simple rules (complete spatial randomness,
 	     Poisson, binomial, random grid, systematic, cell), randomised alteration of patterns
