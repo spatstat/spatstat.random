@@ -1,9 +1,9 @@
 
-        CHANGES IN spatstat.random VERSION 2.1-0.002
+        CHANGES IN spatstat.random VERSION 2.1-0.004
 
 OVERVIEW
 
-    o Bug fix.
+    o Bug fixes and internal improvements.
 
 BUG FIXES
 
