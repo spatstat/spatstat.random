@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.44 $ $Date: 2022/02/20 03:05:41 $
+#'   $Revision: 1.46 $ $Date: 2022/02/20 10:41:41 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -127,885 +127,781 @@
 #'                       Generates random offspring of a parent at the origin
 #'
 #' ..................................................................................................
+#'      Define each entry in the table separately, then create table
+#' ..................................................................................................
+#'
+#'  >>> Thomas process <<<<
+
+.ThomasInfo <- list(
+  modelname      = "Thomas process", # In modelname field of mincon fv obj.
+  descname       = "Thomas process", # In desc field of mincon fvb obj.
+  modelabbrev    = "Thomas process", # In fitted obj.
+  printmodelname = function(...) "Thomas process", # Used by print.kppm
+  parnames       = c("kappa", "sigma2"),
+  clustargsnames = NULL,
+  checkpar = function(par, native = old, ..., old=TRUE){
+    ## 'par' is in either format
+    if(is.null(par))
+      par <- c(kappa=1,scale=1)
+    if(any(par<=0))
+      stop("par values must be positive.", call.=FALSE)
+    fmt <- detect.par.format(par, native=c("kappa", "sigma2"), generic=c("kappa", "scale"))
+    if(fmt == "generic" && native) {
+      ## convert generic to native
+      par[2L] <- par[2L]^2
+      names(par)[2L] <- "sigma2"
+    } else if(fmt == "native" && !native) {
+      ## convert native to generic
+      par[2L] <- sqrt(par[2L])
+      names(par)[2L] <- "scale"
+    }
+    return(par)
+  },
+  outputshape = function(margs, ...) list(),
+  checkclustargs = function(margs, old = TRUE, ...) list(),
+  resolveshape = function(...){ return(list(...)) },
+  resolvedots = function(...){ return(list(...)) },
+  parhandler = NULL,
+  ## density function for the distance to offspring
+  ddist = function(r, scale, ...) {
+    ## 'scale' is generic format
+    2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
+  },
+  ## Practical range of clusters
+  range = function(..., par=NULL, thresh=NULL){
+    ## 'par' is in generic format
+    scale <- retrieve.param("scale", "sigma", ..., par=par)
+    if(!is.null(thresh)){
+      ## The squared length of isotropic Gaussian (sigma)
+      ## is exponential with mean 2 sigma^2
+      rmax <- scale * sqrt(2 * qexp(thresh, lower.tail=FALSE))
+    } else {
+      rmax <- 4*scale
+    }
+    return(rmax)
+  },
+  kernel = function(par, rvals, ...) {
+    ## 'par' is in native format
+    scale <- sqrt(par[2L])
+    dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
+  },
+  isPCP=TRUE,
+  ## K-function
+  K = function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    pi*rvals^2+(1-exp(-rvals^2/(4*par[2L])))/par[1L]
+  },
+  ## pair correlation function
+  pcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    1 + exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L] * par[2L])
+  },
+  ## gradient of pcf (contributed by Chiara Fend)
+  Dpcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0)){
+      dsigma2 <- rep.int(Inf, length(rvals))
+      dkappa <- rep.int(Inf, length(rvals))
+    } else {
+      dsigma2 <- exp(-rvals^2/(4 * par[2L])) * (rvals/(4^2 * pi * par[1L] * par[2L]^3) - 1/(4 * pi * par[1L] * par[2L]^2))
+      dkappa <- -exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L]^2 * par[2L])
+    }
+    out <- rbind(dkappa, dsigma2)
+    rownames(out) <- c("kappa","sigma2")
+    return(out)
+  },
+  ## sensible starting parameters
+  selfstart = function(X) {
+    ## return 'par' in native format
+    kappa <- intensity(X)
+    sigma2 <- 4 * mean(nndist(X))^2
+    c(kappa=kappa, sigma2=sigma2)
+  },
+  ## meaningful model parameters
+  interpret = function(par, lambda) {
+    kappa <- par[["kappa"]]
+    sigma <- sqrt(par[["sigma2"]])
+    mu <- if(is.numeric(lambda) && length(lambda) == 1)
+            lambda/kappa else NA
+    c(kappa=kappa, sigma=sigma, mu=mu)
+  },
+  roffspring = function(n, par, ...) {
+    sd <- sqrt(par[["sigma2"]])
+    list(x=rnorm(n, sd=sd), y=rnorm(n, sd=sd))
+  }
+)
+
+#'  >>> Matern cluster process <<<<
+
+#' auxiliary functions
+.MatClustHfun <- function(zz) {
+  ok <- (zz < 1)
+  h <- numeric(length(zz))
+  h[!ok] <- 1
+  z <- zz[ok]
+  h[ok] <- 2 + (1/pi) * (
+    (8 * z^2 - 4) * acos(z)
+    - 2 * asin(z)
+    + 4 * z * sqrt((1 - z^2)^3)
+    - 6 * z * sqrt(1 - z^2)
+  )
+  return(h)
+}
+
+.MatClustDOH <- function(zz) {
+  ok <- (zz < 1)
+  h <- numeric(length(zz))
+  h[!ok] <- 0
+  z <- zz[ok]
+  h[ok] <- (16/pi) * (z * acos(z) - (z^2) * sqrt(1 - z^2))
+  return(h)
+}
+
+## g(z) = DOH(z)/z has a limit at z=0.
+.MatClustgfun <- function(zz) {
+  ok <- (zz < 1)
+  h <- numeric(length(zz))
+  h[!ok] <- 0
+  z <- zz[ok]
+  h[ok] <- (2/pi) * (acos(z) - z * sqrt(1 - z^2))
+  return(h)
+}
+
+.MatClustgprime <- function(zz) {
+  ok <- (zz < 1)
+  h <- numeric(length(zz))
+  h[!ok] <- 0
+  z <- zz[ok]
+  h[ok] <- -(2/pi) * 2 * sqrt(1 - z^2)
+  return(h)
+}
+
+#' main list of info
+
+.MatClustInfo = list(
+  modelname      = "Matern cluster process", # In modelname field of mincon fv obj.
+  descname       = "Matern cluster process", # In desc field of mincon fv obj.
+  modelabbrev    = "Matern cluster process", # In fitted obj.
+  printmodelname = function(...) "Matern cluster process", # Used by print.kppm
+  parnames       = c("kappa", "R"),
+  clustargsnames = NULL,
+  checkpar = function(par, native = old, ..., old = TRUE){
+    ## 'par' is in either format
+    if(is.null(par))
+      par <- c(kappa=1,scale=1)
+    if(any(par<=0))
+      stop("par values must be positive.", call.=FALSE)
+    detect.par.format(par, native=c("kappa", "R"), generic=c("kappa", "scale"))
+    names(par)[2L] <- if(native) "R" else "scale"
+    return(par)
+  },
+  ## density function for the distance to offspring
+  ddist = function(r, scale, ...) {
+    ## 'scale' is generic format
+    ifelse(r>scale, 0, 2 * r / scale^2)
+  },
+  ## Practical range of clusters
+  range = function(..., par=NULL, thresh=NULL){
+    ## 'par' is in generic format
+    scale <- retrieve.param("scale", "R", ..., par=par)
+    if(!is.null(thresh))
+      warn.once("thresh.Matern",
+                "Argument", sQuote("thresh"), "is ignored for Matern Cluster model")
+    return(scale)
+  },
+  outputshape = function(margs,  ...) list(),
+  checkclustargs = function(margs, old = TRUE, ...) list(),
+  resolveshape = function(...){ return(list(...)) },
+  resolvedots = function(...){ return(list(...)) },
+  parhandler = NULL,
+  kernel = function(par, rvals, ...) {
+    ## 'par' is in native format
+    scale <- par[2L]
+    ifelse(rvals>scale, 0, 1/(pi*scale^2))
+  },
+  isPCP=TRUE,
+  K = function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    kappa <- par[1L]
+    R <- par[2L]
+    y <- pi * rvals^2 + (1/kappa) * .MatClustHfun(rvals/(2 * R))
+    return(y)
+  },
+  pcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    kappa <- par[1L]
+    R <- par[2L]
+    y <- 1 + (1/(pi * kappa * R^2)) * .MatClustgfun(rvals/(2 * R))
+    return(y)
+  },
+  Dpcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    kappa <- par[1L]
+    R <- par[2L]
+    if(any(par <= 0)){
+      dkappa <- rep.int(Inf, length(rvals))
+      dR <- rep.int(Inf, length(rvals))
+    } else {
+      dkappa <- -.MatClustgfun(rvals/(2 * R)) / (pi * kappa^2 * R^2)
+      dR <- -2*.MatClustgfun(rvals/(2 * R))/(pi * kappa * R^3) - (1/(pi * kappa * R^2)) * .MatClustgprime(rvals/(2 * R))*rvals/(2*R^2)
+    }
+    out <- rbind(dkappa, dR)
+    rownames(out) <- c("kappa","R")
+    return(out)
+  },         
+  ## sensible starting paramters
+  selfstart = function(X) {
+    ## return 'par' in native format
+    kappa <- intensity(X)
+    R <- 2 * mean(nndist(X)) 
+    c(kappa=kappa, R=R)
+  },
+  ## meaningful model parameters
+  interpret = function(par, lambda) {
+    kappa <- par[["kappa"]]
+    R     <- par[["R"]]
+    mu    <- if(is.numeric(lambda) && length(lambda) == 1)
+               lambda/kappa else NA           
+    c(kappa=kappa, R=R, mu=mu)
+  },
+  roffspring = function(n, par, ...) {
+    R <- par[["R"]]
+    rad <- R * sqrt(runif(n))
+    theta <- runif(n, max=2*pi)
+    list(x = rad * cos(theta), y = rad * sin(theta))
+  }
+)
+
+#'  >>> Cauchy kernel cluster process <<<<
+
+
+.CauchyInfo <- list(
+  modelname      = "Neyman-Scott process with Cauchy kernel", # In modelname field of mincon fv obj.
+  descname       = "Neyman-Scott process with Cauchy kernel", # In desc field of mincon fv obj.
+  modelabbrev    = "Cauchy process", # In fitted obj.
+  printmodelname = function(...) "Cauchy process", # Used by print.kppm
+  parnames       = c("kappa", "eta2"),
+  clustargsnames = NULL,
+  checkpar = function(par, native = old, ..., old = TRUE){
+    ## 'par' is in either format
+    if(is.null(par))
+      par <- c(kappa=1,scale=1)
+    if(any(par<=0))
+      stop("par values must be positive.", call.=FALSE)
+    fmt <- detect.par.format(par, native=c("kappa", "eta2"), generic=c("kappa", "scale"))
+    if(fmt == "generic" && native) {
+      ## convert generic to native
+      ## eta2 = 4 * scale^2
+      par[2L] <- (2*par[2L])^2
+      names(par)[2L] <- "eta2"
+    } else if(fmt == "native" && !native) {
+      ## convert native to generic
+      ## scale = sqrt(eta2/4)
+      par[2L] <- sqrt(par[2L])/2
+      names(par)[2L] <- "scale"
+    }
+    return(par)
+  },
+  outputshape = function(margs, ...) list(),
+  checkclustargs = function(margs, old = TRUE, ...) list(),
+  resolveshape = function(...){ return(list(...)) },
+  resolvedots = function(...){ return(list(...)) },
+  parhandler = NULL,
+  ## density function for the distance to offspring
+  ddist = function(r, scale, ...) {
+    ## 'scale' is generic format
+    r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
+  },
+  ## Practical range of clusters
+  range = function(..., par=NULL, thresh=0.01){
+    ## 'par' is in generic format
+    thresh <- as.numeric(thresh %orifnull% 0.01)
+    scale <- retrieve.param("scale", character(0), ..., par=par)
+    ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
+    ## solve for integral = 1-thresh:
+    rmax <- scale * sqrt(1/thresh^2 - 1)
+    return(rmax)
+  },
+  kernel = function(par, rvals, ...) {
+    ## 'par' is in native format
+    scale <- sqrt(par[2L])/2
+    1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
+  },
+  isPCP=TRUE,
+  K = function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
+  },
+  pcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
+  },
+  Dpcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0)){
+      dkappa <- rep.int(Inf, length(rvals))
+      deta2 <- rep.int(Inf, length(rvals))
+    } else {
+      dkappa <- -(1 + rvals^2/par[2L])^(-1.5)/(2 * pi * par[2L] * par[1L]^2)
+      deta2 <- 1.5 * rvals^2 * (1 + rvals^2/par[2L])^(-2.5)/(2 * par[2L]^3 * par[1L] * pi) - (1 + rvals^2/par[2L])^(-1.5)/(2*pi*par[1L]*par[2L]^2)
+    }
+    out <- rbind(dkappa, deta2)
+    rownames(out) <- c("kappa","eta2")
+    return(out)
+  },
+  selfstart = function(X) {
+    ## return 'par' in native format
+    kappa <- intensity(X)
+    eta2 <- 4 * mean(nndist(X))^2
+    c(kappa = kappa, eta2 = eta2)
+  },
+  ## meaningful model parameters
+  interpret = function(par, lambda) {
+    #' par is in native format
+    kappa <- par[["kappa"]]
+    omega <- sqrt(par[["eta2"]])/2
+    mu <- if(is.numeric(lambda) && length(lambda) == 1)
+            lambda/kappa else NA
+    c(kappa=kappa, omega=omega, mu=mu)
+  },
+  roffspring = function(n, par, ...) {
+    #' par is in native format
+    rate <- par[["eta2"]]/8 
+    b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
+    list(x = b * rnorm(n), y = b * rnorm(n))
+  }
+)
+
+
+#'  >>> Variance Gamma kernel cluster process <<<<
+
+#' helper functions
+
+resolve.vargamma.shape <- function(...,
+                                   nu.ker=NULL, nu.pcf=NULL,
+                                   nu = NULL, allow.nu = FALSE,
+                                   default = FALSE) {
+  if(is.null(nu.ker) && is.null(nu.pcf)) {
+    if(allow.nu && !is.null(nu)) {
+      nu.ker <- nu
+    } else if(default) {
+      nu.ker <- -1/4
+    } else stop("Must specify nu.ker or nu.pcf", call.=FALSE)
+  }
+  if(!is.null(nu.ker) && !is.null(nu.pcf))
+    stop("Only one of nu.ker and nu.pcf should be specified",
+         call.=FALSE)
+  if(!is.null(nu.ker)) {
+    check.1.real(nu.ker)
+    stopifnot(nu.ker > -1/2)
+    nu.pcf <- 2 * nu.ker + 1
+  } else {
+    check.1.real(nu.pcf)
+    stopifnot(nu.pcf > 0)
+    nu.ker <- (nu.pcf - 1)/2
+  }
+  return(list(nu.ker=nu.ker, nu.pcf=nu.pcf))
+}
+
+.VarGammaResolveShape <- function(...){
+  nu.ker <- resolve.vargamma.shape(..., default=TRUE, allow.nu=TRUE)$nu.ker
+  check.1.real(nu.ker)
+  stopifnot(nu.ker > -1/2)
+  margs <- list(nu.ker=nu.ker, nu.pcf=2*nu.ker+1)
+  cmodel <- list(type="Kernel", model="VarGamma", margs=margs)
+  out <- list(margs = margs, covmodel = cmodel)
+  return(out)
+}
+
+.VarGammaOutputShape <- function(margs, ...) { list(nu=margs$nu.ker) }
+
+.VarGammaDdist <- function(r, scale, nu, ...) {
+  ## one-dimensional probability density function for the distance to offspring
+  ## 'scale' is generic format
+  numer <- ((r/scale)^(nu+1)) * besselK(r/scale, nu)
+  numer[r==0] <- 0
+  denom <- (2^nu) * scale * gamma(nu + 1)
+  numer/denom
+}
+
+.VarGammaPdist <- function(r, scale, nu, ...) {
+  n <- length(r)
+  z <- numeric(n)
+  for(i in seq_len(n)) 
+    z[i] <- integrate(.VarGammaDdist, 0, r[i], scale=scale, nu=nu)$value
+  return(z)
+}
+
+.VarGammaPdistContrast <- function(r, scale, nu, p, ...) {
+  .VarGammaPdist(r, scale, nu, ...) - p
+}
+
+.VarGammaKintegrand <- function(x, par, nu.pcf) {
+  ## x * pcf(x) without check on par values
+  numer <- (x/par[2L])^nu.pcf * besselK(x/par[2L], nu.pcf)
+  denom <- 2^(nu.pcf+1) * pi * par[2L]^2 * par[1L] * gamma(nu.pcf + 1)
+  return(x * (1 + numer/denom))
+}
+
+.VarGammaInfo <- list(
+  modelname      = "Neyman-Scott process with Variance Gamma kernel", # In modelname field of mincon fv obj.
+  descname       = "Neyman-Scott process with Variance Gamma kernel", # In desc field of mincon fv obj.
+  modelabbrev    = "Variance Gamma process", # In fitted obj.
+  printmodelname = function(obj){ # Used by print.kppm
+    paste0("Variance Gamma process (nu=",
+           signif(obj$clustargs[["nu"]], 2), ")")
+  },
+  parnames = c("kappa", "eta"),
+  clustargsnames = "nu",
+  checkpar = function(par, native = old, ..., old = TRUE){
+    ## 'par' is in either format
+    if(is.null(par))
+      par <- c(kappa=1,scale=1)
+    if(any(par<=0))
+      stop("par values must be positive.", call.=FALSE)
+    detect.par.format(par, native=c("kappa", "eta"), generic=c("kappa", "scale"))
+    names(par)[2L] <- if(native) "eta" else "scale"
+    return(par)
+  },
+  outputshape = .VarGammaOutputShape,
+  checkclustargs = function(margs, old = TRUE, ...){
+    if(!old)
+      margs <- list(nu=margs$nu.ker)
+    return(margs)
+  },
+  resolveshape = .VarGammaResolveShape,
+  resolvedots  = .VarGammaResolveShape,
+  parhandler = function(...){ .VarGammaResolveShape(...)$covmodel },
+  ddist = .VarGammaDdist,
+  ## Practical range of clusters
+  range = function(..., par=NULL, thresh=0.001){
+    ## 'par' is in generic format
+    thresh <- as.numeric(thresh %orifnull% 0.001)
+    scale <- retrieve.param("scale", character(0), ..., par=par)
+    ## Find value of nu:
+    margs <- .VarGammaResolveShape(...)$margs
+    nu <-    .VarGammaOutputShape(margs)$nu
+    if(is.null(nu))
+      stop(paste("Argument ", sQuote("nu"), " must be given."),
+           call.=FALSE)
+    rmax <- uniroot(.VarGammaPdistContrast, lower = scale, upper = 1000 * scale,
+                    scale=scale, nu=nu, p=1-thresh)$root
+    return(rmax)
+  },
+  ## kernel function in polar coordinates (no angular argument).
+  kernel = function(par, rvals, ..., margs) {
+    ## 'par' is in native format
+    scale <- as.numeric(par[2L])
+    nu <- margs$nu
+    if(is.null(nu))
+      stop(paste("Argument ", sQuote("nu"), " is missing."),
+           call.=FALSE)
+    numer <- ((rvals/scale)^nu) * besselK(rvals/scale, nu)
+    numer[rvals==0] <- ifelse(nu>0, 2^(nu-1)*gamma(nu), Inf)
+    denom <- pi * (2^(nu+1)) * scale^2 * gamma(nu + 1)
+    numer/denom
+  },
+  isPCP=TRUE,
+  K = function(par,rvals, ..., margs){
+    ## 'par' is in native format
+    ## margs = list(.. nu.pcf.. )
+    ## K function requires integration of pair correlation
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    nu.pcf <- margs$nu.pcf
+    out <- numeric(length(rvals))
+    for (i in which(rvals > 0))
+      out[i] <- 2 * pi * integrate(.VarGammaKintegrand,
+                                   lower=0, upper=rvals[i],
+                                   par=par, nu.pcf=nu.pcf)$value
+    return(out)
+  },
+  pcf= function(par,rvals, ..., margs){
+    ## 'par' is in native format
+    ## margs = list(..nu.pcf..)
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    nu.pcf <- margs$nu.pcf
+    sig2 <- 1 / (4 * pi * (par[2L]^2) * nu.pcf * par[1L])
+    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    rr <- rvals / par[2L]
+    ## Matern correlation function
+    fr <- ifelseXB(rr > 0,
+                  (rr^nu.pcf) * besselK(rr, nu.pcf) / denom,
+                  1)
+    return(1 + sig2 * fr)
+  },
+  Dpcf = NULL,
+  ## sensible starting values
+  selfstart = function(X) {
+    ## return 'par' in native format
+    kappa <- intensity(X)
+    eta <- 2 * mean(nndist(X))
+    c(kappa=kappa, eta=eta)
+  },
+  ## meaningful model parameters
+  interpret = function(par, lambda) {
+    #' par is in native format
+    kappa <- par[["kappa"]]
+    omega <- par[["eta"]]
+    mu <- if(is.numeric(lambda) && length(lambda) == 1)
+            lambda/kappa else NA
+    c(kappa=kappa, omega=omega, mu=mu)
+  },
+  roffspring = function(n, par, ..., margs) {
+    #' par is in native format
+    shape <- margs$nu.ker + 1
+    scale <- par[[2L]]
+    rate <- 1/(2 * scale^2)
+    b <- sqrt(rgamma(n, shape=shape, rate=rate))
+    list(x= b * rnorm(n), y = b * rnorm(n))
+  }
+)
+
+#'  >>> Log-Gaussian Cox process <<<<
+
+#' helper functions
+
+.LGCPResolveShape <- function(...){
+  ## resolve shape parameters for kppm and friends allowing for native/generic par syntax
+  dots <- list(...)
+  nam <- names(dots)
+  out <- list()
+  cmod <- dots$covmodel
+  model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
+  margs <- NULL
+  shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+  if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
+     (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
+    ## avoid RandomFields package
+    ## extract shape parameters and validate them
+    switch(model,
+           stable = ,
+           fastStable = {
+             stuff <- cmod %orifnull% dots
+             ok <- "alpha" %in% names(stuff)
+             if(!ok) stop("Parameter 'alpha' is required")
+             margs <- stuff["alpha"]
+             with(margs, {
+               check.1.real(alpha)
+               stopifnot(0 < alpha && alpha <= 2)
+             })
+           },
+           gencauchy = ,
+           fastGencauchy = {
+             stuff <- cmod %orifnull% dots
+             ok <- c("alpha", "beta") %in% names(stuff)
+             if(!ok[1]) stop("Parameter 'alpha' is required")
+             if(!ok[2]) stop("Parameter 'beta' is required")
+             margs <- stuff[c("alpha", "beta")]
+             with(margs, {
+               check.1.real(alpha)
+               check.1.real(beta)
+               stopifnot(0 < alpha && alpha <= 2)
+               stopifnot(beta > 0)
+             })
+           })
+  } else {
+    ## get the 'model generator' 
+    modgen <- getRandomFieldsModelGen(model)
+    attr(model, "modgen") <- modgen
+    if(is.null(cmod)){
+      margsnam <- names(formals(modgen))
+      margsnam <- margsnam[!(margsnam %in% c("var", "scale"))]
+      margs <- dots[nam %in% margsnam]
+    } else{
+      margs <- cmod[names(cmod)!="model"]
+    }
+  }
+  if(length(margs)==0) {
+    margs <- NULL
+  } else {
+    ## detect anisotropic model
+    if("Aniso" %in% names(margs))
+      stop("Anisotropic covariance models cannot be used",
+           call.=FALSE)
+  }
+  out$margs <- margs
+  out$model <- model
+  out$covmodel <- list(type="Covariance", model=model, margs=margs)
+  return(out)
+}
+
+.LGCPInfo <- list(
+  ## Log Gaussian Cox process: native par = (sigma2, alpha) 
+  ## Log Gaussian Cox process: generic par = (var, scale) 
+  modelname      = "Log-Gaussian Cox process", # In modelname field of mincon fv obj.
+  descname       = "LGCP", # In desc field of mincon fv obj.
+  modelabbrev    = "log-Gaussian Cox process", # In fitted obj.
+  printmodelname = function(...) "log-Gaussian Cox process", # Used by print.kppm
+  parnames       = c("sigma2", "alpha"),
+  checkpar = function(par, native = old, ..., old=TRUE){
+    ## 'par' is in either format
+    if(is.null(par))
+      par <- c(var=1,scale=1)
+    if(any(par<=0))
+      stop("par values must be positive.", call.=FALSE)
+    detect.par.format(par, native=c("sigma2", "alpha"), generic=c("var", "scale"))
+    names(par) <- if(native) c("sigma2", "alpha") else c("var","scale")
+    return(par)
+  },
+  outputshape = function(margs, ...) return(margs),
+  checkclustargs = function(margs, old = TRUE, ...) return(margs),
+  resolveshape = .LGCPResolveShape,
+  resolvedots  = .LGCPResolveShape,
+  parhandler   = function(...) { .LGCPResolveShape(...)$covmodel },
+  isPCP=FALSE,
+  ## calls relevant covariance function from RandomFields package
+  K = function(par, rvals, ..., model, margs) {
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+    if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) || 
+       (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
+      ## For efficiency and to avoid need for RandomFields package
+      switch(model,
+             exponential = {
+               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-r/par[2L])) }
+             },
+             gauss = ,
+             fastGauss = {
+               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^2)) }
+             },
+             stable = ,
+             fastStable = {
+               alpha <- margs[["alpha"]]
+               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^alpha)) }
+             },
+             gencauchy = ,
+             fastGencauchy = {
+               alpha <- margs[["alpha"]]
+               beta  <- margs[["beta"]]
+               integrand <- function(r) { 2*pi*r*exp(par[1L] * (1 + (r/par[2L])^alpha)^(-beta/alpha)) }
+             })
+    } else {
+      ## Use RandomFields package
+      kraeverRandomFields()
+      modgen <- attr(model, "modgen")
+      ## create the model with the specified parameters
+      if(length(margs) == 0) {
+        mod <- modgen(var=par[1L], scale=par[2L])
+      } else {
+        mod <- do.call(modgen,
+                       append(list(var=par[1L], scale=par[2L]),
+                              margs))
+      }
+      ## Encode integrand 
+      ## RandomFields does not like evaluating covariance at r=0
+      integrand <- function(r) {
+        z <- numeric(length(r))
+        if(any(ok <- (r != 0))) {
+          rok <- r[ok]
+          z[ok] <- 2*pi*rok*exp(RandomFields::RFcov(model=mod, x=rok))
+        }
+        return(z)
+      }
+    }
+    ## compute indefinite integral
+    imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
+    th <- indefinteg(integrand, rvals, lower=0, method=imethod)
+    return(th)
+  },
+  pcf= function(par, rvals, ..., model, margs) {
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+    if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
+       (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
+      ## For efficiency and to avoid need for RandomFields package
+      switch(model,
+             exponential = {
+               gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
+             },
+             gauss = ,
+             fastGauss = {
+               gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^2))
+             },
+             stable = ,
+             fastStable = {
+               alpha <- margs[["alpha"]]
+               gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^alpha))
+             },
+             gencauchy = ,
+             fastGencauchy = {
+               alpha <- margs[["alpha"]]
+               beta  <- margs[["beta"]]
+               gtheo <- exp(par[1L] * (1 + (rvals/par[2L])^alpha)^(-beta/alpha))
+             })
+    } else {
+      ## use RandomFields
+      kraeverRandomFields()
+      modgen <- attr(model, "modgen")
+      ## create the model with the specified parameters
+      if(length(margs) == 0) {
+        mod <- modgen(var=par[1L], scale=par[2L])
+      } else {
+        mod <- do.call(modgen,
+                       append(list(var=par[1L], scale=par[2L]),
+                              margs))
+      }
+      ## calculate pcf
+      gtheo <- exp(RandomFields::RFcov(model=mod, x=rvals))
+    }
+    return(gtheo)
+  },
+  Dpcf= function(par,rvals, ..., model){
+    ## 'par' is in native format
+    if(!identical(model, "exponential")) {
+      stop("Gradient of the pcf not available for this model.")
+    } 
+    dsigma2 <- exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))
+    dalpha <- rvals * par[1L] * exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))/par[2L]^2
+    out <- rbind(dsigma2, dalpha)
+    rownames(out) <- c("sigma2","alpha")
+    return(out)
+  },
+  ## sensible starting values
+  selfstart = function(X) {
+    ## return 'par' in native format
+    alpha <- 2 * mean(nndist(X))
+    c(sigma2=1, alpha=alpha)
+  },
+  ## meaningful model parameters
+  interpret = function(par, lambda) {
+    sigma2 <- par[["sigma2"]]
+    alpha  <- par[["alpha"]]
+    mu <- if(is.numeric(lambda) && length(lambda) == 1 && lambda > 0)
+            log(lambda) - sigma2/2 else NA
+    c(sigma2=sigma2, alpha=alpha, mu=mu)
+  }
+)
+
+#' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#'   C O N S T R U C T     T A B L E
+#' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 .Spatstat.ClusterModelInfoTable <- 
   list(
-       Thomas=list(
-         ## Thomas process: native par = (kappa, sigma2) 
-         ## Thomas process: generic par = (kappa, scale) 
-         modelname = "Thomas process", # In modelname field of mincon fv obj.
-         descname = "Thomas process", # In desc field of mincon fvb obj.
-         modelabbrev = "Thomas process", # In fitted obj.
-         printmodelname = function(...) "Thomas process", # Used by print.kppm
-         parnames = c("kappa", "sigma2"),
-         clustargsnames = NULL,
-         checkpar = function(par, native = old, ..., old=TRUE){
-           ## 'par' is in either format
-           if(is.null(par))
-             par <- c(kappa=1,scale=1)
-           if(any(par<=0))
-             stop("par values must be positive.", call.=FALSE)
-           fmt <- detect.par.format(par, native=c("kappa", "sigma2"), generic=c("kappa", "scale"))
-           if(fmt == "generic" && native) {
-             ## convert generic to native
-             par[2L] <- par[2L]^2
-             names(par)[2L] <- "sigma2"
-           } else if(fmt == "native" && !native) {
-             ## convert native to generic
-             par[2L] <- sqrt(par[2L])
-             names(par)[2L] <- "scale"
-           }
-           return(par)
-         },
-         outputshape = function(margs, ...) list(),
-         checkclustargs = function(margs, old = TRUE, ...) list(),
-         resolveshape = function(...){ return(list(...)) },
-         resolvedots = function(...){ return(list(...)) },
-         parhandler = NULL,
-         # density function for the distance to offspring
-         ddist = function(r, scale, ...) {
-           ## 'scale' is generic format
-           2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
-         },
-         ## Practical range of clusters
-         range = function(..., par=NULL, thresh=NULL){
-           ## 'par' is in generic format
-           scale <- retrieve.param("scale", "sigma", ..., par=par)
-           if(!is.null(thresh)){
-             ## The squared length of isotropic Gaussian (sigma)
-             ## is exponential with mean 2 sigma^2
-             rmax <- scale * sqrt(2 * qexp(thresh, lower.tail=FALSE))
-           } else {
-             rmax <- 4*scale
-           }
-           return(rmax)
-         },
-         kernel = function(par, rvals, ...) {
-           ## 'par' is in native format
-           scale <- sqrt(par[2L])
-           dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
-         },
-         isPCP=TRUE,
-         ## K-function
-         K = function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           pi*rvals^2+(1-exp(-rvals^2/(4*par[2L])))/par[1L]
-         },
-         ## pair correlation function
-         pcf= function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           1 + exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L] * par[2L])
-         },
-         ## gradient of pcf (contributed by Chiara Fend)
-         Dpcf= function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0)){
-             dsigma2 <- rep.int(Inf, length(rvals))
-             dkappa <- rep.int(Inf, length(rvals))
-           } else {
-             dsigma2 <- exp(-rvals^2/(4 * par[2L])) * (rvals/(4^2 * pi * par[1L] * par[2L]^3) - 1/(4 * pi * par[1L] * par[2L]^2))
-             dkappa <- -exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L]^2 * par[2L])
-           }
-           out <- rbind(dkappa, dsigma2)
-           rownames(out) <- c("kappa","sigma2")
-           return(out)
-         },
-         ## sensible starting parameters
-         selfstart = function(X) {
-           ## return 'par' in native format
-           kappa <- intensity(X)
-           sigma2 <- 4 * mean(nndist(X))^2
-           c(kappa=kappa, sigma2=sigma2)
-         },
-         ## meaningful model parameters
-         interpret = function(par, lambda) {
-           kappa <- par[["kappa"]]
-           sigma <- sqrt(par[["sigma2"]])
-           mu <- if(is.numeric(lambda) && length(lambda) == 1)
-             lambda/kappa else NA
-           c(kappa=kappa, sigma=sigma, mu=mu)
-         },
-         roffspring = function(n, par, ...) {
-           sd <- sqrt(par[["sigma2"]])
-           list(x=rnorm(n, sd=sd), y=rnorm(n, sd=sd))
-         }
-       ),
-       ## ...............................................
-       MatClust=list(
-         ## Matern Cluster process: native par = (kappa, R) 
-         ## Matern Cluster process: generic par = (kappa, scale)
-         modelname = "Matern cluster process", # In modelname field of mincon fv obj.
-         descname = "Matern cluster process", # In desc field of mincon fv obj.
-         modelabbrev = "Matern cluster process", # In fitted obj.
-         printmodelname = function(...) "Matern cluster process", # Used by print.kppm
-         parnames = c("kappa", "R"),
-         clustargsnames = NULL,
-         checkpar = function(par, native = old, ..., old = TRUE){
-           ## 'par' is in either format
-           if(is.null(par))
-             par <- c(kappa=1,scale=1)
-           if(any(par<=0))
-             stop("par values must be positive.", call.=FALSE)
-           detect.par.format(par, native=c("kappa", "R"), generic=c("kappa", "scale"))
-           names(par)[2L] <- if(native) "R" else "scale"
-           return(par)
-         },
-         # density function for the distance to offspring
-         ddist = function(r, scale, ...) {
-           ## 'scale' is generic format
-           ifelse(r>scale, 0, 2 * r / scale^2)
-         },
-         ## Practical range of clusters
-         range = function(..., par=NULL, thresh=NULL){
-           ## 'par' is in generic format
-           scale <- retrieve.param("scale", "R", ..., par=par)
-           if(!is.null(thresh))
-             warn.once("thresh.Matern",
-                       "Argument", sQuote("thresh"), "is ignored for Matern Cluster model")
-           return(scale)
-         },
-         outputshape = function(margs,  ...) list(),
-         checkclustargs = function(margs, old = TRUE, ...) list(),
-         resolveshape = function(...){ return(list(...)) },
-         resolvedots = function(...){ return(list(...)) },
-         parhandler = NULL,
-         kernel = function(par, rvals, ...) {
-           ## 'par' is in native format
-           scale <- par[2L]
-           ifelse(rvals>scale, 0, 1/(pi*scale^2))
-         },
-         isPCP=TRUE,
-         K = function(par,rvals, ..., funaux){
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           kappa <- par[1L]
-           R <- par[2L]
-           Hfun <- funaux$Hfun
-           y <- pi * rvals^2 + (1/kappa) * Hfun(rvals/(2 * R))
-           return(y)
-         },
-         pcf= function(par,rvals, ..., funaux){
-           ## 'par' is in native format
-             if(any(par <= 0))
-               return(rep.int(Inf, length(rvals)))
-             kappa <- par[1L]
-             R <- par[2L]
-             g <- funaux$g
-             y <- 1 + (1/(pi * kappa * R^2)) * g(rvals/(2 * R))
-             return(y)
-         },
-         Dpcf= function(par,rvals, ..., funaux){
-           ## 'par' is in native format
-           kappa <- par[1L]
-           R <- par[2L]
-           g <- funaux$g
-           gprime <- funaux$gprime
-           if(any(par <= 0)){
-             dkappa <- rep.int(Inf, length(rvals))
-             dR <- rep.int(Inf, length(rvals))
-           } else {
-             dkappa <- -g(rvals/(2 * R)) / (pi * kappa^2 * R^2)
-             dR <- -2*g(rvals/(2 * R))/(pi * kappa * R^3) - (1/(pi * kappa * R^2)) * gprime(rvals/(2 * R))*rvals/(2*R^2)
-           }
-           out <- rbind(dkappa, dR)
-           rownames(out) <- c("kappa","R")
-           return(out)
-         },         
-         funaux=list(
-           Hfun=function(zz) {
-             ok <- (zz < 1)
-             h <- numeric(length(zz))
-             h[!ok] <- 1
-             z <- zz[ok]
-             h[ok] <- 2 + (1/pi) * (
-                                    (8 * z^2 - 4) * acos(z)
-                                    - 2 * asin(z)
-                                    + 4 * z * sqrt((1 - z^2)^3)
-                                    - 6 * z * sqrt(1 - z^2)
-                                    )
-             return(h)
-           },
-           DOH=function(zz) {
-             ok <- (zz < 1)
-             h <- numeric(length(zz))
-             h[!ok] <- 0
-             z <- zz[ok]
-             h[ok] <- (16/pi) * (z * acos(z) - (z^2) * sqrt(1 - z^2))
-             return(h)
-           },
-           ## g(z) = DOH(z)/z has a limit at z=0.
-           g=function(zz) {
-             ok <- (zz < 1)
-             h <- numeric(length(zz))
-             h[!ok] <- 0
-             z <- zz[ok]
-             h[ok] <- (2/pi) * (acos(z) - z * sqrt(1 - z^2))
-             return(h)
-           },
-           gprime=function(zz) {
-             ok <- (zz < 1)
-             h <- numeric(length(zz))
-             h[!ok] <- 0
-             z <- zz[ok]
-             h[ok] <- -(2/pi) * 2 * sqrt(1 - z^2)
-             return(h)
-           }),
-         ## sensible starting paramters
-         selfstart = function(X) {
-           ## return 'par' in native format
-           kappa <- intensity(X)
-           R <- 2 * mean(nndist(X)) 
-           c(kappa=kappa, R=R)
-         },
-         ## meaningful model parameters
-         interpret = function(par, lambda) {
-           kappa <- par[["kappa"]]
-           R     <- par[["R"]]
-           mu    <- if(is.numeric(lambda) && length(lambda) == 1)
-             lambda/kappa else NA           
-           c(kappa=kappa, R=R, mu=mu)
-         },
-         roffspring = function(n, par, ...) {
-           R <- par[["R"]]
-           rad <- R * sqrt(runif(n))
-           theta <- runif(n, max=2*pi)
-           list(x = rad * cos(theta), y = rad * sin(theta))
-         }
-         ),
-       ## ...............................................
-       Cauchy=list(
-         ## Neyman-Scott with Cauchy clusters: native par = (kappa, eta2)
-         ## Neyman-Scott with Cauchy clusters: generic par = (kappa, scale) 
-         modelname = "Neyman-Scott process with Cauchy kernel", # In modelname field of mincon fv obj.
-         descname = "Neyman-Scott process with Cauchy kernel", # In desc field of mincon fv obj.
-         modelabbrev = "Cauchy process", # In fitted obj.
-         printmodelname = function(...) "Cauchy process", # Used by print.kppm
-         parnames = c("kappa", "eta2"),
-         clustargsnames = NULL,
-         checkpar = function(par, native = old, ..., old = TRUE){
-           ## 'par' is in either format
-           if(is.null(par))
-             par <- c(kappa=1,scale=1)
-           if(any(par<=0))
-             stop("par values must be positive.", call.=FALSE)
-           fmt <- detect.par.format(par, native=c("kappa", "eta2"), generic=c("kappa", "scale"))
-           if(fmt == "generic" && native) {
-             ## convert generic to native
-             ## eta2 = 4 * scale^2
-             par[2L] <- (2*par[2L])^2
-             names(par)[2L] <- "eta2"
-           } else if(fmt == "native" && !native) {
-             ## convert native to generic
-             ## scale = sqrt(eta2/4)
-             par[2L] <- sqrt(par[2L])/2
-             names(par)[2L] <- "scale"
-           }
-           return(par)
-         },
-         outputshape = function(margs, ...) list(),
-         checkclustargs = function(margs, old = TRUE, ...) list(),
-         resolveshape = function(...){ return(list(...)) },
-         resolvedots = function(...){ return(list(...)) },
-         parhandler = NULL,
-         # density function for the distance to offspring
-         ddist = function(r, scale, ...) {
-           ## 'scale' is generic format
-           r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
-         },
-         ## Practical range of clusters
-         range = function(..., par=NULL, thresh=0.01){
-           ## 'par' is in generic format
-           thresh <- as.numeric(thresh %orifnull% 0.01)
-           scale <- retrieve.param("scale", character(0), ..., par=par)
-           ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
-           ## solve for integral = 1-thresh:
-           rmax <- scale * sqrt(1/thresh^2 - 1)
-           return(rmax)
-         },
-         kernel = function(par, rvals, ...) {
-           ## 'par' is in native format
-           scale <- sqrt(par[2L])/2
-           1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
-         },
-         isPCP=TRUE,
-         K = function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
-         },
-         pcf= function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
-         },
-         Dpcf= function(par,rvals, ...){
-           ## 'par' is in native format
-           if(any(par <= 0)){
-             dkappa <- rep.int(Inf, length(rvals))
-             deta2 <- rep.int(Inf, length(rvals))
-           } else {
-             dkappa <- -(1 + rvals^2/par[2L])^(-1.5)/(2 * pi * par[2L] * par[1L]^2)
-             deta2 <- 1.5 * rvals^2 * (1 + rvals^2/par[2L])^(-2.5)/(2 * par[2L]^3 * par[1L] * pi) - (1 + rvals^2/par[2L])^(-1.5)/(2*pi*par[1L]*par[2L]^2)
-           }
-           out <- rbind(dkappa, deta2)
-           rownames(out) <- c("kappa","eta2")
-           return(out)
-         },
-         selfstart = function(X) {
-           ## return 'par' in native format
-           kappa <- intensity(X)
-           eta2 <- 4 * mean(nndist(X))^2
-           c(kappa = kappa, eta2 = eta2)
-         },
-         ## meaningful model parameters
-         interpret = function(par, lambda) {
-           #' par is in native format
-           kappa <- par[["kappa"]]
-           omega <- sqrt(par[["eta2"]])/2
-           mu <- if(is.numeric(lambda) && length(lambda) == 1)
-             lambda/kappa else NA
-           c(kappa=kappa, omega=omega, mu=mu)
-         },
-         roffspring = function(n, par, ...) {
-           #' par is in native format
-           rate <- par[["eta2"]]/8 
-           b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
-           list(x = b * rnorm(n), y = b * rnorm(n))
-         }
-         ),
-       ## ...............................................
-       VarGamma=list(
-         ## Neyman-Scott with VarianceGamma/Bessel clusters: native par = (kappa, eta) 
-         ## Neyman-Scott with VarianceGamma/Bessel clusters: generic par = (kappa, scale) 
-         modelname = "Neyman-Scott process with Variance Gamma kernel", # In modelname field of mincon fv obj.
-         descname = "Neyman-Scott process with Variance Gamma kernel", # In desc field of mincon fv obj.
-         modelabbrev = "Variance Gamma process", # In fitted obj.
-         printmodelname = function(obj){ # Used by print.kppm
-             paste0("Variance Gamma process (nu=",
-                    signif(obj$clustargs[["nu"]], 2), ")")
-         },
-         parnames = c("kappa", "eta"),
-         clustargsnames = "nu",
-         checkpar = function(par, native = old, ..., old = TRUE){
-           ## 'par' is in either format
-           if(is.null(par))
-             par <- c(kappa=1,scale=1)
-           if(any(par<=0))
-             stop("par values must be positive.", call.=FALSE)
-           detect.par.format(par, native=c("kappa", "eta"), generic=c("kappa", "scale"))
-           names(par)[2L] <- if(native) "eta" else "scale"
-           return(par)
-         },
-         outputshape = function(margs, ...) { list(nu=margs$nu.ker) },
-         checkclustargs = function(margs, old = TRUE, ...){
-             if(!old)
-                 margs <- list(nu=margs$nu.ker)
-             return(margs)
-         },
-         resolveshape = function(...){
-           ## resolve shape parameters
-           nu.ker <- resolve.vargamma.shape(..., default=TRUE, allow.nu=TRUE)$nu.ker
-           check.1.real(nu.ker)
-           stopifnot(nu.ker > -1/2)
-           margs <- list(nu.ker=nu.ker, nu.pcf=2*nu.ker+1)
-           cmodel <- list(type="Kernel", model="VarGamma", margs=margs)
-           out <- list(margs = margs, covmodel = cmodel)
-           return(out)
-         },
-         resolvedots = function(...){
-           ## resolve shape parameters
-           nu.ker <- resolve.vargamma.shape(..., default=TRUE, allow.nu=TRUE)$nu.ker
-           check.1.real(nu.ker)
-           stopifnot(nu.ker > -1/2)
-           margs <- list(nu.ker=nu.ker, nu.pcf=2*nu.ker+1)
-           cmodel <- list(type="Kernel", model="VarGamma", margs=margs)
-           out <- list(margs = margs, covmodel = cmodel)
-           return(out)
-         },
-         parhandler = function(...){
-           ## resolve shape parameters
-           nu.ker <- resolve.vargamma.shape(..., default=TRUE, allow.nu=TRUE)$nu.ker
-           check.1.real(nu.ker)
-           stopifnot(nu.ker > -1/2)
-           margs <- list(nu.ker=nu.ker, nu.pcf=2*nu.ker+1)
-           cmodel <- list(type="Kernel", model="VarGamma", margs=margs)
-           return(cmodel)
-         },
-         # density function for the distance to offspring
-         ddist = function(r, scale, nu, ...) {
-           ## 'scale' is generic format
-           numer <- ((r/scale)^(nu+1)) * besselK(r/scale, nu)
-           numer[r==0] <- 0
-           denom <- (2^nu) * scale * gamma(nu + 1)
-           numer/denom
-         },
-         ## Practical range of clusters
-         range = function(..., par=NULL, thresh=0.001){
-           ## 'par' is in generic format
-           thresh <- as.numeric(thresh %orifnull% 0.001)
-           scale <- retrieve.param("scale", character(0), ..., par=par)
-           ## Find value of nu:
-           extra <- .Spatstat.ClusterModelInfoTable$VarGamma$resolveshape(...)
-           nu <- .Spatstat.ClusterModelInfoTable$VarGamma$outputshape(extra$margs)$nu
-           if(is.null(nu))
-             stop(paste("Argument ", sQuote("nu"), " must be given."),
-                  call.=FALSE)
-           ddist <- .Spatstat.ClusterModelInfoTable$VarGamma$ddist
-           f1 <- function(rmx) {
-             integrate(ddist, 0, rmx, scale=scale, nu=nu)$value - (1 - thresh)
-           }
-           f <- Vectorize(f1)
-           rmax <- uniroot(f, lower = scale, upper = 1000 * scale)$root
-           return(rmax)
-         },
-         ## kernel function in polar coordinates (no angular argument).
-         kernel = function(par, rvals, ..., margs) {
-           ## 'par' is in native format
-             scale <- as.numeric(par[2L])
-             nu <- margs$nu
-             if(is.null(nu))
-               stop(paste("Argument ", sQuote("nu"), " is missing."),
-                    call.=FALSE)
-             numer <- ((rvals/scale)^nu) * besselK(rvals/scale, nu)
-             numer[rvals==0] <- ifelse(nu>0, 2^(nu-1)*gamma(nu), Inf)
-             denom <- pi * (2^(nu+1)) * scale^2 * gamma(nu + 1)
-             numer/denom
-         },
-         isPCP=TRUE,
-         K = local({
-           ## K function requires integration of pair correlation
-           xgx <- function(x, par, nu.pcf) {
-             ## x * pcf(x) without check on par values
-             numer <- (x/par[2L])^nu.pcf * besselK(x/par[2L], nu.pcf)
-             denom <- 2^(nu.pcf+1) * pi * par[2L]^2 * par[1L] * gamma(nu.pcf + 1)
-             return(x * (1 + numer/denom))
-           }
-           vargammaK <- function(par,rvals, ..., margs){
-             ## 'par' is in native format
-             ## margs = list(.. nu.pcf.. ) 
-             if(any(par <= 0))
-               return(rep.int(Inf, length(rvals)))
-             nu.pcf <- margs$nu.pcf
-             out <- numeric(length(rvals))
-             ok <- (rvals > 0)
-             rvalsok <- rvals[ok]
-             outok <- numeric(sum(ok))
-             for (i in 1:length(rvalsok))
-               outok[i] <- 2 * pi * integrate(xgx,
-                                              lower=0, upper=rvalsok[i],
-                                              par=par, nu.pcf=nu.pcf)$value
-             out[ok] <- outok
-             return(out)
-           }
-           ## Initiated integration in sub-subintervals, but it is unfinished!
-           ## vargammaK <- function(par,rvals, ..., margs){
-           ##   ## margs = list(.. nu.pcf.. ) 
-           ##   if(any(par <= 0))
-           ##     return(rep.int(Inf, length(rvals)))
-           ##   nu.pcf <- margs$nu.pcf
-           ##   out <- numeric(length(rvals))
-           ##   out[1L] <- if(rvals[1L] == 0) 0 else 
-           ##   integrate(xgx, lower=0, upper=rvals[1L],
-           ##             par = par, nu.pcf=nu.pcf)$value
-           ##   for (i in 2:length(rvals)) {
-           ##     delta <- integrate(xgx,
-           ##                        lower=rvals[i-1L], upper=rvals[i],
-           ##                        par=par, nu.pcf=nu.pcf)
-           ##     out[i]=out[i-1L]+delta$value
-           ##   }
-           ##   return(out)
-           ## }
-           vargammaK
-           }), ## end of 'local'
-         pcf= function(par,rvals, ..., margs){
-           ## 'par' is in native format
-           ## margs = list(..nu.pcf..)
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           nu.pcf <- margs$nu.pcf
-           sig2 <- 1 / (4 * pi * (par[2L]^2) * nu.pcf * par[1L])
-           denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
-           rr <- rvals / par[2L]
-           ## Matern correlation function
-           fr <- ifelseXB(rr > 0,
-                        (rr^nu.pcf) * besselK(rr, nu.pcf) / denom,
-                        1)
-           return(1 + sig2 * fr)
-         },
-         Dpcf = NULL,
-         ## sensible starting values
-         selfstart = function(X) {
-           ## return 'par' in native format
-           kappa <- intensity(X)
-           eta <- 2 * mean(nndist(X))
-           c(kappa=kappa, eta=eta)
-         },
-         ## meaningful model parameters
-         interpret = function(par, lambda) {
-           #' par is in native format
-           kappa <- par[["kappa"]]
-           omega <- par[["eta"]]
-           mu <- if(is.numeric(lambda) && length(lambda) == 1)
-             lambda/kappa else NA
-           c(kappa=kappa, omega=omega, mu=mu)
-         },
-         roffspring = function(n, par, ..., margs) {
-           #' par is in native format
-           shape <- margs$nu.ker + 1
-           scale <- par[[2L]]
-           rate <- 1/(2 * scale^2)
-           b <- sqrt(rgamma(n, shape=shape, rate=rate))
-           list(x= b * rnorm(n), y = b * rnorm(n))
-         }
-         ),
-       ## ...............................................
-       LGCP=list(
-         ## Log Gaussian Cox process: native par = (sigma2, alpha) 
-         ## Log Gaussian Cox process: generic par = (var, scale) 
-         modelname = "Log-Gaussian Cox process", # In modelname field of mincon fv obj.
-         descname = "LGCP", # In desc field of mincon fv obj.
-         modelabbrev = "log-Gaussian Cox process", # In fitted obj.
-         printmodelname = function(...) "log-Gaussian Cox process", # Used by print.kppm
-         parnames = c("sigma2", "alpha"),
-         checkpar = function(par, native = old, ..., old=TRUE){
-           ## 'par' is in either format
-           if(is.null(par))
-             par <- c(var=1,scale=1)
-           if(any(par<=0))
-             stop("par values must be positive.", call.=FALSE)
-           detect.par.format(par, native=c("sigma2", "alpha"), generic=c("var", "scale"))
-           names(par) <- if(native) c("sigma2", "alpha") else c("var","scale")
-           return(par)
-         },
-         outputshape = function(margs, ...) return(margs),
-         checkclustargs = function(margs, old = TRUE, ...) return(margs),
-         resolveshape = function(...){
-           ## resolve shape parameters for kppm and friends allowing for native/generic par syntax
-           dots <- list(...)
-           nam <- names(dots)
-           out <- list()
-           cmod <- dots$covmodel
-           model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
-           margs <- NULL
-           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
-           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-             ## avoid RandomFields package
-             ## extract shape parameters and validate them
-             switch(model,
-                    stable = ,
-                    fastStable = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- "alpha" %in% names(stuff)
-                      if(!ok) stop("Parameter 'alpha' is required")
-                      margs <- stuff["alpha"]
-                      with(margs, {
-                        check.1.real(alpha)
-                        stopifnot(0 < alpha && alpha <= 2)
-                      })
-                    },
-                    gencauchy = ,
-                    fastGencauchy = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- c("alpha", "beta") %in% names(stuff)
-                      if(!ok[1]) stop("Parameter 'alpha' is required")
-                      if(!ok[2]) stop("Parameter 'beta' is required")
-                      margs <- stuff[c("alpha", "beta")]
-                      with(margs, {
-                        check.1.real(alpha)
-                        check.1.real(beta)
-                        stopifnot(0 < alpha && alpha <= 2)
-                        stopifnot(beta > 0)
-                      })
-                    })
-           } else {
-             ## get the 'model generator' 
-             modgen <- getRandomFieldsModelGen(model)
-             attr(model, "modgen") <- modgen
-             if(is.null(cmod)){
-               margsnam <- names(formals(modgen))
-               margsnam <- margsnam[!(margsnam %in% c("var", "scale"))]
-               margs <- dots[nam %in% margsnam]
-             } else{
-               margs <- cmod[names(cmod)!="model"]
-             }
-           }
-           if(length(margs)==0) {
-             margs <- NULL
-           } else {
-             ## detect anisotropic model
-             if("Aniso" %in% names(margs))
-               stop("Anisotropic covariance models cannot be used",
-                    call.=FALSE)
-           }
-           out$margs <- margs
-           out$model <- model
-           out$covmodel <- list(type="Covariance", model=model, margs=margs)
-           return(out)
-         },
-         resolvedots = function(...){
-           ## resolve dots for kppm and friends allowing for native/generic par syntax
-           dots <- list(...)
-           nam <- names(dots)
-           out <- list()
-           cmod <- dots$covmodel
-           model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
-           margs <- NULL
-           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
-           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-             ## avoid RandomFields package
-             ## extract shape parameters and validate them
-             switch(model,
-                    stable = ,
-                    fastStable = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- "alpha" %in% names(stuff)
-                      if(!ok) stop("Parameter 'alpha' is required")
-                      margs <- stuff["alpha"]
-                      with(margs, {
-                        check.1.real(alpha)
-                        stopifnot(0 < alpha && alpha <= 2)
-                      })
-                    },
-                    gencauchy = ,
-                    fastGencauchy = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- c("alpha", "beta") %in% names(stuff)
-                      if(!ok[1]) stop("Parameter 'alpha' is required")
-                      if(!ok[2]) stop("Parameter 'beta' is required")
-                      margs <- stuff[c("alpha", "beta")]
-                      with(margs, {
-                        check.1.real(alpha)
-                        check.1.real(beta)
-                        stopifnot(0 < alpha && alpha <= 2)
-                        stopifnot(beta > 0)
-                      })
-                    })
-           } else {
-             ## get the 'model generator' 
-             modgen <- getRandomFieldsModelGen(model)
-             attr(model, "modgen") <- modgen
-             if(is.null(cmod)){
-               margsnam <- names(formals(modgen))
-               margsnam <- margsnam[!(margsnam %in% c("var", "scale"))]
-               margs <- dots[nam %in% margsnam]
-             } else{
-               margs <- cmod[names(cmod)!="model"]
-             }
-           }
-           if(length(margs)==0) {
-             margs <- NULL
-           } else {
-             ## detect anisotropic model
-             if("Aniso" %in% names(margs))
-               stop("Anisotropic covariance models cannot be used",
-                    call.=FALSE)
-           }
-           out$margs <- margs
-           out$model <- model
-           out$covmodel <- list(type="Covariance", model=model, margs=margs)
-           return(out)
-         },
-         parhandler=function(...) {
-           ## equivalent to resolvedots(...)$covmodel
-           dots <- list(...)
-           nam <- names(dots)
-           cmod <- dots$covmodel
-           model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
-           if(!is.character(model))
-             stop("Covariance function model should be specified by name",
-                  call.=FALSE)
-           margs <- NULL
-           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
-           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-             ## avoid RandomFields package
-             ## extract shape parameters and validate them
-             switch(model,
-                    stable = ,
-                    fastStable = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- "alpha" %in% names(stuff)
-                      if(!ok) stop("Parameter 'alpha' is required")
-                      margs <- stuff["alpha"]
-                      with(margs, {
-                        check.1.real(alpha)
-                        stopifnot(0 < alpha && alpha <= 2)
-                      })
-                    },
-                    gencauchy = ,
-                    fastGencauchy = {
-                      stuff <- cmod %orifnull% dots
-                      ok <- c("alpha", "beta") %in% names(stuff)
-                      if(!ok[1]) stop("Parameter 'alpha' is required")
-                      if(!ok[2]) stop("Parameter 'beta' is required")
-                      margs <- stuff[c("alpha", "beta")]
-                      with(margs, {
-                        check.1.real(alpha)
-                        check.1.real(beta)
-                        stopifnot(0 < alpha && alpha <= 2)
-                        stopifnot(beta > 0)
-                      })
-                    })
-           } else {
-             ## get the 'model generator' 
-             modgen <- getRandomFieldsModelGen(model)
-             attr(model, "modgen") <- modgen
-             if(is.null(cmod)){
-               margsnam <- names(formals(modgen))
-               margsnam <- margsnam[!(margsnam %in% c("var", "scale"))]
-               margs <- dots[nam %in% margsnam]
-             } else{
-               margs <- cmod[names(cmod)!="model"]
-             }
-           }
-           if(length(margs)==0) {
-             margs <- NULL
-           } else {
-             ## detect anisotropic model
-             if("Aniso" %in% names(margs))
-               stop("Anisotropic covariance models cannot be used",
-                    call.=FALSE)
-           }
-           covmodel <- list(type="Covariance", model=model, margs=margs)
-           return(covmodel)
-         },
-         isPCP=FALSE,
-         ## calls relevant covariance function from RandomFields package
-         K = function(par, rvals, ..., model, margs) {
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
-           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) || 
-              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-             ## For efficiency and to avoid need for RandomFields package
-             switch(model,
-                    exponential = {
-                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-r/par[2L])) }
-                    },
-                    gauss = ,
-                    fastGauss = {
-                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^2)) }
-                    },
-                    stable = ,
-                    fastStable = {
-                      alpha <- margs[["alpha"]]
-                      integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^alpha)) }
-                    },
-                    gencauchy = ,
-                    fastGencauchy = {
-                      alpha <- margs[["alpha"]]
-                      beta  <- margs[["beta"]]
-                      integrand <- function(r) { 2*pi*r*exp(par[1L] * (1 + (r/par[2L])^alpha)^(-beta/alpha)) }
-                    })
-           } else {
-             ## Use RandomFields package
-             kraeverRandomFields()
-             modgen <- attr(model, "modgen")
-             ## create the model with the specified parameters
-             if(length(margs) == 0) {
-               mod <- modgen(var=par[1L], scale=par[2L])
-             } else {
-               mod <- do.call(modgen,
-                              append(list(var=par[1L], scale=par[2L]),
-                                     margs))
-             }
-             ## Encode integrand 
-             ## RandomFields does not like evaluating covariance at r=0
-             integrand <- function(r) {
-               z <- numeric(length(r))
-               if(any(ok <- (r != 0))) {
-                 rok <- r[ok]
-                 z[ok] <- 2*pi*rok*exp(RandomFields::RFcov(model=mod, x=rok))
-               }
-               return(z)
-             }
-           }
-           ## compute indefinite integral
-           imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
-           th <- indefinteg(integrand, rvals, lower=0, method=imethod)
-           return(th)
-         },
-         pcf= function(par, rvals, ..., model, margs) {
-           ## 'par' is in native format
-           if(any(par <= 0))
-             return(rep.int(Inf, length(rvals)))
-           shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
-           if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-              (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-             ## For efficiency and to avoid need for RandomFields package
-             switch(model,
-                    exponential = {
-                      gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
-                    },
-                    gauss = ,
-                    fastGauss = {
-                      gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^2))
-                    },
-                    stable = ,
-                    fastStable = {
-                      alpha <- margs[["alpha"]]
-                      gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^alpha))
-                    },
-                    gencauchy = ,
-                    fastGencauchy = {
-                      alpha <- margs[["alpha"]]
-                      beta  <- margs[["beta"]]
-                      gtheo <- exp(par[1L] * (1 + (rvals/par[2L])^alpha)^(-beta/alpha))
-                    })
-           } else {
-             ## use RandomFields
-             kraeverRandomFields()
-             modgen <- attr(model, "modgen")
-             ## create the model with the specified parameters
-             if(length(margs) == 0) {
-               mod <- modgen(var=par[1L], scale=par[2L])
-             } else {
-               mod <- do.call(modgen,
-                              append(list(var=par[1L], scale=par[2L]),
-                                     margs))
-             }
-             ## calculate pcf
-             gtheo <- exp(RandomFields::RFcov(model=mod, x=rvals))
-           }
-           return(gtheo)
-         },
-         Dpcf= function(par,rvals, ..., model){
-           ## 'par' is in native format
-           if(!identical(model, "exponential")) {
-             stop("Gradient of the pcf not available for this model.")
-           } 
-           dsigma2 <- exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))
-           dalpha <- rvals * par[1L] * exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))/par[2L]^2
-           out <- rbind(dsigma2, dalpha)
-           rownames(out) <- c("sigma2","alpha")
-           return(out)
-         },
-         ## sensible starting values
-         selfstart = function(X) {
-           ## return 'par' in native format
-           alpha <- 2 * mean(nndist(X))
-           c(sigma2=1, alpha=alpha)
-         },
-         ## meaningful model parameters
-         interpret = function(par, lambda) {
-           sigma2 <- par[["sigma2"]]
-           alpha  <- par[["alpha"]]
-           mu <- if(is.numeric(lambda) && length(lambda) == 1 && lambda > 0)
-             log(lambda) - sigma2/2 else NA
-           c(sigma2=sigma2, alpha=alpha, mu=mu)
-         }
-       )
-  )
+    Thomas   = .ThomasInfo,
+    MatClust = .MatClustInfo,
+    Cauchy   = .CauchyInfo,
+    VarGamma = .VarGammaInfo,
+    LGCP     = .LGCPInfo)
+
 
 spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
   if(inherits(name, "detpointprocfamily")) {
@@ -1059,31 +955,6 @@ retrieve.param <- function(desired, aliases, ..., par=NULL) {
   stop(mess, call.=FALSE)
 }
 
-resolve.vargamma.shape <- function(...,
-                                   nu.ker=NULL, nu.pcf=NULL,
-                                   nu = NULL, allow.nu = FALSE,
-                                   default = FALSE) {
-  if(is.null(nu.ker) && is.null(nu.pcf)) {
-    if(allow.nu && !is.null(nu)) {
-      nu.ker <- nu
-    } else if(default) {
-      nu.ker <- -1/4
-    } else stop("Must specify nu.ker or nu.pcf", call.=FALSE)
-  }
-  if(!is.null(nu.ker) && !is.null(nu.pcf))
-    stop("Only one of nu.ker and nu.pcf should be specified",
-         call.=FALSE)
-  if(!is.null(nu.ker)) {
-    check.1.real(nu.ker)
-    stopifnot(nu.ker > -1/2)
-    nu.pcf <- 2 * nu.ker + 1
-  } else {
-    check.1.real(nu.pcf)
-    stopifnot(nu.pcf > 0)
-    nu.ker <- (nu.pcf - 1)/2
-  }
-  return(list(nu.ker=nu.ker, nu.pcf=nu.pcf))
-}
 
 detect.par.format <- function(par, native, generic) {
   a <- check.named.vector(par, native, onError="null")
