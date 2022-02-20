@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.42 $ $Date: 2022/02/20 01:52:09 $
+#'   $Revision: 1.44 $ $Date: 2022/02/20 03:05:41 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -34,7 +34,7 @@
 #'                            MatClust -> c('kappa', 'R')
 #'
 #'                       **NOTE** that there are two parametrisations:
-#'                             - the 'GENERIC' parameters are 'kappa', 'scale'
+#'                             - the 'GENERIC' parameters (e.g. 'kappa' and 'scale' for cluster models)
 #'                             - the 'NATIVE' parameters depend on the model.
 #' 
 #'                       The native parameters are designed to be a more efficient representation
@@ -145,16 +145,15 @@
              par <- c(kappa=1,scale=1)
            if(any(par<=0))
              stop("par values must be positive.", call.=FALSE)
-           nam <- check.named.vector(par, c("kappa","sigma2"),
-                                     onError="null")
-           if(is.null(nam)) {
-             check.named.vector(par, c("kappa","scale"))
-             names(par)[2L] <- "sigma2"
+           fmt <- detect.par.format(par, native=c("kappa", "sigma2"), generic=c("kappa", "scale"))
+           if(fmt == "generic" && native) {
+             ## convert generic to native
              par[2L] <- par[2L]^2
-           }
-           if(!native){
-             names(par)[2L] <- "scale"
+             names(par)[2L] <- "sigma2"
+           } else if(fmt == "native" && !native) {
+             ## convert native to generic
              par[2L] <- sqrt(par[2L])
+             names(par)[2L] <- "scale"
            }
            return(par)
          },
@@ -248,18 +247,12 @@
          checkpar = function(par, native = old, ..., old = TRUE){
            ## 'par' is in either format
            if(is.null(par))
-                 par <- c(kappa=1,scale=1)
-             if(any(par<=0))
-                 stop("par values must be positive.", call.=FALSE)
-             nam <- check.named.vector(par, c("kappa","R"), onError="null")
-             if(is.null(nam)) {
-               check.named.vector(par, c("kappa","scale"))
-               names(par)[2L] <- "R"
-             }
-             if(!native){
-                 names(par)[2L] <- "scale"
-             }
-             return(par)
+             par <- c(kappa=1,scale=1)
+           if(any(par<=0))
+             stop("par values must be positive.", call.=FALSE)
+           detect.par.format(par, native=c("kappa", "R"), generic=c("kappa", "scale"))
+           names(par)[2L] <- if(native) "R" else "scale"
+           return(par)
          },
          # density function for the distance to offspring
          ddist = function(r, scale, ...) {
@@ -397,20 +390,22 @@
          checkpar = function(par, native = old, ..., old = TRUE){
            ## 'par' is in either format
            if(is.null(par))
-                 par <- c(kappa=1,scale=1)
-             if(any(par<=0))
-                 stop("par values must be positive.", call.=FALSE)
-             nam <- check.named.vector(par, c("kappa","eta2"), onError="null")
-             if(is.null(nam)) {
-                 check.named.vector(par, c("kappa","scale"))
-                 names(par)[2L] <- "eta2"
-                 par[2L] <- (2*par[2L])^2
-             }
-             if(!native){
-                 names(par)[2L] <- "scale"
-                 par[2L] <- sqrt(par[2L])/2
-             }
-             return(par)
+             par <- c(kappa=1,scale=1)
+           if(any(par<=0))
+             stop("par values must be positive.", call.=FALSE)
+           fmt <- detect.par.format(par, native=c("kappa", "eta2"), generic=c("kappa", "scale"))
+           if(fmt == "generic" && native) {
+             ## convert generic to native
+             ## eta2 = 4 * scale^2
+             par[2L] <- (2*par[2L])^2
+             names(par)[2L] <- "eta2"
+           } else if(fmt == "native" && !native) {
+             ## convert native to generic
+             ## scale = sqrt(eta2/4)
+             par[2L] <- sqrt(par[2L])/2
+             names(par)[2L] <- "scale"
+           }
+           return(par)
          },
          outputshape = function(margs, ...) list(),
          checkclustargs = function(margs, old = TRUE, ...) list(),
@@ -471,6 +466,7 @@
          },
          ## meaningful model parameters
          interpret = function(par, lambda) {
+           #' par is in native format
            kappa <- par[["kappa"]]
            omega <- sqrt(par[["eta2"]])/2
            mu <- if(is.numeric(lambda) && length(lambda) == 1)
@@ -478,6 +474,7 @@
            c(kappa=kappa, omega=omega, mu=mu)
          },
          roffspring = function(n, par, ...) {
+           #' par is in native format
            rate <- par[["eta2"]]/8 
            b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
            list(x = b * rnorm(n), y = b * rnorm(n))
@@ -499,16 +496,12 @@
          checkpar = function(par, native = old, ..., old = TRUE){
            ## 'par' is in either format
            if(is.null(par))
-                 par <- c(kappa=1,scale=1)
-             if(any(par<=0))
-                 stop("par values must be positive.", call.=FALSE)
-             nam <- check.named.vector(par, c("kappa","eta"), onError="null")
-             if(is.null(nam)) {
-               check.named.vector(par, c("kappa","scale"))
-               names(par)[2L] <- "eta"
-             }
-             if(!native) names(par)[2L] <- "scale"
-             return(par)
+             par <- c(kappa=1,scale=1)
+           if(any(par<=0))
+             stop("par values must be positive.", call.=FALSE)
+           detect.par.format(par, native=c("kappa", "eta"), generic=c("kappa", "scale"))
+           names(par)[2L] <- if(native) "eta" else "scale"
+           return(par)
          },
          outputshape = function(margs, ...) { list(nu=margs$nu.ker) },
          checkclustargs = function(margs, old = TRUE, ...){
@@ -656,6 +649,7 @@
          },
          ## meaningful model parameters
          interpret = function(par, lambda) {
+           #' par is in native format
            kappa <- par[["kappa"]]
            omega <- par[["eta"]]
            mu <- if(is.numeric(lambda) && length(lambda) == 1)
@@ -663,6 +657,7 @@
            c(kappa=kappa, omega=omega, mu=mu)
          },
          roffspring = function(n, par, ..., margs) {
+           #' par is in native format
            shape <- margs$nu.ker + 1
            scale <- par[[2L]]
            rate <- 1/(2 * scale^2)
@@ -682,16 +677,12 @@
          checkpar = function(par, native = old, ..., old=TRUE){
            ## 'par' is in either format
            if(is.null(par))
-                 par <- c(var=1,scale=1)
-             if(any(par<=0))
-                 stop("par values must be positive.", call.=FALSE)
-             nam <- check.named.vector(par, c("sigma2","alpha"), onError="null")
-             if(is.null(nam)) {
-                 check.named.vector(par, c("var","scale"))
-                 names(par) <- c("sigma2", "alpha")
-             }
-             if(!native) names(par) <- c("var", "scale")
-             return(par)
+             par <- c(var=1,scale=1)
+           if(any(par<=0))
+             stop("par values must be positive.", call.=FALSE)
+           detect.par.format(par, native=c("sigma2", "alpha"), generic=c("var", "scale"))
+           names(par) <- if(native) c("sigma2", "alpha") else c("var","scale")
+           return(par)
          },
          outputshape = function(margs, ...) return(margs),
          checkclustargs = function(margs, old = TRUE, ...) return(margs),
@@ -1062,9 +1053,9 @@ retrieve.param <- function(desired, aliases, ..., par=NULL) {
   if(nali == 0) {
     explain <- NULL
   } else {
-    explain <- paste("also tried", ngettext(nali, "alias", "aliases"), commasep(sQuote(aliases)))
+    explain <- paren(paste("also tried", ngettext(nali, "alias", "aliases"), commasep(sQuote(aliases))))
   }
-  mess <- paste("Unable to retrieve argument", sQuote(desired), paren(explain))
+  mess <- paste("Unable to retrieve argument", sQuote(desired), explain)
   stop(mess, call.=FALSE)
 }
 
@@ -1092,4 +1083,16 @@ resolve.vargamma.shape <- function(...,
     nu.ker <- (nu.pcf - 1)/2
   }
   return(list(nu.ker=nu.ker, nu.pcf=nu.pcf))
+}
+
+detect.par.format <- function(par, native, generic) {
+  a <- check.named.vector(par, native, onError="null")
+  if(!is.null(a)) return("native")
+  a <- check.named.vector(par, generic, onError="null")
+  if(!is.null(a)) return("generic")
+  whinge <- paste("'par' should be a named vector with elements",
+                  paren(paste(sQuote(native), collapse=" and "), "["),
+                  "or",
+                  paren(paste(sQuote(generic), collapse=" and "), "["))
+  stop(whinge, call.=FALSE)
 }

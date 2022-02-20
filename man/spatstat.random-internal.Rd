@@ -6,6 +6,7 @@
 \alias{datagen.runifpoisppOnLines}
 \alias{datagen.rpoisppOnLines}
 \alias{default.clipwindow}
+\alias{detect.par.format}
 \alias{expandwinPerfect}
 \alias{fakeNeyScot}
 \alias{getRandomFieldsModelGen}
@@ -65,6 +66,7 @@ datagen.runifpoisppOnLines(lambda, L)
 datagen.rpoisppOnLines(lambda, L, lmax, \dots, check)
 default.clipwindow(object, epsilon)
 expandwinPerfect(W, expand, amount)
+detect.par.format(par, native, generic)
 fakeNeyScot(Y, lambda, win, saveLambda, saveparents)
 getRandomFieldsModelGen(model)
 handle.rshift.args(W, \dots, radius, width, height,
