@@ -5,7 +5,7 @@
 ##  - clusterfield
 ##  - clusterradius.
 ##
-##   $Revision: 1.10 $  $Date: 2022/01/04 05:30:06 $
+##   $Revision: 1.11 $  $Date: 2022/02/21 02:24:34 $
 ##
 
 clusterkernel <- function(model, ...) {
@@ -16,8 +16,8 @@ clusterkernel.character <- function(model, ...){
   internalkernel <- info$kernel
   dots <- list(...)
   par <- c(kappa = 1, scale = dots$scale)
-  par <- info$checkpar(par, old = TRUE)
-  nam <- info$clustargsnames
+  par <- info$checkpar(par, native = TRUE)
+  nam <- info$shapenames
   margs <- NULL
   if(!is.null(nam))
     margs <- dots[nam]

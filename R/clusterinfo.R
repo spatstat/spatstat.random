@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.46 $ $Date: 2022/02/20 10:41:41 $
+#'   $Revision: 1.48 $ $Date: 2022/02/21 03:53:21 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -115,6 +115,7 @@
 #'
 #'       funaux          list
 #'                       Additional functions used in computation
+#'                       DEPRECATED (Additional functions should now be defined as stand-alone objects)
 #'
 #'       selfstart       function(X)
 #'                       Calculates reasonable default estimates of 'par' from point pattern X
@@ -126,18 +127,64 @@
 #'       roffspring      function(n, par, ..., model, margs)
 #'                       Generates random offspring of a parent at the origin
 #'
+
 #' ..................................................................................................
-#'      Define each entry in the table separately, then create table
+#'      This file defines each entry in the table separately, then creates the table
 #' ..................................................................................................
-#'
-#'  >>> Thomas process <<<<
+#'  
+
+
+## ................. general helper functions (exported) ....................
+
+## The following function simplifies code maintenance
+## (due to changes in subscripting behaviour in recent versions of R)
+
+retrieve.param <- function(desired, aliases, ..., par=NULL) {
+  ## Retrieve the generic parameter named <desired> (or one of its <aliases>)
+  ## from (...) or from 'par'
+  dots <- list(...)
+  par  <- as.list(par) # may be empty
+  dnames <- names(dots)
+  pnames <- names(par)
+  for(key in c(desired, aliases)) {
+    if(key %in% dnames) return(dots[[key]])
+    if(key %in% pnames) return(par[[key]])
+  }
+  ## failed
+  nali <- length(aliases)
+  if(nali == 0) {
+    explain <- NULL
+  } else {
+    explain <- paren(paste("also tried", ngettext(nali, "alias", "aliases"), commasep(sQuote(aliases))))
+  }
+  mess <- paste("Unable to retrieve argument", sQuote(desired), explain)
+  stop(mess, call.=FALSE)
+}
+
+detect.par.format <- function(par, native, generic) {
+  a <- check.named.vector(par, native, onError="null")
+  if(!is.null(a)) return("native")
+  a <- check.named.vector(par, generic, onError="null")
+  if(!is.null(a)) return("generic")
+  whinge <- paste("'par' should be a named vector with elements",
+                  paren(paste(sQuote(native), collapse=" and "), "["),
+                  "or",
+                  paren(paste(sQuote(generic), collapse=" and "), "["))
+  stop(whinge, call.=FALSE)
+}
+
+
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#'  >>>>>>>>>>>>>>>>>>>>>> Thomas process <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 .ThomasInfo <- list(
   modelname      = "Thomas process", # In modelname field of mincon fv obj.
-  descname       = "Thomas process", # In desc field of mincon fvb obj.
-  modelabbrev    = "Thomas process", # In fitted obj.
+  descname       = "Thomas process", # In desc field of mincon fv obj.
+  modelabbrev    = "Thomas process", # In fitted kppm obj.
   printmodelname = function(...) "Thomas process", # Used by print.kppm
   parnames       = c("kappa", "sigma2"),
+  shapenames     = NULL,
   clustargsnames = NULL,
   checkpar = function(par, native = old, ..., old=TRUE){
     ## 'par' is in either format
@@ -235,7 +282,9 @@
   }
 )
 
-#'  >>> Matern cluster process <<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#'  >>>>>>>>>>>>>>>>> Matern cluster process <<<<<<<<<<<<<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #' auxiliary functions
 .MatClustHfun <- function(zz) {
@@ -288,6 +337,7 @@
   modelabbrev    = "Matern cluster process", # In fitted obj.
   printmodelname = function(...) "Matern cluster process", # Used by print.kppm
   parnames       = c("kappa", "R"),
+  shapenames     = NULL,
   clustargsnames = NULL,
   checkpar = function(par, native = old, ..., old = TRUE){
     ## 'par' is in either format
@@ -308,9 +358,6 @@
   range = function(..., par=NULL, thresh=NULL){
     ## 'par' is in generic format
     scale <- retrieve.param("scale", "R", ..., par=par)
-    if(!is.null(thresh))
-      warn.once("thresh.Matern",
-                "Argument", sQuote("thresh"), "is ignored for Matern Cluster model")
     return(scale)
   },
   outputshape = function(margs,  ...) list(),
@@ -380,7 +427,9 @@
   }
 )
 
-#'  >>> Cauchy kernel cluster process <<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#'  >>>>>>>>>>>>>>>>>>>>> Cauchy kernel cluster process <<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 .CauchyInfo <- list(
@@ -389,6 +438,7 @@
   modelabbrev    = "Cauchy process", # In fitted obj.
   printmodelname = function(...) "Cauchy process", # Used by print.kppm
   parnames       = c("kappa", "eta2"),
+  shapenames     = NULL,
   clustargsnames = NULL,
   checkpar = function(par, native = old, ..., old = TRUE){
     ## 'par' is in either format
@@ -485,7 +535,9 @@
 )
 
 
-#'  >>> Variance Gamma kernel cluster process <<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#'  >>>>>>>>>>>>>>>>> Variance Gamma kernel cluster process <<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #' helper functions
 
@@ -555,6 +607,8 @@ resolve.vargamma.shape <- function(...,
   return(x * (1 + numer/denom))
 }
 
+#'    main list of info
+
 .VarGammaInfo <- list(
   modelname      = "Neyman-Scott process with Variance Gamma kernel", # In modelname field of mincon fv obj.
   descname       = "Neyman-Scott process with Variance Gamma kernel", # In desc field of mincon fv obj.
@@ -564,6 +618,7 @@ resolve.vargamma.shape <- function(...,
            signif(obj$clustargs[["nu"]], 2), ")")
   },
   parnames = c("kappa", "eta"),
+  shapenames     = "nu",
   clustargsnames = "nu",
   checkpar = function(par, native = old, ..., old = TRUE){
     ## 'par' is in either format
@@ -670,7 +725,9 @@ resolve.vargamma.shape <- function(...,
   }
 )
 
-#'  >>> Log-Gaussian Cox process <<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#'  >>>>>>>>>>>>>>>>>>  Log-Gaussian Cox process <<<<<<<<<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #' helper functions
 
@@ -738,6 +795,8 @@ resolve.vargamma.shape <- function(...,
   out$covmodel <- list(type="Covariance", model=model, margs=margs)
   return(out)
 }
+
+#'      main list of info
 
 .LGCPInfo <- list(
   ## Log Gaussian Cox process: native par = (sigma2, alpha) 
@@ -890,9 +949,11 @@ resolve.vargamma.shape <- function(...,
   }
 )
 
-#' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#'   C O N S T R U C T     T A B L E
-#' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#' >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#'              C O N S T R U C T     T A B L E
+#' <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#'  |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 .Spatstat.ClusterModelInfoTable <- 
   list(
@@ -914,56 +975,16 @@ spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
   }
   if(!is.character(name) || length(name) != 1)
     stop("Argument must be a single character string", call.=FALSE)
-  TheTable <- .Spatstat.ClusterModelInfoTable
-  nama2 <- names(TheTable)
+  nama2 <- names(.Spatstat.ClusterModelInfoTable)
   if(onlyPCP){
-    ok <- sapply(TheTable, getElement, name="isPCP")
+    ok <- sapply(.Spatstat.ClusterModelInfoTable, getElement, name="isPCP")
     nama2 <- nama2[ok]
   } 
   if(!(name %in% nama2))
     stop(paste(sQuote(name), "is not recognised;",
                "valid names are", commasep(sQuote(nama2))),
          call.=FALSE)
-  out <- TheTable[[name]]
+  out <- .Spatstat.ClusterModelInfoTable[[name]]
   return(out)
 }
 
-## ................. helper functions (user-callable) ....................
-
-## The following function simplifies code maintenance
-## (due to changes in subscripting behaviour in recent versions of R)
-
-retrieve.param <- function(desired, aliases, ..., par=NULL) {
-  ## Retrieve the generic parameter named <desired> (or one of its <aliases>)
-  ## from (...) or from 'par'
-  dots <- list(...)
-  par  <- as.list(par) # may be empty
-  dnames <- names(dots)
-  pnames <- names(par)
-  for(key in c(desired, aliases)) {
-    if(key %in% dnames) return(dots[[key]])
-    if(key %in% pnames) return(par[[key]])
-  }
-  ## failed
-  nali <- length(aliases)
-  if(nali == 0) {
-    explain <- NULL
-  } else {
-    explain <- paren(paste("also tried", ngettext(nali, "alias", "aliases"), commasep(sQuote(aliases))))
-  }
-  mess <- paste("Unable to retrieve argument", sQuote(desired), explain)
-  stop(mess, call.=FALSE)
-}
-
-
-detect.par.format <- function(par, native, generic) {
-  a <- check.named.vector(par, native, onError="null")
-  if(!is.null(a)) return("native")
-  a <- check.named.vector(par, generic, onError="null")
-  if(!is.null(a)) return("generic")
-  whinge <- paste("'par' should be a named vector with elements",
-                  paren(paste(sQuote(native), collapse=" and "), "["),
-                  "or",
-                  paren(paste(sQuote(generic), collapse=" and "), "["))
-  stop(whinge, call.=FALSE)
-}
