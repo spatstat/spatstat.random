@@ -95,27 +95,24 @@
 #'       isPCP           logical.
 #'                       TRUE iff the model is a Poisson cluster process
 #'
-#'       K               function(par, rvals, ..., model, margs, funaux)
+#'       K               function(par, rvals, ..., model, margs)
 #'                       Compute K-function
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
-#'                       Argument 'funaux' may be required
-#'                       
-#'       pcf             function(par, rvals, ..., model, margs, funaux)
+#'                        
+#'       pcf             function(par, rvals, ..., model, margs)
 #'                       Compute pair correlation function
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
-#'                       Argument 'funaux' may be required
 #'                       
-#'       Dpcf            function(par, rvals, ..., model, margs, funaux)
+#'       Dpcf            function(par, rvals, ..., model, margs)
 #'                       Compute vector of partial derivatives of pair correlation function with respect to 'par'
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
-#'                       Argument 'funaux' may be required
 #'
-#'       funaux          list
-#'                       Additional functions used in computation
-#'                       DEPRECATED (Additional functions should now be defined as stand-alone objects)
+#'       funaux          DEPRECATED
+#'                       List of additional functions used in computation
+#'                       (These should now be defined as stand-alone objects)
 #'
 #'       selfstart       function(X)
 #'                       Calculates reasonable default estimates of 'par' from point pattern X
