@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.31 $  $Date: 2022/01/25 12:22:52 $
+##   $Revision: 1.32 $  $Date: 2022/03/17 08:45:33 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -386,11 +386,13 @@ rVarGamma <- local({
     ## Catch old nu.ker/nu.pcf syntax and resolve nu-value.
     dots <- list(...)
     if(missing(nu)){
-        nu <- resolve.vargamma.shape(nu.ker=dots$nu.ker, nu.pcf=dots$nu.pcf)$nu.ker
-    } else{
-        check.1.real(nu)
-        stopifnot(nu > -1/2)
+      nu <- resolve.vargamma.shape(nu.ker=dots$nu.ker,
+                                   nu.pcf=dots$nu.pcf)$nu.ker
+    } else {
+      check.1.real(nu)
+      stopifnot(nu > -1)
     }
+    nu.ker <- nu
     ## Catch old scale syntax (omega)
     if(missing(scale)) scale <- dots$omega
     
@@ -416,18 +418,22 @@ rVarGamma <- local({
     
      ## determine the maximum radius of clusters
     if(missing(expand)){
-        expand <- clusterradius("VarGamma", scale = scale, nu = nu,
-                             thresh = thresh, ...)
-    } else if(!missthresh){
-        warning("Argument ", sQuote("thresh"), " is ignored when ", sQuote("expand"), " is given")
+        expand <- clusterradius("VarGamma", scale = scale, nu = nu.ker,
+                                thresh = thresh, ...)
+    } else if(!missthresh) {
+      warning("Argument ", sQuote("thresh"), " is ignored when ",
+              sQuote("expand"), " is given")
     }
 
+    ## gamma mixture of normals
+    alpha <- 2 * (nu.ker + 1)
+    beta  <- 1/(2 * scale^2)
+    
     ## simulate
     result <- rNeymanScott(kappa, expand,
                            list(mu, rnmix.gamma), win,
-##                          WAS:  shape = 2 * (nu.ker + 1)
-                           shape = nu + 1,
-                           rate = 1/(2 * scale^2),
+                           shape = alpha, 
+                           rate = beta,
                            nsim=nsim, drop=FALSE,
                            nonempty = nonempty,
                            saveparents = saveparents || saveLambda)
@@ -435,7 +441,7 @@ rVarGamma <- local({
       for(i in 1:nsim) {
         parents <- attr(result[[i]], "parents")
         Lambda <- clusterfield("VarGamma", parents, scale=scale,
-                               nu=nu, mu=mu, ...)
+                               nu=nu.ker, mu=mu, ...)
         attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
       }
     }

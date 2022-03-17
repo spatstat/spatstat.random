@@ -1,11 +1,16 @@
 
-        CHANGES IN spatstat.random VERSION 2.1-0.009
+        CHANGES IN spatstat.random VERSION 2.1-0.010
 
 OVERVIEW
 
     o Bug fixes and internal improvements.
 
 BUG FIXES
+
+    o rVarGamma
+    The parameter 'nu' was interpreted incorrectly
+    as if it were 2 * nu + 1.
+    Fixed.
 
     o Internal code
     Fix a bug in internal code that causes bug in spatstat.core::kppm

@@ -101,9 +101,9 @@
   according to a Variance Gamma kernel.
 
   The shape of the kernel is determined by the dimensionless
-  index \code{nu}. This is the parameter
+  index \code{nu}. This is the parameter \eqn{nu^\prime}{nu'} (nu-prime)
   \eqn{\nu^\prime = \alpha/2-1}{nu' = alpha/2 - 1} appearing in
-  equation (12) on page 126 of Jalilian et al (2013).
+  equation (12) on page 126 of Jalilian et al (2013). 
 
   The scale of the kernel is determined by the argument \code{scale},
   which is the parameter
@@ -148,6 +148,15 @@
   \code{kappa * mu}, using \code{\link[spatstat.random]{rpoispp}}.
   This avoids computations that would otherwise require huge amounts
   of memory.
+}
+\section{Warning}{
+  The argument \code{nu} is the parameter \eqn{\nu^\prime}{nu'} (nu-prime)
+  \eqn{\nu^\prime = \alpha/2-1}{nu' = alpha/2 - 1} appearing in
+  equation (12) on page 126 of Jalilian et al (2013).
+  This is different from the parameter called \eqn{\nu}{nu} appearing in
+  equation(14) on page 127 of  Jalilian et al (2013), defined
+  by \eqn{\nu = \alpha-1}{nu = alpha - 1}. This has been a frequent
+  source of confusion.
 }
 \seealso{
   \code{\link[spatstat.random]{rpoispp}},

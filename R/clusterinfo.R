@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.48 $ $Date: 2022/02/21 03:53:21 $
+#'   $Revision: 1.49 $ $Date: 2022/03/17 08:46:30 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -87,6 +87,7 @@
 #'                       (thresh = probability that parent-to-offspring distance exceeds this radius)
 #'
 #'       kernel          function(par, rvals, ..., margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
 #'                       compute kernel (two-dimensional probability density of offspring)
 #'                       as a function of distance from parent to offspring.
 #'                       'par' is in native format
@@ -94,6 +95,14 @@
 #'
 #'       isPCP           logical.
 #'                       TRUE iff the model is a Poisson cluster process
+#'
+#'       iscompact       logical.
+#'                       TRUE if the kernel has compact support.
+#'
+#'       roffspring      function(n, par, ..., margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Random generator of cluster.
+#'                       Generates n offspring of a parent at the origin.
 #'
 #'       K               function(par, rvals, ..., model, margs)
 #'                       Compute K-function
@@ -230,6 +239,12 @@ detect.par.format <- function(par, native, generic) {
     dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
   },
   isPCP=TRUE,
+  iscompact=FALSE,
+  roffspring=function(n, par, ...) {
+    ## 'par' is in native format
+    sigma <- sqrt(par[2L])
+    list(x=rnorm(n, sd=sigma), y=rnorm(n, sd=sigma))
+  },
   ## K-function
   K = function(par,rvals, ...){
     ## 'par' is in native format
@@ -368,6 +383,14 @@ detect.par.format <- function(par, native, generic) {
     ifelse(rvals>scale, 0, 1/(pi*scale^2))
   },
   isPCP=TRUE,
+  iscompact=TRUE,
+  roffspring = function(n, par, ...) {
+    ## 'par' is in native format
+    R <- par[2L]
+    rad <- R * sqrt(runif(n))
+    theta <- runif(n, max=2*pi)
+    list(x = rad * cos(theta), y = rad * sin(theta))
+  },
   K = function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0))
@@ -483,6 +506,13 @@ detect.par.format <- function(par, native, generic) {
     1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
   },
   isPCP=TRUE,
+  iscompact=FALSE,
+  roffspring=function(n, par, ...) {
+    ## 'par' is in native format
+    rate <- par[["eta2"]]/8 
+    b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
+    list(x = b * rnorm(n), y = b * rnorm(n))
+  },
   K = function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0))
@@ -666,6 +696,17 @@ resolve.vargamma.shape <- function(...,
     numer/denom
   },
   isPCP=TRUE,
+  iscompact=FALSE,
+  roffspring=function(n, par, ..., margs) {
+    ## 'par' is in native format
+    scale <- par[["eta"]] ## eta = omega = scale
+    nu.ker <- margs$nu.ker
+    alpha <- 2 * (nu.ker + 1)
+    beta  <- 1/(2 * scale^2)
+    sdee <- sqrt(rgamma(n, shape=alpha, rate=beta))
+    list(x = sdee * rnorm(n),
+         y = sdee * rnorm(n))
+  },
   K = function(par,rvals, ..., margs){
     ## 'par' is in native format
     ## margs = list(.. nu.pcf.. )
@@ -819,6 +860,8 @@ resolve.vargamma.shape <- function(...,
   resolvedots  = .LGCPResolveShape,
   parhandler   = function(...) { .LGCPResolveShape(...)$covmodel },
   isPCP=FALSE,
+  iscompact=FALSE,
+  roffspring=NULL,
   ## calls relevant covariance function from RandomFields package
   K = function(par, rvals, ..., model, margs) {
     ## 'par' is in native format
