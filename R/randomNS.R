@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.32 $  $Date: 2022/03/17 08:45:33 $
+##   $Revision: 1.33 $  $Date: 2022/03/18 04:04:09 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -432,7 +432,7 @@ rVarGamma <- local({
     ## simulate
     result <- rNeymanScott(kappa, expand,
                            list(mu, rnmix.gamma), win,
-                           shape = alpha, 
+                           shape = alpha/2, 
                            rate = beta,
                            nsim=nsim, drop=FALSE,
                            nonempty = nonempty,

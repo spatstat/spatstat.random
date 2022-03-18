@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.49 $ $Date: 2022/03/17 08:46:30 $
+#'   $Revision: 1.50 $ $Date: 2022/03/18 04:20:21 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -635,6 +635,9 @@ resolve.vargamma.shape <- function(...,
 }
 
 #'    main list of info
+#'   NOTE: 'nu' represents 'nu.ker',
+#'         the parameter \nu^\prime in equation (12)
+#'         of Jalilian, Guan & Waagepetersen 2013
 
 .VarGammaInfo <- list(
   modelname      = "Neyman-Scott process with Variance Gamma kernel", # In modelname field of mincon fv obj.
@@ -703,7 +706,7 @@ resolve.vargamma.shape <- function(...,
     nu.ker <- margs$nu.ker
     alpha <- 2 * (nu.ker + 1)
     beta  <- 1/(2 * scale^2)
-    sdee <- sqrt(rgamma(n, shape=alpha, rate=beta))
+    sdee <- sqrt(rgamma(n, shape=alpha/2, rate=beta))
     list(x = sdee * rnorm(n),
          y = sdee * rnorm(n))
   },
