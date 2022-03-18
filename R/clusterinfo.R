@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.50 $ $Date: 2022/03/18 04:20:21 $
+#'   $Revision: 1.52 $ $Date: 2022/03/18 15:16:47 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -569,13 +569,14 @@ detect.par.format <- function(par, native, generic) {
 #' helper functions
 
 resolve.vargamma.shape <- function(...,
-                                   nu.ker=NULL, nu.pcf=NULL,
+                                   nu.ker=NULL,  nu.pcf=NULL,
                                    nu = NULL, allow.nu = FALSE,
-                                   default = FALSE) {
+                                   allow.default = FALSE) {
+  ## ingest any kind of 'nu' argument by name
   if(is.null(nu.ker) && is.null(nu.pcf)) {
     if(allow.nu && !is.null(nu)) {
       nu.ker <- nu
-    } else if(default) {
+    } else if(allow.default) {
       nu.ker <- -1/4
     } else stop("Must specify nu.ker or nu.pcf", call.=FALSE)
   }
@@ -595,7 +596,8 @@ resolve.vargamma.shape <- function(...,
 }
 
 .VarGammaResolveShape <- function(...){
-  nu.ker <- resolve.vargamma.shape(..., default=TRUE, allow.nu=TRUE)$nu.ker
+  nu.ker <- resolve.vargamma.shape(...,
+                                   allow.default=TRUE, allow.nu=TRUE)$nu.ker
   check.1.real(nu.ker)
   stopifnot(nu.ker > -1/2)
   margs <- list(nu.ker=nu.ker, nu.pcf=2*nu.ker+1)
@@ -689,13 +691,11 @@ resolve.vargamma.shape <- function(...,
   kernel = function(par, rvals, ..., margs) {
     ## 'par' is in native format
     scale <- as.numeric(par[2L])
-    nu <- margs$nu
-    if(is.null(nu))
-      stop(paste("Argument ", sQuote("nu"), " is missing."),
-           call.=FALSE)
-    numer <- ((rvals/scale)^nu) * besselK(rvals/scale, nu)
-    numer[rvals==0] <- ifelse(nu>0, 2^(nu-1)*gamma(nu), Inf)
-    denom <- pi * (2^(nu+1)) * scale^2 * gamma(nu + 1)
+    nu.ker <- margs$nu.ker %orifnull% margs$nu
+    ## evaluate
+    numer <- ((rvals/scale)^nu.ker) * besselK(rvals/scale, nu.ker)
+    numer[rvals==0] <- if(nu.ker > 0) 2^(nu.ker-1)*gamma(nu.ker) else Inf
+    denom <- pi * (2^(nu.ker+1)) * scale^2 * gamma(nu.ker + 1)
     numer/denom
   },
   isPCP=TRUE,
