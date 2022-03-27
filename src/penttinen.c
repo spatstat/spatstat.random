@@ -40,7 +40,7 @@ Cdata *penttineninit(state, model, algo)
 	  penttinen->gamma, penttinen->r);
 #endif
   /* is the model numerically equivalent to hard core ? */
-  penttinen->hard   = (penttinen->gamma < DOUBLE_EPS);
+  penttinen->hard   = (penttinen->gamma < DBL_EPSILON);
   penttinen->loggamma = (penttinen->hard) ? 0 : log(penttinen->gamma);
   /* periodic boundary conditions? */
   penttinen->per    = (model.period[0] > 0.0);

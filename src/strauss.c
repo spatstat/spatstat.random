@@ -38,7 +38,7 @@ Cdata *straussinit(state, model, algo)
 	  strauss->gamma, strauss->r);
 #endif
   /* is the model numerically equivalent to hard core ? */
-  strauss->hard   = (strauss->gamma < DOUBLE_EPS);
+  strauss->hard   = (strauss->gamma < DBL_EPSILON);
   strauss->loggamma = (strauss->hard) ? 0 : log(strauss->gamma);
   /* periodic boundary conditions? */
   strauss->per    = (model.period[0] > 0.0);

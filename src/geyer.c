@@ -55,7 +55,7 @@ Cdata *geyerinit(state, model, algo)
 	  geyer->gamma, geyer->r, geyer->s);
 #endif
   /* is the model numerically equivalent to hard core ? */
-  geyer->hard   = (geyer->gamma < DOUBLE_EPS);
+  geyer->hard   = (geyer->gamma < DBL_EPSILON);
   geyer->loggamma = (geyer->hard) ? 0 : log(geyer->gamma);
   /* periodic boundary conditions? */
   geyer->period = model.period;

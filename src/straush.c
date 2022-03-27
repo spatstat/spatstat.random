@@ -40,7 +40,7 @@ Cdata *straushinit(state, model, algo)
   strausshard->r2h2   = strausshard->r2 - strausshard->h2;
   strausshard->period = model.period;
   /* is the interaction numerically equivalent to hard core ? */
-  strausshard->hard   = (strausshard->gamma < DOUBLE_EPS);
+  strausshard->hard   = (strausshard->gamma < DBL_EPSILON);
   strausshard->loggamma = (strausshard->hard) ? 0.0 : log(strausshard->gamma);
   /* periodic boundary conditions? */
   strausshard->per    = (model.period[0] > 0.0);

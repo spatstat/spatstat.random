@@ -24,7 +24,7 @@ typedef struct Lennard {
    MAXEXP is intended to be the largest x such that exp(-x) != 0 
    although the exact value is not needed
 */
-#define MAXEXP (-log(DOUBLE_XMIN))
+#define MAXEXP (-log(DBL_MIN))
 #define MINEXP (log(1.001))
 
 /* initialiser function */

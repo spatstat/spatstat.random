@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.33 $  $Date: 2022/03/18 04:04:09 $
+##   $Revision: 1.34 $  $Date: 2022/03/22 00:51:53 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -387,7 +387,8 @@ rVarGamma <- local({
     dots <- list(...)
     if(missing(nu)){
       nu <- resolve.vargamma.shape(nu.ker=dots$nu.ker,
-                                   nu.pcf=dots$nu.pcf)$nu.ker
+                                   nu.pcf=dots$nu.pcf,
+                                   allow.default=TRUE)$nu.ker
     } else {
       check.1.real(nu)
       stopifnot(nu > -1)

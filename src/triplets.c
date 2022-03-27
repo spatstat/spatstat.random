@@ -42,7 +42,7 @@ Cdata *tripletsinit(state, model, algo)
 	  triplets->gamma, triplets->r);
 #endif
   /* is the model numerically equivalent to hard core ? */
-  triplets->hard   = (triplets->gamma < DOUBLE_EPS);
+  triplets->hard   = (triplets->gamma < DBL_EPSILON);
   triplets->loggamma = (triplets->hard) ? 0 : log(triplets->gamma);
   /* periodic boundary conditions? */
   triplets->per    = (model.period[0] > 0.0);

@@ -65,7 +65,7 @@ Cdata *areaintInit(state, model, algo)
   areaint->range2 = 4 * r * r;    /* square of interaction distance */
   /* is the model numerically equivalent to hard core ? */
   areaint->hard   = (areaint->eta == 0.0);
-  areaint->logeta = (areaint->hard) ? log(DOUBLE_XMIN) : log(areaint->eta);
+  areaint->logeta = (areaint->hard) ? log(DBL_MIN) : log(areaint->eta);
 #ifdef BADBUG
   if(areaint->hard) Rprintf("Hard core recognised\n");
 #endif

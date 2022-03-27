@@ -78,7 +78,7 @@ Cdata *straushminit(state, model, algo)
       h = model.ipar[2*n2 + i + j*ntypes];
       r2 = r * r;
       h2 = h * h;
-      hard = (g < DOUBLE_EPS);
+      hard = (g < DBL_EPSILON);
       logg = (hard) ? 0 : log(g);
       MAT(multistrausshard->gamma,    i, j, ntypes) = g;
       MAT(multistrausshard->rad,      i, j, ntypes) = r;

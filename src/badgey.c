@@ -66,8 +66,8 @@ Cdata *badgeyinit(state, model, algo)
     r = badgey->r[i] =     model.ipar[i0 + 1];
         badgey->s[i] =     model.ipar[i0 + 2];
     badgey->r2[i] = r * r;
-    badgey->hard[i] = (g < DOUBLE_EPS);
-    badgey->loggamma[i] = (g < DOUBLE_EPS) ? 0 : log(g);
+    badgey->hard[i] = (g < DBL_EPSILON);
+    badgey->loggamma[i] = (g < DBL_EPSILON) ? 0 : log(g);
   }
   /* periodic boundary conditions? */
   badgey->period = model.period;

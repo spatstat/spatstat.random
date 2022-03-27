@@ -68,7 +68,7 @@ Cdata *straussminit(state, model, algo)
       g = model.ipar[i + j*ntypes];
       r = model.ipar[n2 + i + j*ntypes];
       r2 = r * r;
-      hard = (g < DOUBLE_EPS);
+      hard = (g < DBL_EPSILON);
       logg = (hard) ? 0 : log(g);
       MAT(multistrauss->gamma, i, j, ntypes) = g;
       MAT(multistrauss->rad, i, j, ntypes) = r;

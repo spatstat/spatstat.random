@@ -1,6 +1,6 @@
 
 // ........................... Penttinen process ................
-// $Revision: 1.4 $  $Date: 2020/05/12 03:32:19 $
+// $Revision: 1.5 $  $Date: 2022/03/27 01:58:21 $
 
 class PenttProcess : public PointProcess {
  public:
@@ -22,7 +22,7 @@ PenttProcess::PenttProcess(double xmin, double xmax,
 			   double b, double g, double r) :
   PointProcess(xmin, xmax, ymin, ymax){
     beta = b; gamma = g; radius = r; 
-    ishard = (gamma <= DOUBLE_EPS);
+    ishard = (gamma <= DBL_EPSILON);
     loggamma2pi = M_2PI * (ishard? 0.0 : log(gamma));
     reachsquared = 4.0 * radius * radius;
     InteractionRange = 2.0 * radius;
