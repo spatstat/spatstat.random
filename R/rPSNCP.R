@@ -1,7 +1,7 @@
 #'   simulation of product shot-noise Cox process
 #'   Original: (c) Abdollah Jalilian 2021
 #'   Adapted to spatstat by Adrian Baddeley
-#'   $Revision: 1.5 $ $Date: 2021/05/16 02:24:17 $
+#'   $Revision: 1.6 $ $Date: 2022/04/06 07:29:33 $
 
 rPSNCP <- local({
   
@@ -44,7 +44,11 @@ rPSNCP <- local({
                       epsth=0.001
                       # , mc.cores=1L
                       ) {
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
     m <- length(lambda)
+    if(m == 0) stop("No lambda values supplied")
     if ((length(kappa) != m) || length(omega) != m ) 
       stop("arguments kappa and omega must have the same length as lambda")
     if (is.null(kernels))
@@ -85,7 +89,7 @@ rPSNCP <- local({
     }
     ## outlist <- if (mc.cores == 1) lapply(1:nsim, corefun0) 
     ## else parallel::mclapply(1:nsim, corefun0, mc.cores=mc.cores)
-    outlist <- lapply(1:nsim, corefun0)
+    outlist <- lapply(seq_len(nsim), corefun0)
     outlist <- simulationresult(outlist, nsim, drop)
     return(outlist)
   }
@@ -101,6 +105,7 @@ rPSNCP <- local({
                                         # , mc.cores=1L
                      ) {
     m <- length(lambda)
+    if(m == 0) stop("No lambda values supplied")
     if ((length(kappa) != m) || length(omega) != m ) 
       stop("Arguments kappa and omega must have the same length as lambda")
     if (!all(dim(alpha) == c(m, m)))
@@ -177,7 +182,7 @@ rPSNCP <- local({
     }
     ## outlist <- if (mc.cores == 1) lapply(1:nsim, corefun) 
     ## else parallel::mclapply(1:nsim, corefun, mc.cores=mc.cores)
-    outlist <- lapply(1:nsim, corefun)
+    outlist <- lapply(seq_len(nsim), corefun)
     outlist <- simulationresult(outlist, nsim, drop)
     return(outlist)
   }

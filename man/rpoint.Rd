@@ -8,7 +8,7 @@
 }
 \usage{
  rpoint(n, f, fmax=NULL, win=unit.square(),
-        \dots, giveup=1000, verbose=FALSE,
+        \dots, giveup=1000, warn=TRUE, verbose=FALSE,
         nsim=1, drop=TRUE, forcewin=FALSE)
 }
 \arguments{
@@ -35,6 +35,10 @@
   \item{giveup}{
     Number of attempts in the rejection method after which
     the algorithm should stop trying to generate new points.
+  }
+  \item{warn}{
+    Logical value specifying whether to issue a warning if \code{n} is very large.
+    See Details.
   }
   \item{verbose}{
     Flag indicating whether to report details of performance
@@ -113,6 +117,11 @@
   }
   The algorithm for pixel images is more efficient than that for
   functions.
+
+  If \code{warn=TRUE} (the default), a warning will be issued if \code{n} is very large.
+  The threshold is \code{\link{spatstat.options}("huge.npoints")}.
+  This warning has no consequences,
+  but it helps to trap a number of common errors.
 }
 \seealso{
 \code{\link{ppp.object}},

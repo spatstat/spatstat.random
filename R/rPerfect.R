@@ -1,7 +1,7 @@
 #
 #  Perfect Simulation 
 #
-#  $Revision: 1.24 $ $Date: 2022/01/03 04:51:13 $
+#  $Revision: 1.25 $ $Date: 2022/04/06 07:26:31 $
 #
 #  rStrauss
 #  rHardcore
@@ -37,7 +37,7 @@ rStrauss <- function(beta, gamma=1, R=0, W=owin(), expand=TRUE,
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- storage.mode(gamma) <- storage.mode(R) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
   
@@ -67,8 +67,7 @@ rStrauss <- function(beta, gamma=1, R=0, W=owin(), expand=TRUE,
     
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 
@@ -95,7 +94,7 @@ rHardcore <- function(beta, R=0, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- storage.mode(R) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
   
@@ -121,8 +120,7 @@ rHardcore <- function(beta, R=0, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
     if(nsim == 1 && drop) return(P)
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 
@@ -162,7 +160,7 @@ rStraussHard <- function(beta, gamma=1, R=0, H=0, W=owin(),
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- storage.mode(gamma) <-
       storage.mode(R) <- storage.mode(H) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
@@ -191,8 +189,7 @@ rStraussHard <- function(beta, gamma=1, R=0, H=0, W=owin(),
     if(nsim == 1 && drop) return(P)
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 
@@ -229,7 +226,7 @@ rDiggleGratton <- function(beta, delta, rho, kappa=1, W=owin(),
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- "double"
     storage.mode(delta) <- storage.mode(rho) <- storage.mode(kappa) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
@@ -258,8 +255,7 @@ rDiggleGratton <- function(beta, delta, rho, kappa=1, W=owin(),
     if(nsim == 1 && drop) return(P)
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 
@@ -289,7 +285,7 @@ rDGS <- function(beta, rho, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- "double"
     storage.mode(rho) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
@@ -316,8 +312,7 @@ rDGS <- function(beta, rho, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
     if(nsim == 1 && drop) return(P)
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 
@@ -352,7 +347,7 @@ rPenttinen <- function(beta, gamma=1, R, W=owin(),
 
   result <- vector(mode="list", length=nsim)
 
-  for(i in 1:nsim) {
+  for(i in seq_len(nsim)) {
     storage.mode(beta) <- storage.mode(gamma) <- storage.mode(R) <- "double"
     storage.mode(xrange) <- storage.mode(yrange) <- "double"
   
@@ -379,8 +374,7 @@ rPenttinen <- function(beta, gamma=1, R, W=owin(),
     if(nsim == 1 && drop) return(P)
     result[[i]] <- P
   }
-  result <- as.solist(result)
-  names(result) <- paste("Simulation", 1:nsim)
+  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 

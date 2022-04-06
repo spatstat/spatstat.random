@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.24 $    $Date: 2022/01/04 05:30:06 $
+#'  $Revision: 1.25 $    $Date: 2022/04/06 07:19:52 $
 #'
 
 rLGCP <- local({
@@ -20,7 +20,7 @@ rLGCP <- local({
     } else if(!is.function(mu) && !is.im(mu))
       stop(paste(sQuote("mu"), "must be a constant, a function or an image"))
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
     ## check for outdated usage
     if(!all(nzchar(names(param))))
       stop("Outdated syntax of argument 'param' to rLGCP", call.=FALSE)
@@ -46,6 +46,9 @@ rLGCP <- local({
     if(modelonly)
       return(rfmodel)
 
+    ## empty list
+    if(nsim == 0) return(simulationresult(list()))
+    
     ## simulation window
     win.given <- !is.null(win)
     mu.image <- is.im(mu)
@@ -93,7 +96,7 @@ rLGCP <- local({
     if(Lambdaonly) {
       ## undocumented exit - return Lambda only
       Lambdalist <- vector(mode="list", length=nsim)
-      for(i in 1:nsim) {
+      for(i in seq_len(nsim)) {
         ## Extract i-th realisation of Z; convert to log-Gaussian image
         Lambda$v[] <- exp(muxy + z[,,i])
         ## save as i-th realisation of Lambda
@@ -104,7 +107,7 @@ rLGCP <- local({
     
     ## generate realisations of LGCP
     result <- vector(mode="list", length=nsim)
-    for(i in 1:nsim) {
+    for(i in seq_len(nsim)) {
       ## Extract i-th realisation of Z; convert to log-Gaussian image
       Lambda$v[] <- exp(muxy + z[,,i])
       ## generate Poisson points
@@ -114,10 +117,7 @@ rLGCP <- local({
         attr(X, "Lambda") <- Lambda
       result[[i]] <- X
     }
-    if(drop && nsim == 1)
-      return(result[[1]])
-    names(result) <- paste("Simulation", 1:nsim)
-    return(as.solist(result))
+    return(simulationresult(result, nsim, drop))
   }
 
   rLGCP

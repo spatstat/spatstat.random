@@ -4,7 +4,7 @@
 #
 #   Random generators for MULTITYPE point processes
 #
-#   $Revision: 1.39 $   $Date: 2018/05/07 04:34:35 $
+#   $Revision: 1.40 $   $Date: 2022/04/06 03:16:14 $
 #
 #   rmpoispp()   random marked Poisson pp
 #   rmpoint()    n independent random marked points
@@ -49,16 +49,12 @@ rmpoispp <- local({
       ##     ...     extra arguments passed to lambda()
       ##
 
+      check.1.integer(nsim)
+      stopifnot(nsim >= 0)
+      if(nsim == 0) return(simulationresult(list()))
+
       if(missing(types)) types <- NULL
       force(warnwin)
-      
-      if(nsim > 1) {
-        result <- vector(mode="list", length=nsim)
-        for(i in 1:nsim)
-          result[[i]] <- rmpoispp(lambda, lmax, win, types, ...,
-                                  warnwin=warnwin)
-        return(simulationresult(result, nsim, drop))
-      }
       
       ## Validate arguments
       single.arg <- checkone(lambda)
@@ -87,7 +83,6 @@ rmpoispp <- local({
           types <- seq_along(lambda)
         }
       } 
-
       ntypes <- length(types)
       if(!single.arg && (length(lambda) != ntypes))
         stop(paste("The lengths of", sQuote("lambda"),
@@ -117,24 +112,28 @@ rmpoispp <- local({
       lam <- if(single.arg) rep(list(lambda), ntypes) else
              if(vector.arg) as.list(lambda) else lambda
 
-      ## Simulate
-      for(i in 1:ntypes) {
-        if(single.arg && is.function(lambda)) {
-          ## call f(x,y,m, ...)
-          Y <- rpoispp(slice.fun, lmax=maxes[i], win=win,
-                       fun=lambda, mvalue=types[i], ..., warnwin=warnwin)
-        } else {
-          ## call f(x,y, ...) or use other formats
-          Y <- rpoispp(lam[[i]], lmax=maxes[i], win=win, ..., warnwin=warnwin)
+      ## ------------- SIMULATE ----------------------------
+      resultlist <- vector(mode="list", length=nsim)
+      for(isim in seq_len(nsim)) {
+        for(i in 1:ntypes) {
+          if(single.arg && is.function(lambda)) {
+            ## call f(x,y,m, ...)
+            Y <- rpoispp(slice.fun, lmax=maxes[i], win=win,
+                         fun=lambda, mvalue=types[i], ..., warnwin=warnwin)
+          } else {
+            ## call f(x,y, ...) or use other formats
+            Y <- rpoispp(lam[[i]], lmax=maxes[i], win=win, ..., warnwin=warnwin)
+          }
+          Y <- Y %mark% factortype[i]
+          X <- if(i == 1) Y else superimpose(X, Y, W=X$window, check=FALSE)
         }
-        Y <- Y %mark% factortype[i]
-        X <- if(i == 1) Y else superimpose(X, Y, W=X$window, check=FALSE)
+        ## Randomly permute, just in case the order is important
+        permu <- sample(X$n)
+        X <- X[permu]
+        ## save 
+        resultlist[[isim]] <- X
       }
-
-      ## Randomly permute, just in case the order is important
-      permu <- sample(X$n)
-      X <- X[permu]
-      return(simulationresult(list(X), 1, drop))
+      return(simulationresult(resultlist, nsim, drop))
     }
 
   rmpoispp
@@ -183,23 +182,25 @@ rmpoint <- local({
     if(missing(types)) types <- NULL
     if(missing(ptypes)) ptypes <- NULL
 
-    if(nsim > 1) {
-      result <- vector(mode="list", length=nsim)
-      for(i in 1:nsim)
-        result[[i]] <- rmpoint(n, f, fmax, win, types, ptypes, ...,
-                               giveup=giveup, verbose=verbose)
-      return(simulationresult(result, nsim, drop))
-    }
-      
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+
+    ######  Trivial cases
+
+    if(nsim == 0) return(simulationresult(list()))
+    
     if(sum(n) == 0) {
+      ## results are empty patterns
       nopoints <- ppp(x=numeric(0), y=numeric(0), window=win, check=FALSE)
       if(!is.null(types)) {
-        nomarks <- factor(types[numeric(0)], levels=types)
+        nomarks <- factor(types[integer(0)], levels=types)
         nopoints <- nopoints %mark% nomarks
       }
-      return(simulationresult(list(nopoints), 1, drop))
-    }         
-    #############
+      resultlist <- rep(list(nopoints), nsim)
+      return(simulationresult(resultlist, nsim, drop))
+    }
+
+    ####### Validate arguments and determine type of simulation ##############
   
     Model <- if(length(n) == 1) {
       if(is.null(ptypes)) "I" else "II"
@@ -254,6 +255,7 @@ rmpoint <- local({
                  "do not match"))
 
     factortype <- factor(types, levels=types)
+    seqtypes <- seq_len(ntypes)
   
     #######################  Validate `fmax'
     if(! (is.null(fmax) || is.numvector(fmax) || is.list(fmax) ))
@@ -276,17 +278,19 @@ rmpoint <- local({
     flist <- if(single.arg) rep(list(f), ntypes) else
              if(vector.arg) as.list(f) else f
 
-    #################### START ##################################
+    #################### Finished validating arguments ########################
 
-    ## special algorithm for Model I when all f[[i]] are images
-
-    if(Model == "I" && !same.density && all(unlist(lapply(flist, is.im)))) {
-      X <- rmpoint.I.allim(n, flist, types)
-      return(simulationresult(list(X), 1, drop))
+    #################### Handle special case ########################
+    
+    if(Model == "I" && !same.density && all(sapply(flist, is.im))) {
+      resultlist <- rmpoint.I.allim(n, flist, types, nsim)
+      return(simulationresult(resultlist, nsim, drop))
     }
+    
+    #################### Prepare for simulations ########################
 
-    ## otherwise, first select types, then locations given types
-  
+    ## Set up some data for repeated use in the simulations
+
     if(Model == "I") {
       ## Compute approximate marginal distribution of type
       if(vector.arg)
@@ -309,50 +313,60 @@ rmpoint <- local({
         }
       }
     }
-
-    ## Generate marks 
-
-    if(Model == "I" || Model == "II") {
-      ## i.i.d.: n marks with distribution 'ptypes'
-      marques <- sample(factortype, n, prob=ptypes, replace=TRUE)
-      nn <- table(marques)
-    } else {
+    if(Model == "III") {
       ## multinomial: fixed number n[i] of types[i]
       repmarks <- factor(rep.int(types, n), levels=types)
-      marques <- sample(repmarks)
-      nn <- n
     }
-    ntot <- sum(nn)
+      
+    #################### RANDOM GENERATION, general case  ########################
 
-    ##############  SIMULATE !!!  #########################
+    resultlist <- vector(mode="list", length=nsim)
 
-    ## If all types have the same conditional density of location,
-    ## generate the locations using rpoint, and return.
-    if(same.density) {
-      X <- rpoint(ntot, flist[[1]], maxes[[1]], win=win, ...,
-                  giveup=giveup, verbose=verbose)
-      X <- X %mark% marques
-      return(simulationresult(list(X), 1, drop))
-    }
-    ## Otherwise invoke rpoint() for each type separately
-    X <- ppp(numeric(ntot), numeric(ntot), window=win, marks=marques,
-              check=FALSE)
+    for(isim in seq_len(nsim)) {
+      ## First generate types, then locations given types
+      switch(Model,
+             I = ,
+             II = {
+               ## i.i.d.: n marks with distribution 'ptypes'
+               marques <- sample(factortype, n, prob=ptypes, replace=TRUE)
+               nn <- table(marques)
+             },
+             III = {
+               ## multinomial: fixed number n[i] of types[i]
+               marques <- sample(repmarks)
+               nn <- n
+             })
+      ntot <- sum(nn)
 
-    for(i in 1:ntypes) {
-      if(verbose) cat(paste("Type", i, "\n"))
-      if(single.arg && is.function(f)) {
-        ## want to call f(x,y,m, ...)
-        Y <- rpoint(nn[i], funwithfixedmark, fmax=maxes[i], win=win,
-                    ..., m=factortype[i], fun=f, giveup=giveup, verbose=verbose)
+      if(same.density) {
+        ## All types have the same conditional density of location;
+        ## generate the locations using rpoint
+        X <- rpoint(ntot, flist[[1]], maxes[[1]], win=win, ...,
+                    giveup=giveup, verbose=verbose)
+        resultlist[[isim]] <- X %mark% marques
       } else {
-        ## call f(x,y, ...) or use other formats
-        Y <- rpoint(nn[i], flist[[i]], fmax=maxes[i], win=win,
-                    ..., giveup=giveup, verbose=verbose)
+        ## Invoke rpoint() for each type separately
+        ## Set up 'blank' pattern
+        X <- ppp(numeric(ntot), numeric(ntot), window=win, marks=marques,
+                 check=FALSE)
+        for(i in seqtypes) {
+          if(verbose) cat(paste("Type", i, "\n"))
+          if(single.arg && is.function(f)) {
+            ## want to call f(x,y,m, ...)
+            Y <- rpoint(nn[i], funwithfixedmark, fmax=maxes[i], win=win,
+                        ..., m=factortype[i], fun=f, giveup=giveup, verbose=verbose)
+          } else {
+            ## call f(x,y, ...) or use other formats
+            Y <- rpoint(nn[i], flist[[i]], fmax=maxes[i], win=win,
+                        ..., giveup=giveup, verbose=verbose)
+          }
+          Y <- Y %mark% factortype[i]
+          X[marques == factortype[i]] <- Y
+        }
+        resultlist[[isim]] <- X
       }
-      Y <- Y %mark% factortype[i]
-      X[marques == factortype[i]] <- Y
     }
-    return(simulationresult(list(X), 1, drop))
+    return(simulationresult(resultlist, nsim, drop))
   }
 
   rmpoint
@@ -375,7 +389,7 @@ rmpoint.I.allim <- local({
                 npix=npix))
   }
 
-  rmpoint.I.allim <- function(n, f, types) {
+  rmpoint.I.allim <- function(n, f, types, nsim=1) {
     ## Internal use only!
     ## Generates random marked points (Model I *only*)
     ## when all f[[i]] are pixel images.
@@ -390,18 +404,21 @@ rmpoint.I.allim <- local({
     ## replicate types
     numpix <- unlist(lapply(stuff, getElement, name="npix"))
     tpix <- rep.int(seq_along(types), numpix)
-    ##
-    ## sample pixels from union of all images
-    ##
     npix <- sum(numpix)
-    id <- sample(npix, n, replace=TRUE, prob=ppix)
-    ## get pixel centre coordinates and randomise within pixel
-    x <- xpix[id] + (runif(n) - 1/2) * dx[id]
-    y <- ypix[id] + (runif(n) - 1/2) * dy[id]
-    ## compute types
-    marx <- factor(types[tpix[id]],levels=types)
-    ## et voila!
-    return(ppp(x, y, window=as.owin(f[[1]]), marks=marx, check=FALSE))
+    ##
+    resultlist <- vector(mode="list", length=nsim)
+    for(isim in seq_len(nsim)) {
+      ## sample pixels from union of all images
+      id <- sample(npix, n, replace=TRUE, prob=ppix)
+      ## get pixel centre coordinates and randomise within pixel
+      x <- xpix[id] + (runif(n) - 1/2) * dx[id]
+      y <- ypix[id] + (runif(n) - 1/2) * dy[id]
+      ## compute types
+      marx <- factor(types[tpix[id]],levels=types)
+      ## et voila!
+      resultlist[[isim]] <- ppp(x, y, window=as.owin(f[[1]]), marks=marx, check=FALSE)
+    }
+    return(resultlist)
   }
 
   rmpoint.I.allim
@@ -414,57 +431,63 @@ rpoint.multi <- function (n, f, fmax=NULL, marks = NULL,
                           win = unit.square(),
                           giveup = 1000, verbose = FALSE,
                           warn=TRUE, nsim=1, drop=TRUE) {
-  if(nsim > 1) {
-    result <- vector(mode="list", length=nsim)
-    for(i in 1:nsim)
-      result[[i]] <- rpoint.multi(n, f, fmax, marks, win, giveup, verbose)
-    return(simulationresult(result, nsim, drop))
-  }
-  
-  no.marks <- is.null(marks) ||
-               (is.factor(marks) && length(levels(marks)) == 1)
-  if(warn) {
-    nhuge <- spatstat.options("huge.npoints")
-    if(n > nhuge)
-      warning(paste("Attempting to generate", n, "random points"))
-  }
-  ## unmarked case
-  if (no.marks) {
-    X <- if(is.function(f)) {
-      rpoint(n, f, fmax, win, giveup=giveup, verbose=verbose)
+  check.1.integer(nsim)
+  stopifnot(nsim >= 0)
+
+  if(is.null(marks) || (is.factor(marks) && length(levels(marks)) == 1)) {
+    ## Unmarked
+    if(is.function(f)) {
+      return(rpoint(n, f, fmax, win, nsim=nsim, warn=warn, giveup=giveup, verbose=verbose))
     } else {
-      rpoint(n, f, fmax, giveup=giveup, verbose=verbose)
+      return(rpoint(n, f, fmax,      nsim=nsim, warn=warn, giveup=giveup, verbose=verbose))
     }
-    return(simulationresult(list(X), 1, drop))
   }
-  ## multitype case
+
+  ## multitype case: validate arguments
   if(length(marks) != n)
     stop("length of marks vector != n")
   if(!is.factor(marks))
     stop("marks should be a factor")
   types <- levels(marks)
   types <- factor(types, levels=types)
-  ## generate required number of points of each type
   nums <- table(marks)
-  X <- rmpoint(nums, f, fmax, win=win, types=types,
-               giveup=giveup, verbose=verbose)
-  if(any(table(marks(X)) != nums))
-    stop("Internal error: output of rmpoint illegal")
-  ## reorder them to correspond to the desired 'marks' vector
-  Y <- X
-  Xmarks <- marks(X)
-  for(ty in types) {
-    to   <- (marks == ty)
-    from <- (Xmarks == ty)
-    if(sum(to) != sum(from))
-      stop(paste("Internal error: mismatch for mark =", ty))
-    if(any(to)) {
-      Y$x[to] <- X$x[from]
-      Y$y[to] <- X$y[from]
-      Y$marks[to] <- ty
+  
+  if(warn) {
+    nhuge <- spatstat.options("huge.npoints")
+    if(n > nhuge) {
+      whinge <- paste("Attempting to generate", n, "random points")
+      if(nsim > 1) whinge <- paste(whinge, paren(paste(nsim, "times")))
+      warning(whinge, call.=FALSE)
     }
   }
-  return(simulationresult(list(Y), 1, drop))
+
+  ## simulate
+  resultlist <- vector(mode="list", length=nsim)
+  ## generate required number of points of each type
+  Xlist <- rmpoint(nums, f, fmax, win=win, types=types,
+                   nsim=nsim, drop=FALSE,
+                   giveup=giveup, verbose=verbose)
+  ## Reorder them to correspond to the desired 'marks' vector
+  for(isim in seq_len(nsim)) {
+    X <- Xlist[[isim]]
+    if(any(table(marks(X)) != nums))
+      stop("Internal error: output of rmpoint illegal")
+    Y <- X
+    Xmarks <- marks(X)
+    for(ty in types) {
+      to   <- (marks == ty)
+      from <- (Xmarks == ty)
+      if(sum(to) != sum(from))
+        stop(paste("Internal error: mismatch for mark =", ty))
+      if(any(to)) {
+        Y$x[to] <- X$x[from]
+        Y$y[to] <- X$y[from]
+        Y$marks[to] <- ty
+      }
+    }
+    resultlist[[isim]] <- Y
+  }
+  return(simulationresult(resultlist, nsim, drop))
 }
 
 

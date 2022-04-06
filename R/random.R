@@ -43,13 +43,13 @@ runifdisc <- function(n, radius=1, centre=c(0,0), ..., nsim=1, drop=TRUE)
   stopifnot(radius > 0)
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   disque <- disc(centre=centre, radius=radius, ...)
   twopi <- 2 * pi
   rad2 <- radius^2
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     theta <- runif(n, min=0, max=twopi)
     s <- sqrt(runif(n, min=0, max=rad2))
     result[[isim]] <- ppp(centre[1] + s * cos(theta),
@@ -67,7 +67,7 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
 {
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   
   if(missing(n) && missing(win) && !is.null(ex)) {
@@ -109,7 +109,7 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
            ypix <- rxy$y
            ## make a list of nsim point patterns
            result <- vector(mode="list", length=nsim)
-           for(isim in 1:nsim) {
+           for(isim in seq_len(nsim)) {
              ## select pixels with equal probability
              id <- sample(seq_along(xpix), n, replace=TRUE)
              ## extract pixel centres and randomise within pixels
@@ -121,7 +121,7 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
          polygonal={
            ## make a list of nsim point patterns
            result <- vector(mode="list", length=nsim)
-           for(isim in 1:nsim) {
+           for(isim in seq_len(nsim)) {
              ## rejection method
              ## initialise empty pattern
              x <- numeric(0)
@@ -172,7 +172,7 @@ runifpoispp <- function(lambda, win = owin(c(0,1),c(0,1)), ...,
     stop("Intensity lambda must be a single finite number >= 0")
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
 
   if(lambda == 0) {
@@ -188,7 +188,7 @@ runifpoispp <- function(lambda, win = owin(c(0,1),c(0,1)), ...,
   meanN <- lambda * area(box)
   
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     n <- rpois(1, meanN)
     if(!is.finite(n))
       stop(paste("Unable to generate Poisson process with a mean of",
@@ -204,12 +204,12 @@ runifpoispp <- function(lambda, win = owin(c(0,1),c(0,1)), ...,
 }
 
 rpoint <- function(n, f, fmax=NULL,
-                   win=unit.square(), ..., giveup=1000,verbose=FALSE,
+                   win=unit.square(), ..., giveup=1000, warn=TRUE, verbose=FALSE,
                    nsim=1, drop=TRUE, forcewin=FALSE) {
   
   if(missing(f) || (is.numeric(f) && length(f) == 1))
     ## uniform distribution
-    return(runifpoint(n, win, giveup, nsim=nsim, drop=drop))
+    return(runifpoint(n, win, giveup=giveup, warn=warn, nsim=nsim, drop=drop))
   
   ## non-uniform distribution....
   if(!is.function(f) && !is.im(f))
@@ -219,7 +219,7 @@ rpoint <- function(n, f, fmax=NULL,
 
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   
   if(is.im(f)) {
@@ -258,7 +258,7 @@ rpoint <- function(n, f, fmax=NULL,
     ppix <- as.vector(f$v[M]) ## not normalised - OK
     ## generate
     result <- vector(mode="list", length=nsim)
-    for(isim in 1:nsim) {
+    for(isim in seq_len(nsim)) {
       ## select pixels
       id <- sample(npix, n, replace=TRUE, prob=ppix)
       ## extract pixel centres and randomise location within pixels
@@ -306,7 +306,7 @@ rpoint <- function(n, f, fmax=NULL,
   box <- boundingbox(win)
 
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
 
     ## initialise empty pattern
     X <- ppp(numeric(0), numeric(0), window=win)
@@ -369,7 +369,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
 
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   
   if(missing(lambda) && is.null(lmax) && missing(win) && !is.null(ex)) {
@@ -415,7 +415,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
     #'      runifpoispp checks 'lmax'
     result <- runifpoispp(lmax, win, nsim=nsim, drop=FALSE)
     #'      result is a 'ppplist' with appropriate names
-    for(isim in 1:nsim) {
+    for(isim in seq_len(nsim)) {
       X <- result[[isim]]
       if(X$n > 0) {
         prob <- lambda(X$x, X$y, ...)/lmax
@@ -424,9 +424,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
         result[[isim]] <- X[retain]
       }
     }
-    if(nsim == 1 && drop)
-       result <- result[[1L]]
-    return(result)
+    return(simulationresult(result, nsim, drop))
   }
 
   if(is.im(lambda)) {
@@ -456,7 +454,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
     } else {
       ## old code: thinning
       result <- runifpoispp(lmax, win, nsim=nsim, drop=FALSE)
-      for(isim in 1:nsim) {
+      for(isim in seq_len(nsim)) {
         X <- result[[isim]]
         if(X$n > 0) {
           prob <- lambda[X]/lmax
@@ -465,9 +463,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
           result[[isim]] <- X[retain]
         }
       }
-      if(nsim == 1 && drop)
-         return(result[[1L]])
-      return(result)
+      return(simulationresult(result, nsim, drop))
     }
   }
   stop(paste(sQuote("lambda"), "must be a constant, a function or an image"))
@@ -497,7 +493,7 @@ rMaternInhibition <- function(type,
   stopifnot(type %in% c(1,2))
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   ## Resolve window class
   if(!inherits(win, c("owin", "box3", "boxx"))) {
@@ -519,7 +515,7 @@ rMaternInhibition <- function(type,
     bigbox <- if(stationary) grow.boxx(win, r) else win
     result <- rpoisppx(kappa, domain = bigbox, nsim = nsim, drop=FALSE)
   }
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     Y <- result[[isim]]
     nY <- npoints(Y)
     if(type == 1) {
@@ -635,7 +631,7 @@ rSSI <- function(r, n=Inf, win = square(1),
 
   #' start simulation 		    
   pstate <- list()
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     if(nsim > 1) pstate <- progressreport(isim, nsim, state=pstate)
     ## Simple Sequential Inhibition process
     ## fixed number of points
@@ -706,7 +702,8 @@ rPoissonCluster <-
   
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
   }
 
   ## Generate parents in dilated window
@@ -723,7 +720,7 @@ rPoissonCluster <-
   if(nsim == 1) parentlist <- list(parentlist)
 
   resultlist <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     parents <- parentlist[[isim]]
     result <- NULL
     ## generate clusters
@@ -801,10 +798,10 @@ rstrat <- function(win=square(1), nx, ny=nx, k=1, nsim=1, drop=TRUE) {
   stopifnot(k >= 1)
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
   }
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     xy <- stratrand(win, nx, ny, k)
     Xbox <- ppp(xy$x, xy$y, win$xrange, win$yrange, check=FALSE)
     result[[isim]] <- Xbox[win]
@@ -856,7 +853,8 @@ rcell <- function(win=square(1), nx=NULL, ny=nx, ...,
                   dx=NULL, dy=dx, N=10, nsim=1, drop=TRUE) {
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
   }
   win <- as.owin(win)
   xr <- win$xrange
@@ -873,7 +871,7 @@ rcell <- function(win=square(1), nx=NULL, ny=nx, ...,
   dy <- g$dy
   ## generate pattern(s)
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     x <- numeric(0)
     y <- numeric(0)
     for(ix in seq_len(nx))
@@ -915,7 +913,8 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
          call.=FALSE)
   if(!missing(nsim)) {
     check.1.integer(nsim)
-    stopifnot(nsim >= 1)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
   }
   nX <- nobjects(X)
   if(nX == 0) {
@@ -927,7 +926,7 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
   if(is.numeric(P) && length(P) == 1 && spatstat.options("fastthin")) {
     # special algorithm for constant probability
     result <- vector(mode="list", length=nsim)
-    for(isim in 1:nsim) {
+    for(isim in seq_len(nsim)) {
       retain <- thinjump(nX, P)
       Y <- X[retain]
       ## also handle offspring-to-parent map if present
@@ -981,7 +980,7 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
   if(max(pX) > 1) stop("some probabilities are greater than 1")
 
   result <- vector(mode="list", length=nsim)
-  for(isim in 1:nsim) {
+  for(isim in seq_len(nsim)) {
     retain <- (runif(length(pX)) < pX)
     Y <- X[retain]
     ## also handle offspring-to-parent map if present

@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.34 $  $Date: 2022/03/22 00:51:53 $
+##   $Revision: 1.35 $  $Date: 2022/04/06 07:07:57 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -16,6 +16,9 @@ rNeymanScott <-
   ## Generic Neyman-Scott process
   ## Implementation for bounded cluster radius
   ##
+  check.1.integer(nsim)
+  stopifnot(nsim >= 0)
+  if(nsim == 0) return(simulationresult(list()))
 
   ## Catch old argument name rmax for expand
   if(missing(expand) && !is.null(rmax <- list(...)$rmax))
@@ -188,6 +191,10 @@ rMatClust <- local({
     check.1.real(scale)
     stopifnot(scale > 0)
 
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
+    
     ## trap case of large clusters, close to Poisson
     kok <- is.numeric(kappa) || is.im(kappa)
     if(kok) {
@@ -215,7 +222,7 @@ rMatClust <- local({
         attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
       }
     }
-    return(if(nsim == 1 && drop) result[[1]] else result)
+    return(simulationresult(result, nsim, drop))
   }
 
   rMatClust
@@ -236,6 +243,9 @@ rThomas <- local({
                poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
       ## Thomas process with Poisson(mu) number of offspring
       ## at isotropic Normal(0,sigma^2) displacements from parent
+      check.1.integer(nsim)
+      stopifnot(nsim >= 0)
+      if(nsim == 0) return(simulationresult(list()))
       ##
       ## Catch old scale syntax (sigma)
       if(missing(scale)) scale <- list(...)$sigma
@@ -274,7 +284,7 @@ rThomas <- local({
           attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
         }
       }
-      return(if(nsim == 1 && drop) result[[1]] else result)
+      return(simulationresult(result, nsim, drop))
     }
 
   rThomas
@@ -305,6 +315,10 @@ rCauchy <- local({
     ## scale / omega: scale parameter of Cauchy kernel function
     ## eta: scale parameter of Cauchy pair correlation function
 
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
+    
     ## Catch old scale syntax (omega)
     dots <- list(...)
     if(missing(scale)) scale <- dots$omega
@@ -350,7 +364,7 @@ rCauchy <- local({
         attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
       }
     }
-    return(if(nsim == 1 && drop) result[[1]] else result)
+    return(simulationresult(result, nsim, drop))
   }
 
   rCauchy })
@@ -383,6 +397,9 @@ rVarGamma <- local({
                         saveparents=TRUE) {
     ## nu / nu.ker: smoothness parameter of Variance Gamma kernel function
     ## scale / omega: scale parameter of kernel function
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+    if(nsim == 0) return(simulationresult(list()))
     ## Catch old nu.ker/nu.pcf syntax and resolve nu-value.
     dots <- list(...)
     if(missing(nu)){
@@ -446,7 +463,7 @@ rVarGamma <- local({
         attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
       }
     }
-    return(if(nsim == 1 && drop) result[[1]] else result)
+    return(simulationresult(result, nsim, drop))
   }
 
   rVarGamma

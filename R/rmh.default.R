@@ -1,5 +1,5 @@
 #
-# $Id: rmh.default.R,v 1.117 2022/01/03 04:48:16 adrian Exp $
+# $Id: rmh.default.R,v 1.118 2022/04/06 07:21:49 adrian Exp adrian $
 #
 rmh.default <- function(model,start=NULL,
                         control=default.rmhcontrol(model),
@@ -36,6 +36,9 @@ rmh.default <- function(model,start=NULL,
   control <- rmhResolveControl(control, model)
 
   saveinfo <- as.logical(saveinfo)
+
+  check.1.integer(nsim)
+  stopifnot(nsim >= 0)
   
   # retain "..." arguments unrecognised by rmhcontrol
   # These are assumed to be arguments of functions defining the trend
@@ -509,7 +512,7 @@ rmh.default <- function(model,start=NULL,
       pstate <- list()
     }
     subverb <- verbose && (nsim == 1)
-    for(isim in 1:nsim) {
+    for(isim in seq_len(nsim)) {
       if(verbose) pstate <- progressreport(isim, nsim, state=pstate)
       result[[isim]] <- do.call(rmhEngine,
                                 append(list(InfoList,
