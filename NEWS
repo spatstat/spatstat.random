@@ -1,10 +1,26 @@
 
-        CHANGES IN spatstat.random VERSION 2.2-0.002
+        CHANGES IN spatstat.random VERSION 2.2-0.003
 
 OVERVIEW
 
+    o We thank Liu Yijia for contributions.
+    
     o Bug fixes and internal improvements.
 
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o random generators
+    Random generators now accept 'nsim=0', and return a zero-length list.
+    
+    o random generators
+    Code in the case 'nsim > 1' has been accelerated.
+    
+BUG FIXES
+
+    o rmpoint
+    Crashed if 'f' was a pixel image.
+    [Spotted by Liu Yijia.]
+    Fixed.
 
         CHANGES IN spatstat.random VERSION 2.2-0
 

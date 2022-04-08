@@ -4,7 +4,7 @@
 #
 #   Random generators for MULTITYPE point processes
 #
-#   $Revision: 1.40 $   $Date: 2022/04/06 03:16:14 $
+#   $Revision: 1.41 $   $Date: 2022/04/08 06:25:53 $
 #
 #   rmpoispp()   random marked Poisson pp
 #   rmpoint()    n independent random marked points
@@ -300,7 +300,7 @@ rmpoint <- local({
         ptypes <- fintegrals/sum(fintegrals)
       } else {
         ## single argument
-        if(is.constant(f)) {
+        if(is.constant(f) || is.im(f)) {
           ptypes <- rep.int(1/ntypes, ntypes)
         } else {
           ## f is a function (x,y,m)
