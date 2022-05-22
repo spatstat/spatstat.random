@@ -1,5 +1,5 @@
 #
-# $Id: rmh.default.R,v 1.118 2022/04/06 07:21:49 adrian Exp adrian $
+# $Id: rmh.default.R,v 1.119 2022/05/21 08:53:38 adrian Exp adrian $
 #
 rmh.default <- function(model,start=NULL,
                         control=default.rmhcontrol(model),
