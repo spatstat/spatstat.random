@@ -44,11 +44,11 @@
 \seealso{
   \code{\link[spatstat.random]{rmhcontrol}},
   \code{\link[spatstat.random]{update.rmhcontrol}},
-  \code{\link[spatstat.core]{ppm}},
+  \code{\link[spatstat.model]{ppm}},
   \code{\link[spatstat.random]{default.expand}}
 }
 \examples{
-if(require(spatstat.core)) {
+if(require(spatstat.model)) {
   fit <- ppm(cells, ~1, Strauss(0.1))
   default.rmhcontrol(fit)
   default.rmhcontrol(fit, w=square(2))

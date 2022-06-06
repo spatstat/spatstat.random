@@ -21,12 +21,12 @@
   spatial point processes. For caveats, see below.
   
   The function \code{rmh} is generic; it has methods
-  \code{\link[spatstat.core]{rmh.ppm}} (for objects of class \code{"ppm"})
+  \code{\link[spatstat.model]{rmh.ppm}} (for objects of class \code{"ppm"})
   and  \code{\link{rmh.default}} (the default).
   The actual implementation of the Metropolis-Hastings algorithm is
   contained in \code{\link{rmh.default}}.
   For details of its use, see 
-  \code{\link[spatstat.core]{rmh.ppm}} or \code{\link{rmh.default}}.
+  \code{\link[spatstat.model]{rmh.ppm}} or \code{\link{rmh.default}}.
 
   [If the model is a Poisson process, then Metropolis-Hastings
   is not used; the Poisson model is generated directly

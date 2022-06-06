@@ -1009,10 +1009,10 @@ resolve.vargamma.shape <- function(...,
 
 spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
   if(inherits(name, "detpointprocfamily")) {
-    if(requireNamespace("spatstat.core")) {
-      return(spatstat.core::spatstatDPPModelInfo(name))
+    if(requireNamespace("spatstat.model")) {
+      return(spatstat.model::spatstatDPPModelInfo(name))
     } else {
-      message("The package 'spatstat.core' is required")
+      message("The package 'spatstat.model' is required")
       return(NULL)
     }
   }

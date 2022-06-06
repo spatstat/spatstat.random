@@ -49,7 +49,7 @@
   Strauss-Hardcore point process in the window \code{W}
   using a \sQuote{perfect simulation} algorithm.
 
-  The Strauss-Hardcore process is described in \code{\link[spatstat.core]{StraussHard}}.
+  The Strauss-Hardcore process is described in \code{\link[spatstat.model]{StraussHard}}.
 
   The simulation algorithm used to generate the point pattern
   is \sQuote{dominated coupling from the past}
@@ -100,7 +100,7 @@
 }
 \seealso{
   \code{\link[spatstat.random]{rmh}},
-  \code{\link[spatstat.core]{StraussHard}}.
+  \code{\link[spatstat.model]{StraussHard}}.
 
   \code{\link[spatstat.random]{rHardcore}},
   \code{\link[spatstat.random]{rStrauss}},

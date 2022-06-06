@@ -8,6 +8,7 @@
 }
 \usage{
 
+
  \method{Window}{rmhmodel}(X, \dots)
 
 
@@ -41,5 +42,4 @@
 }
 \keyword{spatial}
 \keyword{manip}
- 
  

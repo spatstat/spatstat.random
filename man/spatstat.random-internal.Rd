@@ -60,6 +60,8 @@
 }
 \usage{
 
+
+
 change.default.expand(x, newdefault)
 datagen.runifpointOnLines(n, L)
 datagen.runifpoisppOnLines(lambda, L)

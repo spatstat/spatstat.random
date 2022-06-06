@@ -98,7 +98,7 @@
   \code{Window(mu)} if \code{mu} is a pixel image,
   and it defaults to the unit square otherwise.
   
-  The LGCP model can be fitted to data using \code{\link[spatstat.core]{kppm}}.
+  The LGCP model can be fitted to data using \code{\link[spatstat.model]{kppm}}.
 }
 \seealso{
 \code{\link[spatstat.random]{rpoispp}},
@@ -106,8 +106,8 @@
 \code{\link[spatstat.random]{rGaussPoisson}},
 \code{\link[spatstat.random]{rNeymanScott}}.
 
-For fitting the model, see \code{\link[spatstat.core]{kppm}},
-\code{\link[spatstat.core]{lgcp.estK}}.
+For fitting the model, see \code{\link[spatstat.model]{kppm}},
+\code{\link[spatstat.model]{lgcp.estK}}.
 }
 \references{
   \Moller, J., Syversveen, A. and Waagepetersen, R. (1998)

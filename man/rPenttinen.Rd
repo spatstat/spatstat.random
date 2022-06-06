@@ -119,7 +119,7 @@
   \code{\link[spatstat.random]{rDiggleGratton}},
   \code{\link[spatstat.random]{rDGS}}.
 
-  \code{\link[spatstat.core]{Penttinen}}.
+  \code{\link[spatstat.model]{Penttinen}}.
 }
 \keyword{spatial}
 \keyword{datagen}

@@ -27,7 +27,7 @@
     to the center of a unit square otherwise.
   }
   \item{\dots}{
-    Additional arguments passed to \code{\link[spatstat.core]{density.ppp}} or the
+    Additional arguments passed to \code{\link[spatstat.explore]{density.ppp}} or the
     cluster kernel. See Details.
   }
   \item{mu}{
@@ -36,9 +36,8 @@
   }
 }
 \details{
-  These functions require the \pkg{spatstat.core} package.
   The actual calculations are performed
-  by \code{\link[spatstat.core]{density.ppp}} and
+  by \code{\link[spatstat.explore]{density.ppp}} and
   \code{\dots} arguments are passed thereto for control over the pixel
   resolution etc.
   (These arguments are then passed on to \code{\link[spatstat.geom]{pixellate.ppp}}
@@ -75,7 +74,7 @@
   A pixel image (object of class \code{"im"}).
 }
 \seealso{
-  \code{\link[spatstat.core]{density.ppp}} and \code{\link[spatstat.core]{kppm}}.
+  \code{\link[spatstat.explore]{density.ppp}} and \code{\link[spatstat.model]{kppm}}.
 
   Simulation algorithms for cluster models:
   \code{\link{rCauchy}}
@@ -84,7 +83,7 @@
   \code{\link{rVarGamma}}
 }
 \examples{
-  if(require(spatstat.core)) {
+  if(require(spatstat.model)) {
 
   # method for functions
   kernel <- function(x,y,scal) { 

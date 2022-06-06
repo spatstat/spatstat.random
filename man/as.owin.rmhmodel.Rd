@@ -148,7 +148,7 @@ in any of several formats, into an object of class \code{"owin"}.
 }
 \seealso{
   \code{\link[spatstat.geom]{as.owin}},
-  \code{\link[spatstat.core]{as.owin.ppm}},
+  \code{\link[spatstat.model]{as.owin.ppm}},
   \code{\link[spatstat.linnet]{as.owin.lpp}}.
   
   \code{\link{owin.object}},

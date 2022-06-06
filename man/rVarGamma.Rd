@@ -118,7 +118,7 @@
 
   This model can be fitted to data by the method of minimum contrast,
   maximum composite likelihood or Palm likelihood using
-  \code{\link[spatstat.core]{kppm}}.
+  \code{\link[spatstat.model]{kppm}}.
   
   The algorithm can also generate spatially inhomogeneous versions of
   the cluster process:
@@ -137,8 +137,8 @@
   When the parents are homogeneous (\code{kappa} is a single number)
   and the offspring are inhomogeneous (\code{mu} is a
   function or pixel image), the model can be fitted to data
-  using \code{\link[spatstat.core]{kppm}}, or using \code{\link[spatstat.core]{vargamma.estK}}
-  or \code{\link[spatstat.core]{vargamma.estpcf}}
+  using \code{\link[spatstat.model]{kppm}}, or using \code{\link[spatstat.model]{vargamma.estK}}
+  or \code{\link[spatstat.model]{vargamma.estpcf}}
   applied to the inhomogeneous \eqn{K} function. 
 
   If the pair correlation function of the model is very close
@@ -161,10 +161,10 @@
 \seealso{
   \code{\link[spatstat.random]{rpoispp}},
   \code{\link[spatstat.random]{rNeymanScott}},
-  \code{\link[spatstat.core]{kppm}}.
+  \code{\link[spatstat.model]{kppm}}.
 
-  \code{\link[spatstat.core]{vargamma.estK}},
-  \code{\link[spatstat.core]{vargamma.estpcf}}.
+  \code{\link[spatstat.model]{vargamma.estK}},
+  \code{\link[spatstat.model]{vargamma.estpcf}}.
 }
 \examples{
  # homogeneous

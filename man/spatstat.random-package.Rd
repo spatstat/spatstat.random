@@ -74,8 +74,10 @@
     and geometrical operations
     \item \pkg{spatstat.random} containing functionality for
     simulation and random generation
-    \item \pkg{spatstat.core} containing the main functionality
-    for statistical analysis and modelling of spatial data
+    \item \pkg{spatstat.explore} containing the main functionality
+    for exploratory data analysis and nonparametric analysis
+    \item \pkg{spatstat.model} containing the main functionality
+    for parametric modelling and formal inference for spatial data
     \item \pkg{spatstat.linnet} containing functions for
     spatial data on a linear network
     \item \pkg{spatstat}, which simply loads the other sub-packages

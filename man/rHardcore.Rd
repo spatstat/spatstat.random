@@ -98,7 +98,7 @@
   \code{\link[spatstat.random]{rPenttinen}}.
 
   For fitting the model, see
-  \code{\link[spatstat.core]{Hardcore}}.
+  \code{\link[spatstat.model]{Hardcore}}.
 }
 \keyword{spatial}
 \keyword{datagen}

@@ -85,12 +85,12 @@
   \code{\link{rstrat}},
   \code{\link{rsyst}},
   \code{\link{runifpoint}},
-  \code{\link[spatstat.core]{Kest}}
+  \code{\link[spatstat.explore]{Kest}}
 }
 \examples{
   X <- rcell(nx=15)
   plot(X)
-  if(require(spatstat.core)) {
+  if(require(spatstat.explore)) {
      plot(Kest(X))
   }
 }

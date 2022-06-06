@@ -11,6 +11,7 @@
 
 
 
+
  \method{domain}{rmhmodel}(X, \dots)
 
 
@@ -48,7 +49,9 @@
 }
 \seealso{
   \code{\link[spatstat.geom]{domain}},
-  \code{\link[spatstat.core]{domain.ppm}},
+  \code{\link[spatstat.geom]{domain.quadratcount}},
+  \code{\link[spatstat.model]{domain.ppm}},
+  \code{\link[spatstat.explore]{domain.quadrattest}},
   \code{\link[spatstat.linnet]{domain.lpp}}.
   \code{\link{Window}},
   \code{\link{Frame}}.

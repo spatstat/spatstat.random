@@ -36,9 +36,9 @@
   given a fitted point process model \code{object}.
   This default is used by
   \code{\link[spatstat.random]{rmh}},
-  \code{\link[spatstat.core]{simulate.ppm}},
-  \code{\link[spatstat.core]{envelope}}, 
-  \code{\link[spatstat.core]{qqplot.ppm}},
+  \code{\link[spatstat.model]{simulate.ppm}},
+  \code{\link[spatstat.explore]{envelope}}, 
+  \code{\link[spatstat.model]{qqplot.ppm}},
   and other functions.
 
   Suppose we wish to generate simulated realisations
@@ -92,12 +92,12 @@
   \code{\link[spatstat.random]{rmhexpand}},
   \code{\link[spatstat.random]{rmhcontrol}},
   \code{\link[spatstat.random]{rmh}},
-  \code{\link[spatstat.core]{envelope}},
-  \code{\link[spatstat.core]{qqplot.ppm}}
+  \code{\link[spatstat.explore]{envelope}},
+  \code{\link[spatstat.model]{qqplot.ppm}}
 }
 \examples{
-if(require(spatstat.core)) {
-  fit <- ppm(cells, ~1, Strauss(0.07))
+if(require(spatstat.model)) {
+  fit <- ppm(cells ~1, Strauss(0.07))
   default.expand(fit)
 }
   mod <- rmhmodel(cif="strauss", par=list(beta=100, gamma=0.5, r=0.07))

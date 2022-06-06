@@ -1,7 +1,7 @@
 #'
 #'   randompp3.R
 #'
-#'   $Revision: 1.1 $ $Date: 2020/11/30 11:43:50 $
+#'   $Revision: 1.2 $ $Date: 2022/05/23 02:33:06 $
 #'
 
 runifpoint3 <- function(n, domain=box3(), nsim=1, drop=TRUE) {

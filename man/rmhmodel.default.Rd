@@ -175,7 +175,7 @@
       with components \code{sigma} and \code{epsilon},
       where \code{sigma} is the characteristic diameter
       and \code{epsilon} is the well depth.
-      See \code{\link[spatstat.core]{LennardJones}} for explanation.
+      See \code{\link[spatstat.model]{LennardJones}} for explanation.
     }
     \item{multihard:}{
       (Multitype hard core process.) A \bold{named} list
@@ -189,7 +189,7 @@
       \code{beta,gamma,r} which are respectively the ``base''
       intensity, the pairwise interaction parameter, and the disc radius.
       Note that \code{gamma} must be less than or equal to 1.
-      See \code{\link[spatstat.core]{Penttinen}} for explanation.
+      See \code{\link[spatstat.model]{Penttinen}} for explanation.
       (Note that there is also an algorithm for perfect simulation
       of the Penttinen process, \code{\link{rPenttinen}})
     }
@@ -438,7 +438,7 @@ otherwise an error is given.
   \code{\link{rmh}},
   \code{\link{rmhcontrol}},
   \code{\link{rmhstart}},
-  \code{\link[spatstat.core]{ppm}},
+  \code{\link[spatstat.model]{ppm}},
   \rmhInteractionsList.
 }
 \examples{

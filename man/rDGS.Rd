@@ -101,7 +101,7 @@
 }
 \seealso{
   \code{\link[spatstat.random]{rmh}},
-  \code{\link[spatstat.core]{DiggleGatesStibbard}}.
+  \code{\link[spatstat.model]{DiggleGatesStibbard}}.
 
   \code{\link[spatstat.random]{rStrauss}},
   \code{\link[spatstat.random]{rHardcore}},

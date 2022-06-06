@@ -10,8 +10,6 @@
 }
 \usage{
 clusterkernel(model, \dots)
-
-
 \method{clusterkernel}{character}(model, \dots)
 }
 \arguments{
@@ -38,10 +36,9 @@ clusterkernel(model, \dots)
   \spatstatAuthors.
 }
 \seealso{
-  \code{\link{clusterfield}}, \code{\link[spatstat.core]{kppm}}
+  \code{\link{clusterfield}}, \code{\link[spatstat.model]{kppm}}
 }
 \examples{
-
   f <- clusterkernel("Thomas", kappa=10, scale=0.5)
   f(0.1, 0.2)
 }

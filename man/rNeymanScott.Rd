@@ -135,7 +135,7 @@
 
   Neyman-Scott models where \code{kappa} is a single number
   and \code{rcluster = list(mu,f)} can be fitted to data
-  using the function \code{\link[spatstat.core]{kppm}}.
+  using the function \code{\link[spatstat.model]{kppm}}.
 }
 \section{Inhomogeneous Neyman-Scott Processes}{
   There are several different ways of specifying a spatially inhomogeneous

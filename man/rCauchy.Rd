@@ -103,7 +103,7 @@
 
   This model can be fitted to data by the method of minimum contrast,
   maximum composite likelihood or Palm likelihood using
-  \code{\link[spatstat.core]{kppm}}.
+  \code{\link[spatstat.model]{kppm}}.
   
   The algorithm can also generate spatially inhomogeneous versions of
   the cluster process:
@@ -122,7 +122,7 @@
   When the parents are homogeneous (\code{kappa} is a single number)
   and the offspring are inhomogeneous (\code{mu} is a
   function or pixel image), the model can be fitted to data
-  using \code{\link[spatstat.core]{kppm}}. 
+  using \code{\link[spatstat.model]{kppm}}. 
 
   If the pair correlation function of the model is very close
   to that of a Poisson process, deviating by less than
@@ -141,8 +141,8 @@
   \code{\link[spatstat.random]{rGaussPoisson}}.
 
   For fitting the model, see
-  \code{\link[spatstat.core]{kppm}},
-  \code{\link[spatstat.core]{clusterfit}}.
+  \code{\link[spatstat.model]{kppm}},
+  \code{\link[spatstat.model]{clusterfit}}.
 }
 \examples{
  # homogeneous

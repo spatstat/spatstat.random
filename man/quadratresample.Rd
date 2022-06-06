@@ -64,7 +64,7 @@ quadratresample(X, nx, ny=nx, ...,
   \code{\link[spatstat.geom]{quadrats}},
   \code{\link[spatstat.geom]{quadratcount}}.
 
-  See \code{\link[spatstat.core]{varblock}} to estimate the variance of
+  See \code{\link[spatstat.explore]{varblock}} to estimate the variance of
   a summary statistic by block resampling.
 }
 \examples{

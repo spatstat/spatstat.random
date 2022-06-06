@@ -27,7 +27,7 @@ clusterkernel.character <- function(model, ...){
   return(f)
 }
 
-## The method clusterkernel.kppm is in spatstat.core
+## The method clusterkernel.kppm is in spatstat.model
 
 clusterfield <- function(model, locations = NULL, ...) {
     UseMethod("clusterfield")
@@ -49,10 +49,10 @@ clusterfield.function <- function(model, locations = NULL, ..., mu = NULL) {
             "cannot be passed as an extra argument to the kernel function. ",
             "Please redefine the kernel function to use another argument name.")
 
-  if(requireNamespace("spatstat.core")) {
-    rslt <- spatstat.core::density.ppp(locations, kernel=model, ..., edge=FALSE)
+  if(requireNamespace("spatstat.explore")) {
+    rslt <- spatstat.explore::density.ppp(locations, kernel=model, ..., edge=FALSE)
   } else {
-    message("The package spatstat.core is required.")
+    message("The package spatstat.explore is required.")
     return(NULL)
   }
   
@@ -67,7 +67,7 @@ clusterfield.function <- function(model, locations = NULL, ..., mu = NULL) {
 }
 
 
-## The method clusterfield.kppm is in spatstat.core
+## The method clusterfield.kppm is in spatstat.model
 
 clusterradius <- function(model, ...){
     UseMethod("clusterradius")
@@ -88,5 +88,5 @@ clusterradius.character <- function(model, ..., thresh = NULL, precision = FALSE
   return(rmax)
 }
 
-## The method clusterradius.kppm is in spatstat.core
+## The method clusterradius.kppm is in spatstat.model
 

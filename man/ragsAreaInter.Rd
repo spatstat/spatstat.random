@@ -19,7 +19,7 @@
   }
   \item{eta}{
     Interaction parameter (canonical form) as described in
-    the help for \code{\link[spatstat.core]{AreaInter}}.
+    the help for \code{\link[spatstat.model]{AreaInter}}.
     A number greater than 1.
   }
   \item{r}{
@@ -48,7 +48,7 @@
 }
 \details{
   This function generates a simulated realisation of the
-  area-interaction process (see \code{\link[spatstat.core]{AreaInter}})
+  area-interaction process (see \code{\link[spatstat.model]{AreaInter}})
   using the alternating Gibbs sampler (see \code{\link[spatstat.random]{rags}}).
 
   It exploits a mathematical relationship between the
@@ -59,7 +59,7 @@
   so that the area-interaction process is clustered.
 
   The parameters \code{beta,eta} are the canonical parameters described
-  in the help for \code{\link[spatstat.core]{AreaInter}}.
+  in the help for \code{\link[spatstat.model]{AreaInter}}.
   The first order trend \code{beta} may be a constant, a function,
   or a pixel image.
 
@@ -88,7 +88,7 @@
   \code{\link[spatstat.random]{rags}},
   \code{\link[spatstat.random]{ragsMultiHard}}
 
-  \code{\link[spatstat.core]{AreaInter}}
+  \code{\link[spatstat.model]{AreaInter}}
 }
 \examples{
    plot(ragsAreaInter(100, 2, 0.07, ncycles=15))

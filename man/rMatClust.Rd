@@ -140,7 +140,7 @@
 
   The \Matern cluster process model
   with homogeneous parents (i.e. where \code{kappa} is a single number)
-  can be fitted to data using \code{\link[spatstat.core]{kppm}}.
+  can be fitted to data using \code{\link[spatstat.model]{kppm}}.
   Currently it is not possible to fit the
   \Matern cluster process model
   with inhomogeneous parents.
@@ -162,8 +162,8 @@
   \code{\link[spatstat.random]{rGaussPoisson}}.
 
   For fitting the model, see 
-  \code{\link[spatstat.core]{kppm}},
-  \code{\link[spatstat.core]{clusterfit}}.
+  \code{\link[spatstat.model]{kppm}},
+  \code{\link[spatstat.model]{clusterfit}}.
 }
 \examples{
  # homogeneous

@@ -32,7 +32,7 @@ rags(model, \dots, ncycles = 100)
   type 2, type 3, and so on. 
 
   This is an experimental implementation which currently works only
-  for multitype hard core processes (see \code{\link[spatstat.core]{MultiHard}})
+  for multitype hard core processes (see \code{\link[spatstat.model]{MultiHard}})
   in which there is no interaction between points of the same type. 
 
   The argument \code{model} should be an object describing a point

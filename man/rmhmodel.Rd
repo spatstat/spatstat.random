@@ -37,8 +37,8 @@
   \describe{
     \item{fitted point process models:}{
       an object of class \code{"ppm"}, obtained by a call to the
-      model-fitting function \code{\link[spatstat.core]{ppm}}.
-      See \code{\link[spatstat.core]{rmhmodel.ppm}}.
+      model-fitting function \code{\link[spatstat.model]{ppm}}.
+      See \code{\link[spatstat.model]{rmhmodel.ppm}}.
     }
     \item{lists:}{
       a list of parameter values in a certain format.
@@ -73,22 +73,22 @@
 }
 
 \seealso{
-  \code{\link[spatstat.core]{rmhmodel.ppm}},
+  \code{\link[spatstat.model]{rmhmodel.ppm}},
   \code{\link{rmhmodel.default}},
   \code{\link{rmhmodel.list}},
   \code{\link{rmh}},
   \code{\link{rmhcontrol}},
   \code{\link{rmhstart}},
-  \code{\link[spatstat.core]{ppm}},
-  \code{\link[spatstat.core]{Strauss}},
-  \code{\link[spatstat.core]{Softcore}},
-  \code{\link[spatstat.core]{StraussHard}},
-  \code{\link[spatstat.core]{Triplets}},
-  \code{\link[spatstat.core]{MultiStrauss}},
-  \code{\link[spatstat.core]{MultiStraussHard}},
-  \code{\link[spatstat.core]{DiggleGratton}},
-  \code{\link[spatstat.core]{PairPiece}}
-  \code{\link[spatstat.core]{Penttinen}}
+  \code{\link[spatstat.model]{ppm}},
+  \code{\link[spatstat.model]{Strauss}},
+  \code{\link[spatstat.model]{Softcore}},
+  \code{\link[spatstat.model]{StraussHard}},
+  \code{\link[spatstat.model]{Triplets}},
+  \code{\link[spatstat.model]{MultiStrauss}},
+  \code{\link[spatstat.model]{MultiStraussHard}},
+  \code{\link[spatstat.model]{DiggleGratton}},
+  \code{\link[spatstat.model]{PairPiece}}
+  \code{\link[spatstat.model]{Penttinen}}
 }
 \author{\adrian
   

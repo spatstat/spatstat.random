@@ -127,7 +127,7 @@
   \code{\link[spatstat.random]{rDGS}},
   \code{\link[spatstat.random]{rPenttinen}}.
 
-  For fitting the model, see \code{\link[spatstat.core]{DiggleGratton}}.
+  For fitting the model, see \code{\link[spatstat.model]{DiggleGratton}}.
 }
 \keyword{spatial}
 \keyword{datagen}

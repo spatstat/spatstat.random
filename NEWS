@@ -1,14 +1,21 @@
 
-        CHANGES IN spatstat.random VERSION 2.2-0.005
+        CHANGES IN spatstat.random VERSION 2.2-0.007
 
 OVERVIEW
 
     o We thank Liu Yijia for contributions.
+
+    o spatstat.random now suggests the new packages 'spatstat.explore'
+    and 'spatstat.model' rather than the old 'spatstat.core'.
     
     o Bug fixes and internal improvements.
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
+    o Package dependence
+    'spatstat.random' now suggests the new packages 'spatstat.explore'
+    and 'spatstat.model' rather than the old 'spatstat.core'.
+    
     o random generators
     Random generators now accept 'nsim=0', and return a zero-length list.
     
