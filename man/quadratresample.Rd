@@ -55,10 +55,7 @@ quadratresample(X, nx, ny=nx, ...,
   list of point patterns (if \code{nsamples > 1}).
 }
 \author{\adrian
-  
-  
   and \rolf
-  
 }
 \seealso{
   \code{\link[spatstat.geom]{quadrats}},
@@ -68,7 +65,6 @@ quadratresample(X, nx, ny=nx, ...,
   a summary statistic by block resampling.
 }
 \examples{
-  data(bei)
   quadratresample(bei, 6, 3)
 }
 \keyword{spatial}

@@ -86,7 +86,7 @@
  # 100 random points in the unit square
  pp <- runifpoint(100)
  # irregular window
- data(letterR)
+ letterR
  # polygonal
  pp <- runifpoint(100, letterR)
  # binary image mask
@@ -97,10 +97,7 @@
  runifpoint(ex=cells)
 }
 \author{\adrian
-  
-  
   and \rolf
-  
 }
 \keyword{spatial}
 \keyword{datagen}

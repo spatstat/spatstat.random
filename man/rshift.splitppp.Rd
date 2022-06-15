@@ -65,7 +65,6 @@
   \code{\link{rshift.ppp}}
 }
 \examples{
-   data(amacrine)
    Y <- split(amacrine)
 
    # random toroidal shift
