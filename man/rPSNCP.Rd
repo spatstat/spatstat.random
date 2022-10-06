@@ -16,7 +16,7 @@
 \arguments{
   \item{lambda}{
     List of intensities of component processes. Either a
-    numberic vector determining the constant (homogeneous) intensities 
+    numeric vector determining the constant (homogeneous) intensities 
     or a list of pixel images (objects of class \code{"im"}) determining 
     the (inhomogeneous) intensity functions of  component processes. 
     The length of \code{lambda} determines the number of component processes.
@@ -38,7 +38,7 @@
   }
   \item{kernels}{
     Vector of character string determining the cluster dispersal kernels
-    of component processes. Impleneted kernels are Gaussian 
+    of component processes. Implemented kernels are Gaussian 
     kernel (\code{"Thomas"}) with bandwidth \code{omega}, 
     Variance-Gamma (Bessel) kernel (\code{"VarGamma"}) with 
     bandwidth \code{omega} and shape parameter \code{nu.ker} 
@@ -46,7 +46,7 @@
     Must have the same length as \code{lambda}, \code{kappa} and \code{omega}.
   }
   \item{nu.ker}{
-    Numeric vector of bandwidths of shape parameters for Varaince-Gamma
+    Numeric vector of bandwidths of shape parameters for Variance-Gamma
     kernels. 
   }
   \item{win}{
@@ -102,7 +102,7 @@
   }{
     S[i](u) = 1 / (kappa[i]) sum[v in Phi[i]] k[i](u - v)
   }
-  is the shot-noise random feild for component \eqn{i} and 
+  is the shot-noise random field for component \eqn{i} and 
   \deqn{
       E_{ji}(u) = \exp(-\kappa_{j} \alpha_{ji} / k_{j}(0)) \prod_{v \in \Phi_{j}} {1 + \alpha_{ji} \frac{k_j(u-v)}{k_j(0)}}
     }{
