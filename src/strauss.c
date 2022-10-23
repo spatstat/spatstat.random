@@ -20,11 +20,7 @@ typedef struct Strauss {
 
 /* initialiser function */
 
-Cdata *straussinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *straussinit(State state, Model model, Algor algo) {
   /* create storage for model parameters */
   Strauss *strauss;
   strauss = (Strauss *) R_alloc(1, sizeof(Strauss)); 
@@ -47,11 +43,7 @@ Cdata *straussinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double strausscif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double strausscif(Propo prop, State state, Cdata *cdata) {
   int npts, kount, ix, ixp1, j;
   double *x, *y;
   double u, v;

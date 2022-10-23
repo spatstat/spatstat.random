@@ -22,11 +22,7 @@ typedef struct Penttinen {
 
 /* initialiser function */
 
-Cdata *penttineninit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *penttineninit(State state, Model model, Algor algo) {
   /* create storage for model parameters */
   Penttinen *penttinen;
   penttinen = (Penttinen *) R_alloc(1, sizeof(Penttinen)); 
@@ -49,11 +45,7 @@ Cdata *penttineninit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double penttinencif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double penttinencif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

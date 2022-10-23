@@ -21,11 +21,7 @@ typedef struct Triplets {
 
 /* initialiser function */
 
-Cdata *tripletsinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *tripletsinit(State state, Model model, Algor algo) {
   /* create storage for model parameters */
   Triplets *triplets;
   triplets = (Triplets *) R_alloc(1, sizeof(Triplets)); 
@@ -51,11 +47,7 @@ Cdata *tripletsinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double tripletscif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double tripletscif(Propo prop, State state, Cdata *cdata) {
   int npts, kount, ix, j, k, nj, nk, N, Nmax, Nmore, N1;
   int *neighbour;
   double *x, *y;

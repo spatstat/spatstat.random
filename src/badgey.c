@@ -38,11 +38,7 @@ typedef struct BadGey {
   double *w;  /* vector[ndisc] : sum of changes in counts at other points */
 } BadGey;
 
-Cdata *badgeyinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *badgeyinit(State state, Model model, Algor algo) {
   int i, j, k, i0, ndisc, nmatrix;
   double r, g, d2;
   BadGey *badgey;
@@ -100,11 +96,7 @@ Cdata *badgeyinit(state, model, algo)
 
 #define AUX(I,J) MAT(aux, I, J, ndisc)
 
-double badgeycif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double badgeycif(Propo prop, State state, Cdata *cdata) {
   int ix, j, k, npts, ndisc, tk;
   double u, v, d2;
   double a, dd2, b, f, r2, s, cifval;
@@ -311,11 +303,7 @@ double badgeycif(prop, state, cdata)
   return cifval;
 }
 
-void badgeyupd(state, prop, cdata) 
-     State state;
-     Propo prop;
-     Cdata *cdata;
-{
+void badgeyupd(State state, Propo prop, Cdata *cdata) {
 /* Declare other variables */
   int ix, npts, ndisc, j, k;
   double u, v, xix, yix, r2, d2, d2old, d2new;

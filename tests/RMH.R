@@ -386,7 +386,7 @@ if(ALWAYS) {
 #
 # test decisions about expansion of simulation window
 #
-#  $Revision: 1.8 $  $Date: 2022/01/05 02:06:32 $
+#  $Revision: 1.9 $  $Date: 2022/10/23 01:17:33 $
 #
 
 local({
@@ -735,7 +735,7 @@ local({
 #  Test that rmhmodel.ppm and rmhmodel.default
 #  work on Hybrid interaction models
 #
-#   $Revision: 1.5 $  $Date: 2020/05/01 05:29:42 $
+#   $Revision: 1.6 $  $Date: 2022/10/23 01:17:56 $
 #
 
 if(ALWAYS) { # involves C code
@@ -778,7 +778,7 @@ local({
 #'
 #'   Test the rmh interactive debugger
 #' 
-#'   $Revision: 1.10 $  $Date: 2020/05/01 05:29:42 $
+#'   $Revision: 1.11 $  $Date: 2022/10/23 01:19:00 $
 
 if(ALWAYS) { # may depend on platform
 local({

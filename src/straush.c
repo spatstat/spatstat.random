@@ -23,11 +23,7 @@ typedef struct StraussHard {
 
 /* initialiser function */
 
-Cdata *straushinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *straushinit(State state, Model model, Algor algo) {
   StraussHard *strausshard;
   strausshard = (StraussHard *) R_alloc(1, sizeof(StraussHard));
 
@@ -49,11 +45,7 @@ Cdata *straushinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double straushcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double straushcif(Propo prop, State state, Cdata *cdata) {
   int npts, kount, ix, ixp1, j;
   double *x, *y;
   double u, v;

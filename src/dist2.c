@@ -17,9 +17,12 @@
 
 */
 
-double dist2(u,v,x,y,period)
-     double u, v, x, y;
-     double *period;
+double dist2(
+     double u,
+     double v,
+     double x,
+     double y,
+     double *period)
 {
   double wide, high, dx, dy, dxp, dyp, a, b, d2;
   /* points are assumed to lie within one period of each other */
@@ -41,17 +44,24 @@ double dist2(u,v,x,y,period)
   return d2;
 }
 
-double dist2either(u,v,x,y,period)
-     double u, v, x, y;
-     double *period;
+double dist2either(
+     double u,
+     double v,
+     double x,
+     double y,
+     double *period)
 {
   if(period[0] < 0.0) return pow(u-x,2) + pow(v-y,2);
   return(dist2(u,v,x,y,period));
 }
 
-int dist2thresh(u,v,x,y,period,r2)
-     double u, v, x, y, r2;
-     double *period;
+int dist2thresh(
+	double u,
+	double v,
+	double x,
+	double y,
+	double *period,
+	double r2)
 {
   double wide, high, dx, dy, dxp, dyp, a, b, residue;
   /* points are assumed to lie within one period of each other */
@@ -75,9 +85,13 @@ int dist2thresh(u,v,x,y,period,r2)
   return NO;
 }
 
-int dist2Mthresh(u,v,x,y,period,r2)
-     double u, v, x, y, r2;
-     double *period;
+int dist2Mthresh(
+	 double u,
+	 double v,
+	 double x,
+	 double y,
+	 double *period,
+	 double r2)
 {
   double wide, high, dx, dy, dxp, dyp, a, b, residue;
   /* points are NOT assumed to lie within one period of each other */

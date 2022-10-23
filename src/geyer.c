@@ -32,11 +32,7 @@ typedef struct Geyer {
 #endif
 } Geyer;
 
-Cdata *geyerinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *geyerinit(State state, Model model, Algor algo) {
   int i, j, n1;
   Geyer *geyer;
   double r2;
@@ -108,11 +104,7 @@ Cdata *geyerinit(state, model, algo)
   return((Cdata *) geyer);
 }
 
-double geyercif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double geyercif(Propo prop, State state, Cdata *cdata) {
   int ix, j, npts, tee;
   double u, v, r2, s;
   double w, a, b, f, cifval;
@@ -257,11 +249,7 @@ double geyercif(prop, state, cdata)
   return cifval;
 }
 
-void geyerupd(state, prop, cdata) 
-     State state;
-     Propo prop;
-     Cdata *cdata;
-{
+void geyerupd(State state, Propo prop, Cdata *cdata) {
 /* Declare other variables */
   int ix, npts, j;
   int oldclose, newclose;

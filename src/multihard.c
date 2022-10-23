@@ -23,11 +23,7 @@ typedef struct MultiHard {
 
 /* initialiser function */
 
-Cdata *multihardinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *multihardinit(State state, Model model, Algor algo) {
   int i, j, ntypes, n2;
   double h, h2, range2;
   MultiHard *multihard;
@@ -72,11 +68,7 @@ Cdata *multihardinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double multihardcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double multihardcif(Propo prop, State state, Cdata *cdata) {
   int npts, ntypes, ix, ixp1, j, mrk, mrkj;
   int *marks;
   double *x, *y;

@@ -34,11 +34,7 @@ typedef struct Dgs {
 
 /* initialiser function */
 
-Cdata *dgsinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *dgsinit(State state, Model model, Algor algo) {
   Dgs *dgs;
   /* allocate storage */
   dgs = (Dgs *) R_alloc(1, sizeof(Dgs));
@@ -56,11 +52,7 @@ Cdata *dgsinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double dgscif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double dgscif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

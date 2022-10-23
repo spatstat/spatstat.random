@@ -34,11 +34,7 @@ typedef struct Diggra {
 
 /* initialiser function */
 
-Cdata *diggrainit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *diggrainit(State state, Model model, Algor algo) {
   Diggra *diggra;
   diggra = (Diggra *) R_alloc(1, sizeof(Diggra));
 
@@ -58,11 +54,7 @@ Cdata *diggrainit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double diggracif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double diggracif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

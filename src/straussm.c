@@ -27,11 +27,7 @@ typedef struct MultiStrauss {
 
 /* initialiser function */
 
-Cdata *straussminit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *straussminit(State state, Model model, Algor algo) {
   int i, j, ntypes, n2, hard;
   double g, r, r2, logg, range2;
   MultiStrauss *multistrauss;
@@ -92,11 +88,7 @@ Cdata *straussminit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double straussmcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double straussmcif(Propo prop, State state, Cdata *cdata) {
   int npts, ntypes, kount, ix, ixp1, j, mrk, mrkj, m1, m2;
   int *marks;
   double *x, *y;

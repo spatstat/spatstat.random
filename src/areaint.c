@@ -44,11 +44,7 @@ typedef struct AreaInt {
 
 /* initialiser function */
 
-Cdata *areaintInit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *areaintInit(State state, Model model, Algor algo) {
   double r, dx, dy, x0;
   int i, my, kdisc;
   AreaInt *areaint;
@@ -106,16 +102,12 @@ Cdata *areaintInit(state, model, algo)
 }
 
 #ifdef BADBUG
-void fexitc();
+void fexitc(const char *msg);
 #endif
 
 /* conditional intensity evaluator */
 
-double areaintCif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double areaintCif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *period, *x, *y;
   double u, v;

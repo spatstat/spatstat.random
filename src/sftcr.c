@@ -21,11 +21,7 @@ typedef struct Softcore {
 
 /* initialiser function */
 
-Cdata *sftcrinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *sftcrinit(State state, Model model, Algor algo) {
   Softcore *softcore;
   softcore = (Softcore *) R_alloc(1, sizeof(Softcore));
 
@@ -43,11 +39,7 @@ Cdata *sftcrinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double sftcrcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double sftcrcif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

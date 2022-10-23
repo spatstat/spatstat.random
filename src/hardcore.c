@@ -17,11 +17,7 @@ typedef struct Hardcore {
 
 /* initialiser function */
 
-Cdata *hardcoreinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *hardcoreinit(State state, Model model, Algor algo) {
   Hardcore *hardcore;
   double h;
   hardcore = (Hardcore *) R_alloc(1, sizeof(Hardcore));
@@ -38,11 +34,7 @@ Cdata *hardcoreinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double hardcorecif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double hardcorecif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

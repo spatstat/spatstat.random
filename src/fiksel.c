@@ -32,11 +32,7 @@ typedef struct Fiksel {
 
 /* initialiser function */
 
-Cdata *fikselinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *fikselinit(State state, Model model, Algor algo) {
   Fiksel *fiksel;
   fiksel = (Fiksel *) R_alloc(1, sizeof(Fiksel));
 
@@ -57,11 +53,7 @@ Cdata *fikselinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double fikselcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double fikselcif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

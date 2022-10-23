@@ -29,11 +29,7 @@ typedef struct Lennard {
 
 /* initialiser function */
 
-Cdata *lennardinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *lennardinit(State state, Model model, Algor algo) {
   Lennard *lennard;
   double sigma2, foureps, minfrac, maxfrac;
 
@@ -61,11 +57,7 @@ Cdata *lennardinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double lennardcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double lennardcif(Propo prop, State state, Cdata *cdata) {
   int npts, ix, ixp1, j;
   double *x, *y;
   double u, v;

@@ -38,9 +38,7 @@ CifPair CifTable[] = {
   {(char *) NULL, (Cifns *) NULL}
 };
 
-Cifns getcif(cifname) 
-     char *cifname;
-{
+Cifns getcif(char *cifname) {
   int i;
   CifPair cp;
   for(i = 0; CifTable[i].name; i++) {
@@ -55,10 +53,7 @@ Cifns getcif(cifname)
 
 /* R interface function, to check directly whether cif is recognised */
 
-void knownCif(cifname, answer) 
-     char** cifname;
-     int* answer;
-{
+void knownCif(char** cifname, int* answer) {
   int i;
   CifPair cp;
   for(i = 0; CifTable[i].name; i++) {

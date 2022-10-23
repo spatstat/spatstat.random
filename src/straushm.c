@@ -30,11 +30,7 @@ typedef struct MultiStraussHard {
 
 /* initialiser function */
 
-Cdata *straushminit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *straushminit(State state, Model model, Algor algo) {
   int i, j, ntypes, n2, hard;
   double g, r, h, r2, h2, logg, range2;
   MultiStraussHard *multistrausshard;
@@ -105,11 +101,7 @@ Cdata *straushminit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double straushmcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double straushmcif(Propo prop, State state, Cdata *cdata) {
   int npts, ntypes, kount, ix, ixp1, j, mrk, mrkj, m1, m2;
   int *marks;
   double *x, *y;

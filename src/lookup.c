@@ -31,11 +31,7 @@ typedef struct Lookup {
 
 /* initialiser function */
 
-Cdata *lookupinit(state, model, algo)
-     State state;
-     Model model;
-     Algor algo;
-{
+Cdata *lookupinit(State state, Model model, Algor algo) {
   int i, nlook;
   double ri;
   Lookup *lookup;
@@ -80,11 +76,7 @@ Cdata *lookupinit(state, model, algo)
 
 /* conditional intensity evaluator */
 
-double lookupcif(prop, state, cdata)
-     Propo prop;
-     State state;
-     Cdata *cdata;
-{
+double lookupcif(Propo prop, State state, Cdata *cdata) {
   int npts, nlook, k, kk, ix, ixp1, j;
   double *x, *y;
   double u, v;
