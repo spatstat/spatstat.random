@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.15 $ $Date: 2022/04/08 06:31:47 $
+#'  $Revision: 1.16 $ $Date: 2022/10/23 06:20:10 $
 
 
 local({
@@ -96,6 +96,9 @@ local({
     Y <- rMatClust(10, 0.05, Z, saveLambda=TRUE)
     Y <- rCauchy(30, 0.01, Z, saveLambda=TRUE)
     Y <- rVarGamma(30, 2, 0.02, Z, saveLambda=TRUE)
+    #' inhomogeneous
+    Moo <- as.im(function(x,y) { 10 * x }, unit.square())
+    X <- rMatClust(10, 0.2, Moo)
   }
 
   if(FULLTEST) {
