@@ -14,7 +14,7 @@
 
 */
 
-void knownCif(char *, int *);
+void knownCif(char **, int *);
 /*
 
              Functions invoked by .Call

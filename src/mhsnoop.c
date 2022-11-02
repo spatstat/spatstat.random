@@ -8,7 +8,7 @@
 /*
   mhsnoop.c
 
-  $Revision: 1.11 $  $Date: 2021/12/24 04:28:15 $
+  $Revision: 1.12 $  $Date: 2022/11/02 11:02:26 $
 
   support for visual debugger in RMH
 
@@ -51,7 +51,7 @@ void mhsnoop(Snoop *s,
 	     int *itype) 
 {
   SEXP e;
-  int npts, j, proptype, accepted, fateMH, fateUser;
+  int npts, j, proptype, fateMH, fateUser;
   /* passed from C to R before debugger */
   SEXP Sirep, Sx, Sy, Sm, Sproptype, Sproplocn, Spropmark, Spropindx;
   SEXP Snumer, Sdenom, Sitype;
