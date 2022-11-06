@@ -1,4 +1,23 @@
 
+        CHANGES IN spatstat.random VERSION 3.0-2
+
+OVERVIEW
+
+    o Pakes distribution.
+
+NEW FUNCTIONS
+
+    o dpakes, ppakes, qpakes, rpakes
+    Density, cumulative probability, quantiles, and random generator
+    for the Pakes distribution.
+
+        CHANGES IN spatstat.random VERSION 3.0-1
+
+OVERVIEW
+
+    o Tweaks to placate package checker.
+
+
         CHANGES IN spatstat.random VERSION 3.0-0
 
 OVERVIEW
