@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.54 $ $Date: 2022/11/06 06:42:01 $
+#'   $Revision: 1.56 $ $Date: 2022/11/13 06:03:45 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -56,6 +56,9 @@
 #'                       or converts them to the generic parameters (if native=FALSE).
 #'                       Transitional syntax: function(par, native=old, ..., old=TRUE)
 #'                                            ('old' is a synonym for 'native')
+#'
+#'       native2generic  function(par)
+#'                       Streamlined function to convert 'par' from native to generic format.
 #'
 #'       outputshape     function(margs, ..)
 #'                       Convert 'margs' to the format required for printed output.
@@ -208,6 +211,11 @@ detect.par.format <- function(par, native, generic) {
       par[2L] <- sqrt(par[2L])
       names(par)[2L] <- "scale"
     }
+    return(par)
+  },
+  native2generic = function(par) {
+    par[2L] <- sqrt(par[2L])
+    names(par) <- c("kappa", "scale")
     return(par)
   },
   outputshape = function(margs, ...) list(),
@@ -377,6 +385,10 @@ detect.par.format <- function(par, native, generic) {
     names(par)[2L] <- if(native) "R" else "scale"
     return(par)
   },
+  native2generic = function(par) {
+    names(par) <- c("kappa", "scale")
+    return(par)
+  },
   ## density function for the distance to offspring
   ddist = function(r, scale, ...) {
     ## 'scale' is generic format
@@ -509,6 +521,11 @@ detect.par.format <- function(par, native, generic) {
       par[2L] <- sqrt(par[2L])/2
       names(par)[2L] <- "scale"
     }
+    return(par)
+  },
+  native2generic = function(par) {
+    par[2L] <- sqrt(par[2L])/2
+    names(par) <- c("kappa", "scale")
     return(par)
   },
   outputshape = function(margs, ...) list(),
@@ -707,6 +724,10 @@ resolve.vargamma.shape <- function(...,
       stop("par values must be positive.", call.=FALSE)
     detect.par.format(par, native=c("kappa", "eta"), generic=c("kappa", "scale"))
     names(par)[2L] <- if(native) "eta" else "scale"
+    return(par)
+  },
+  native2generic = function(par) {
+    names(par) <- c("kappa", "scale")
     return(par)
   },
   outputshape = .VarGammaOutputShape,
@@ -919,6 +940,10 @@ resolve.vargamma.shape <- function(...,
       stop("par values must be positive.", call.=FALSE)
     detect.par.format(par, native=c("sigma2", "alpha"), generic=c("var", "scale"))
     names(par) <- if(native) c("sigma2", "alpha") else c("var","scale")
+    return(par)
+  },
+  native2generic = function(par) {
+    names(par) <- c("var","scale")
     return(par)
   },
   outputshape = function(margs, ...) return(margs),
