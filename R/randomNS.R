@@ -3,7 +3,7 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.35 $  $Date: 2022/04/06 07:07:57 $
+##   $Revision: 1.36 $  $Date: 2022/11/24 10:10:39 $
 ##
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
@@ -159,7 +159,7 @@ fakeNeyScot <- function(Y, lambda, win, saveLambda, saveparents) {
     if(isSingle <- is.ppp(Y)) Y <- solist(Y)
     for(i in seq_along(Y)) {
       Yi <- Y[[i]]
-      if(saveLambda) attr(Yi, "lambda") <- lambda
+      if(saveLambda) attr(Yi, "Lambda") <- lambda
       if(saveparents) {
         attr(Yi, "parents") <- emptyparents
         attr(Yi, "parentid") <- integer(0)
