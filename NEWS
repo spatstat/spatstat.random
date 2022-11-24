@@ -7,7 +7,7 @@ OVERVIEW
 
 BUG FIXES
 
-    o simulate.kppm, rThomas, rMatClust, rCauchy, rVarGamma
+    o rThomas, rMatClust, rCauchy, rVarGamma
     If the model was very close to a Poisson process, and if saveLambda=TRUE was selected,
     the attribute "Lambda" was incorrectly labelled "lambda".
     Fixed.
