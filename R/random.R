@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.107 $   $Date: 2022/12/25 00:50:16 $
+##    $Revision: 4.108 $   $Date: 2022/12/25 01:15:48 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -983,11 +983,11 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
   stop("Unrecognised format for P")
 
   if(min(pX) < 0) stop("some probabilities are negative")
-  if(max(pX) > 1) stop("some probabilities are greater than 1")
+  if(max(pX) > Pmax) stop("some probabilities are greater than 1")
 
   result <- vector(mode="list", length=nsim)
   for(isim in seq_len(nsim)) {
-    retain <- (Pmax * runif(length(pX)) < pX)
+    retain <- ((Pmax * runif(length(pX))) < pX)
     Y <- X[retain]
     ## also handle offspring-to-parent map if present
     if(!is.null(parentid <- attr(X, "parentid")))
