@@ -1,14 +1,20 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.001
+        CHANGES IN spatstat.random VERSION 3.1-0.002
 
 OVERVIEW
 
     o Bug fixes and internal improvements.
 
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rthin
+    New argument 'Pmax'.
+
 BUG FIXES
 
     o rThomas, rMatClust, rCauchy, rVarGamma
-    If the model was very close to a Poisson process, and if saveLambda=TRUE was selected,
+    If the model was very close to a Poisson process,
+    and if saveLambda=TRUE was selected,
     the attribute "Lambda" was incorrectly labelled "lambda".
     Fixed.
 

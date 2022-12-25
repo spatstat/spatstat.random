@@ -5,7 +5,7 @@
   Applies independent random thinning to a point pattern or segment pattern.
 }
 \usage{
-rthin(X, P, \dots, nsim=1, drop=TRUE)
+rthin(X, P, \dots, nsim=1, drop=TRUE, Pmax=1)
 }
 \arguments{
   \item{X}{
@@ -29,6 +29,11 @@ rthin(X, P, \dots, nsim=1, drop=TRUE)
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
     result will be a point pattern, rather than a list 
     containing a point pattern.
+  }
+  \item{Pmax}{
+    Optional scale factor. A single numerical value.
+    The values of \code{P} will be divided by \code{Pmax}
+    to determine the probability of retaining each point.
   }
 }
 \value{

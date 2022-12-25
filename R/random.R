@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.106 $   $Date: 2022/05/21 08:53:38 $
+##    $Revision: 4.107 $   $Date: 2022/12/25 00:50:16 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -906,7 +906,7 @@ thinjump <- function(n, p) {
   return(i)
 }
 
-rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
+rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
   if(!(is.ppp(X) || is.lpp(X) || is.pp3(X) || is.ppx(X) || is.psp(X)))
     stop(paste("X should be a point pattern (class ppp, lpp, pp3 or ppx)",
                "or a line segment pattern (class psp)"),
@@ -923,9 +923,15 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
     return(result)
   }
 
+  if(!missing(Pmax)) {
+    check.1.real(Pmax)
+    stopifnot(Pmax > 0)
+  }
+
   if(is.numeric(P) && length(P) == 1 && spatstat.options("fastthin")) {
     # special algorithm for constant probability
     result <- vector(mode="list", length=nsim)
+    if(!missing(Pmax)) P <- P/Pmax
     for(isim in seq_len(nsim)) {
       retain <- thinjump(nX, P)
       Y <- X[retain]
@@ -981,7 +987,7 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
 
   result <- vector(mode="list", length=nsim)
   for(isim in seq_len(nsim)) {
-    retain <- (runif(length(pX)) < pX)
+    retain <- (Pmax * runif(length(pX)) < pX)
     Y <- X[retain]
     ## also handle offspring-to-parent map if present
     if(!is.null(parentid <- attr(X, "parentid")))
