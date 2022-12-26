@@ -5,7 +5,7 @@
   Applies independent random thinning to a point pattern or segment pattern.
 }
 \usage{
-rthin(X, P, \dots, nsim=1, drop=TRUE, Pmax=1)
+rthin(X, P, \dots, nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE)
 }
 \arguments{
   \item{X}{
@@ -34,6 +34,13 @@ rthin(X, P, \dots, nsim=1, drop=TRUE, Pmax=1)
     Optional scale factor. A single numerical value.
     The values of \code{P} will be divided by \code{Pmax}
     to determine the probability of retaining each point.
+  }
+  \item{na.zero}{
+    Logical value specifying what to do with values of \code{P}
+    that are \code{NA}, \code{NaN} or infinite.
+    If \code{na.zero=FALSE} (the default) an error will occur.
+    If \code{na.zero=TRUE}, these values
+    will be replaced by a probability value of zero.
   }
 }
 \value{

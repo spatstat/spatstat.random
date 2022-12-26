@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.003
+        CHANGES IN spatstat.random VERSION 3.1-0.004
 
 OVERVIEW
 
@@ -8,7 +8,7 @@ OVERVIEW
 SIGNIFICANT USER-VISIBLE CHANGES
 
     o rthin
-    New argument 'Pmax'.
+    New arguments 'Pmax' and 'na.zero'.
 
 BUG FIXES
 

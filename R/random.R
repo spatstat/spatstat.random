@@ -906,7 +906,7 @@ thinjump <- function(n, p) {
   return(i)
 }
 
-rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
+rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE) {
   if(!(is.ppp(X) || is.lpp(X) || is.pp3(X) || is.ppx(X) || is.psp(X)))
     stop(paste("X should be a point pattern (class ppp, lpp, pp3 or ppx)",
                "or a line segment pattern (class psp)"),
@@ -930,8 +930,9 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
 
   if(is.numeric(P) && length(P) == 1 && spatstat.options("fastthin")) {
     # special algorithm for constant probability
-    result <- vector(mode="list", length=nsim)
     if(!missing(Pmax)) P <- P/Pmax
+    if(badprobability(P, TRUE)) stop("P is not a valid probability value")
+    result <- vector(mode="list", length=nsim)
     for(isim in seq_len(nsim)) {
       retain <- thinjump(nX, P)
       Y <- X[retain]
@@ -953,8 +954,6 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
       else 
         stop("Length of vector P does not match number of points of X")
     }
-    if(anyNA(pX))
-      stop("P contains NA's")
   } else if(is.function(P)) {
     ## function - evaluate it at points of X
     if(!(is.ppp(X) || is.lpp(X)))
@@ -966,8 +965,6 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
       stop("Function P returned a vector of incorrect length")
     if(!is.numeric(pX))
       stop("Function P returned non-numeric values")
-    if(anyNA(pX))
-      stop("Function P returned some NA values")
   } else if(is.im(P)) {
     ## image - look it up
     if(!(is.ppp(X) || is.lpp(X)))
@@ -977,10 +974,21 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1) {
     if(!(P$type %in% c("integer", "real")))
       stop("Values of image P should be numeric")
     pX <- P[X, drop=FALSE]
-    if(anyNA(pX))
-      stop("some points of X lie outside the domain of image P")
-  } else
-  stop("Unrecognised format for P")
+  } else stop("Unrecognised format for P")
+
+  if(!all(is.finite(pX))) {
+    if(na.zero) {
+      pX[is.na(pX)] <- 0
+    } else if(anyNA(pX)) {
+      if(is.function(P)) stop("Function P returned some NA values")
+      if(is.im(P)) stop("Some points lie outside the domain of image P")
+      stop("P contains NA's")
+    } else {
+      if(is.function(P)) stop("Function P returned some NaN or Inf values")
+      if(is.im(P)) stop("Image P contains NaN or Inf values")
+      stop("P contains NaN or Inf values")
+    }
+  }
 
   if(min(pX) < 0) stop("some probabilities are negative")
   if(max(pX) > Pmax) stop("some probabilities are greater than 1")
