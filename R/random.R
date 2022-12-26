@@ -911,20 +911,25 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
     stop(paste("X should be a point pattern (class ppp, lpp, pp3 or ppx)",
                "or a line segment pattern (class psp)"),
          call.=FALSE)
-  if(!missing(nsim)) {
-    check.1.integer(nsim)
-    stopifnot(nsim >= 0)
-  }
   rthinEngine(X, P, ..., nsim=nsim, drop=drop)
 }
 
 rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
                         Pmax=1, na.zero=FALSE, what=c("objects", "fate")) {
+  check.1.integer(nsim)
+  stopifnot(nsim >= 0)
   ## if what = 'objects', return the thinned pattern
   ## if what = 'fate', return the logical vector (retained/deleted)
   what <- match.arg(what)
+  ## secretly handle list(x,y) input
+  if(israwxy <- (recognise.spatstat.type(X) == "listxy")) {
+    xx <- X$x
+    yy <- X$y
+    nX <- length(xx)
+  } else {
+    nX <- nobjects(X)
+  }
   ## catch trivial cases
-  nX <- nobjects(X)
   if(nX == 0 || nsim == 0) {
     switch(what,
            objects = {
@@ -955,10 +960,14 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
            objects = {
              for(isim in seq_len(nsim)) {
                retain <- thinjump(nX, P)
-               Y <- X[retain]
-               ## also handle offspring-to-parent map if present
-               if(!is.null(parentid <- attr(X, "parentid")))
-                 attr(Y, "parentid") <- parentid[retain]
+               if(israwxy) {
+                 Y <- list(x=xx[retain], y=yy[retain])
+               } else {
+                 Y <- X[retain]
+                 ## also handle offspring-to-parent map if present
+                 if(!is.null(parentid <- attr(X, "parentid")))
+                   attr(Y, "parentid") <- parentid[retain]
+               }
                result[[isim]] <- Y
              }
            })
@@ -979,7 +988,7 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
     }
   } else if(is.function(P)) {
     ## function - evaluate it at points of X
-    if(!(is.ppp(X) || is.lpp(X)))
+    if(!(is.ppp(X) || is.lpp(X) || israwxy))
       stop(paste("Don't know how to apply a function to an object of class",
                  commasep(sQuote(class(X)))),
            call.=FALSE)
@@ -990,7 +999,7 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
       stop("Function P returned non-numeric values")
   } else if(is.im(P)) {
     ## image - look it up
-    if(!(is.ppp(X) || is.lpp(X)))
+    if(!(is.ppp(X) || is.lpp(X) || israwxy))
       stop(paste("Don't know how to apply image values to an object of class",
                  commasep(sQuote(class(X)))),
            call.=FALSE)
@@ -1027,10 +1036,14 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
          objects = {
            for(isim in seq_len(nsim)) {
              retain <- ((Pmax * runif(length(pX))) < pX)
-             Y <- X[retain]
-             ## also handle offspring-to-parent map if present
-             if(!is.null(parentid <- attr(X, "parentid")))
-               attr(Y, "parentid") <- parentid[retain]
+             if(israwxy) {
+               Y <- list(x=xx[retain], y=yy[retain])
+             } else {
+               Y <- X[retain]
+               ## also handle offspring-to-parent map if present
+               if(!is.null(parentid <- attr(X, "parentid")))
+                 attr(Y, "parentid") <- parentid[retain]
+             }
              result[[isim]] <- Y
              }
          })
