@@ -43,6 +43,7 @@
 \alias{rmhstart.list}
 \alias{rmpoint.I.allim}
 \alias{rpoint.multi}
+\alias{rthinEngine}
 \alias{runifpoispp}          
 \alias{runifpoisppOnLines}          
 \alias{spatstatClusterModelInfo}
@@ -108,6 +109,7 @@ rmhSnoopEnv(Xinit, Wclip, R)
 \method{rmhstart}{list}(start, \dots) 
 rmpoint.I.allim(n, f, types, nsim)
 rpoint.multi(n, f, fmax, marks, win, giveup, verbose, warn, nsim, drop)
+rthinEngine(X, P, \dots, nsim, drop, Pmax, na.zero, what)
 runifpoispp(lambda, win, \dots, nsim, drop)
 runifpoisppOnLines(lambda, L, nsim, drop)
 spatstatClusterModelInfo(name, onlyPCP)

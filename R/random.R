@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.108 $   $Date: 2022/12/25 01:15:48 $
+##    $Revision: 4.109 $   $Date: 2022/12/26 07:44:16 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -906,7 +906,7 @@ thinjump <- function(n, p) {
   return(i)
 }
 
-rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE) {
+rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
   if(!(is.ppp(X) || is.lpp(X) || is.pp3(X) || is.ppx(X) || is.psp(X)))
     stop(paste("X should be a point pattern (class ppp, lpp, pp3 or ppx)",
                "or a line segment pattern (class psp)"),
@@ -914,11 +914,25 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE) {
   if(!missing(nsim)) {
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
-    if(nsim == 0) return(simulationresult(list()))
   }
+  rthinEngine(X, P, ..., nsim=nsim, drop=drop)
+}
+
+rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
+                        Pmax=1, na.zero=FALSE, what=c("objects", "fate")) {
+  ## if what = 'objects', return the thinned pattern
+  ## if what = 'fate', return the logical vector (retained/deleted)
+  what <- match.arg(what)
+  ## catch trivial cases
   nX <- nobjects(X)
-  if(nX == 0) {
-    result <- rep(list(X), nsim)
+  if(nX == 0 || nsim == 0) {
+    switch(what,
+           objects = {
+             result <- rep(list(X), nsim)
+           },
+           fate = {
+             result <- rep(list(logical(nX)), nsim)
+           })
     result <- simulationresult(result, nsim, drop)
     return(result)
   }
@@ -929,22 +943,31 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE) {
   }
 
   if(is.numeric(P) && length(P) == 1 && spatstat.options("fastthin")) {
-    # special algorithm for constant probability
+    ## special fast algorithm for constant probability
     if(!missing(Pmax)) P <- P/Pmax
     if(badprobability(P, TRUE)) stop("P is not a valid probability value")
     result <- vector(mode="list", length=nsim)
-    for(isim in seq_len(nsim)) {
-      retain <- thinjump(nX, P)
-      Y <- X[retain]
-      ## also handle offspring-to-parent map if present
-      if(!is.null(parentid <- attr(X, "parentid")))
-        attr(Y, "parentid") <- parentid[retain]
-      result[[isim]] <- Y
-    }
+    switch(what,
+           fate = {
+             for(isim in seq_len(nsim)) 
+               result[[isim]] <- thinjump(nX, P)
+           },
+           objects = {
+             for(isim in seq_len(nsim)) {
+               retain <- thinjump(nX, P)
+               Y <- X[retain]
+               ## also handle offspring-to-parent map if present
+               if(!is.null(parentid <- attr(X, "parentid")))
+                 attr(Y, "parentid") <- parentid[retain]
+               result[[isim]] <- Y
+             }
+           })
     result <- simulationresult(result, nsim, drop)
     return(result)
   }
 
+  #' general case: compute probabilities first
+  
   if(is.numeric(P)) {
     ## vector of retention probabilities
     pX <- P
@@ -993,17 +1016,27 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE, Pmax=1, na.zero=FALSE) {
   if(min(pX) < 0) stop("some probabilities are negative")
   if(max(pX) > Pmax) stop("some probabilities are greater than 1")
 
+  #' now simulate
+  
   result <- vector(mode="list", length=nsim)
-  for(isim in seq_len(nsim)) {
-    retain <- ((Pmax * runif(length(pX))) < pX)
-    Y <- X[retain]
-    ## also handle offspring-to-parent map if present
-    if(!is.null(parentid <- attr(X, "parentid")))
-      attr(Y, "parentid") <- parentid[retain]
-    result[[isim]] <- Y
-  }
+  switch(what,
+         fate = {
+           for(isim in seq_len(nsim)) 
+             result[[isim]] <- ((Pmax * runif(length(pX))) < pX)
+         },
+         objects = {
+           for(isim in seq_len(nsim)) {
+             retain <- ((Pmax * runif(length(pX))) < pX)
+             Y <- X[retain]
+             ## also handle offspring-to-parent map if present
+             if(!is.null(parentid <- attr(X, "parentid")))
+               attr(Y, "parentid") <- parentid[retain]
+             result[[isim]] <- Y
+             }
+         })
   result <- simulationresult(result, nsim, drop)
   return(result)
 }
+
 
 
