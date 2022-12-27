@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.109 $   $Date: 2022/12/26 07:44:16 $
+##    $Revision: 4.110 $   $Date: 2022/12/27 01:46:08 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -907,7 +907,8 @@ thinjump <- function(n, p) {
 }
 
 rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
-  if(!(is.ppp(X) || is.lpp(X) || is.pp3(X) || is.ppx(X) || is.psp(X)))
+  if(!(inherits(X, c("ppp", "lpp", "pp3", "ppx", "psp")) ||
+       recognise.spatstat.type(X) == "listxy"))
     stop(paste("X should be a point pattern (class ppp, lpp, pp3 or ppx)",
                "or a line segment pattern (class psp)"),
          call.=FALSE)
@@ -915,13 +916,15 @@ rthin <- function(X, P, ..., nsim=1, drop=TRUE) {
 }
 
 rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
-                        Pmax=1, na.zero=FALSE, what=c("objects", "fate")) {
+                        Pmax=1, na.zero=FALSE,
+                        what=c("objects", "fate"),
+                        fatal=TRUE, warn=TRUE) {
   check.1.integer(nsim)
   stopifnot(nsim >= 0)
   ## if what = 'objects', return the thinned pattern
   ## if what = 'fate', return the logical vector (retained/deleted)
   what <- match.arg(what)
-  ## secretly handle list(x,y) input
+  ## recognise list(x,y) input
   if(israwxy <- (recognise.spatstat.type(X) == "listxy")) {
     xx <- X$x
     yy <- X$y
@@ -1022,8 +1025,18 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
     }
   }
 
-  if(min(pX) < 0) stop("some probabilities are negative")
-  if(max(pX) > Pmax) stop("some probabilities are greater than 1")
+  if(fatal || warn) {
+    ## check for bad values of probability
+    ra <- range(pX)
+    if(ra[1] < 0) {
+      if(fatal) stop("some probabilities are negative")
+      if(warn) warning("some probabilities are negative")
+    }
+    if(ra[2] > Pmax) {
+      if(fatal) stop("some probabilities are greater than 1")
+      if(warn) warning("some probabilities are greater than 1")
+    }
+  }
 
   #' now simulate
   
