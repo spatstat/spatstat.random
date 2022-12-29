@@ -6,9 +6,10 @@
   Neyman-Scott cluster process.
 }
 \usage{
- rNeymanScott(kappa, expand, rcluster, win = owin(c(0,1),c(0,1)),
-              \dots, lmax=NULL, nsim=1, drop=TRUE,
-              nonempty=TRUE, saveparents=TRUE)
+ rNeymanScott(kappa, expand, rcluster, win = unit.square(),
+              \dots, nsim=1, drop=TRUE,
+              nonempty=TRUE, saveparents=TRUE,
+              kappamax=NULL, mumax=NULL)
 }
 \arguments{
   \item{kappa}{
@@ -32,10 +33,6 @@
   \item{\dots}{
     Arguments passed to \code{rcluster}.
   }
-  \item{lmax}{
-    Optional. Upper bound on the values of \code{kappa}
-    when \code{kappa} is a function or pixel image.
-  }
   \item{nsim}{Number of simulated realisations to be generated.}
   \item{drop}{
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
@@ -53,6 +50,14 @@
   \item{saveparents}{
     Logical value indicating whether to save the locations of the
     parent points as an attribute.
+  }
+  \item{kappamax}{
+    Optional. Upper bound on the values of \code{kappa}
+    when \code{kappa} is a function or pixel image.
+  }
+  \item{mumax}{
+    Optional. Upper bound on the values of \code{mu}
+    when \code{mu=rcluster[[1]]} is a function or pixel image.
   }
 }
 \value{

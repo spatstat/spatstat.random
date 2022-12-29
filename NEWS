@@ -1,9 +1,18 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.007
+        CHANGES IN spatstat.random VERSION 3.1-0.008
 
 OVERVIEW
 
     o Bug fixes and internal improvements.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rNeymanScott
+    Argument 'lmax' has been replaced by 'kappamax'.
+    New argument 'mumax'.
+
+    o rPoissonCluster
+    Argument 'lmax' has been replaced by 'kappamax'.
 
 BUG FIXES
 

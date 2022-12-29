@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.110 $   $Date: 2022/12/27 01:46:08 $
+##    $Revision: 4.111 $   $Date: 2022/12/29 02:50:04 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -680,7 +680,7 @@ rSSI <- function(r, n=Inf, win = square(1),
 
 rPoissonCluster <-
   function(kappa, expand, rcluster, win = owin(c(0,1),c(0,1)), ...,
-           lmax=NULL, nsim=1, drop=TRUE, saveparents=TRUE)
+           nsim=1, drop=TRUE, saveparents=TRUE, kappamax=NULL)
 {
   ## Generic Poisson cluster process
   ## Implementation for bounded cluster radius
@@ -691,33 +691,42 @@ rPoissonCluster <-
   ## "..." are arguments to be passed to 'rcluster()'
   ##
 
-  ## Catch old argument name rmax for expand, and allow rmax to be
-  ## passed to rcluster (and then be ignored)
-  if(missing(expand) && !is.null(rmax <- list(...)$rmax)){
-      expand <- rmax
-      f <- rcluster
-      rcluster <- function(..., rmax) f(...)
-  }
-  win <- as.owin(win)
-  
   if(!missing(nsim)) {
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
     if(nsim == 0) return(simulationresult(list()))
   }
 
+  ## Catch old argument name rmax for expand, and allow rmax to be
+  ## passed to rcluster (and then be ignored)
+  if(missing(expand) && !is.null(rmax <- list(...)$rmax)) {
+    warning("outdated usage in rPoissonCluster: 'rmax' should be 'expand'")
+    expand <- rmax
+  }
+
+  rPoissonClusterEngine(kappa=kappa, expand=expand, rcluster=rcluster,
+                        win=win, nsim=nsim, drop=drop, saveparents=saveparents,
+                        kappamax=kappamax, ...)
+}
+
+rPoissonClusterEngine <- function(kappa, expand=rmax, rcluster, win, ..., 
+                                  nsim=1, drop=TRUE, saveparents=TRUE,
+                                  kappamax=lmax, lmax=NULL, rmax=NULL) {
   ## Generate parents in dilated window
+  win <- as.owin(win)
   frame <- boundingbox(win)
   dilated <- owin(frame$xrange + c(-expand, expand),
                   frame$yrange + c(-expand, expand))
+
   if(is.im(kappa) && !is.subset.owin(dilated, as.owin(kappa)))
     stop(paste("The window in which the image",
                sQuote("kappa"),
                "is defined\n",
                "is not large enough to contain the dilation of the window",
                sQuote("win")))
-  parentlist <- rpoispp(kappa, lmax=lmax, win=dilated, nsim=nsim)
-  if(nsim == 1) parentlist <- list(parentlist)
+
+  parentlist <- rpoispp(kappa, lmax=kappamax, win=dilated,
+                        nsim=nsim, drop=FALSE)
 
   resultlist <- vector(mode="list", length=nsim)
   for(isim in seq_len(nsim)) {

@@ -29,6 +29,7 @@
 \alias{resolve.vargamma.shape}
 \alias{retrieve.param}
 \alias{rMaternInhibition}
+\alias{rPoissonClusterEngine}
 \alias{RmhExpandRule}
 \alias{rmhsnoop}
 \alias{rmhResolveControl}
@@ -92,6 +93,8 @@ reheat(model, invtemp)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, nu, allow.nu, allow.default)
 retrieve.param(desired, aliases, \dots, par)
 rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
+rPoissonClusterEngine(kappa, expand, rcluster, win, \dots,
+                      nsim, drop, saveparents, kappamax, lmax, rmax) 
 RmhExpandRule(nama)
 \method{rmhcontrol}{rmhcontrol}(\dots) 
 \method{rmhcontrol}{list}(\dots) 

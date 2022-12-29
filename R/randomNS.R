@@ -3,15 +3,20 @@
 ##
 ##   simulating from Neyman-Scott processes
 ##
-##   $Revision: 1.36 $  $Date: 2022/11/24 10:10:39 $
+##   $Revision: 1.37 $  $Date: 2022/12/29 03:03:16 $
 ##
+##    Generic code for Neyman-Scott by Adrian Baddeley
 ##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
 ##    Bug fixes by Abdollah, Adrian, and Rolf Turner
+##
+##   Copyright (c) 2000-2022 Adrian Baddeley and Abdollah Jalilian
+##   GNU Public Licence >= 2.0
 
 rNeymanScott <- 
-  function(kappa, expand, rcluster, win = owin(c(0,1),c(0,1)), ...,
-           lmax=NULL, nsim=1, drop=TRUE, nonempty=TRUE, saveparents=TRUE)
+  function(kappa, expand, rcluster, win = unit.square(),
+           ..., nsim=1, drop=TRUE, nonempty=TRUE, saveparents=TRUE,
+           kappamax=NULL, mumax=NULL)
 {
   ## Generic Neyman-Scott process
   ## Implementation for bounded cluster radius
@@ -20,9 +25,17 @@ rNeymanScott <-
   stopifnot(nsim >= 0)
   if(nsim == 0) return(simulationresult(list()))
 
-  ## Catch old argument name rmax for expand
-  if(missing(expand) && !is.null(rmax <- list(...)$rmax))
+  ## Catch old argument name 'rmax'
+  if(missing(expand) && !is.null(rmax <- list(...)$rmax)) {
+    warning("outdated usage in rNeymanScott: 'rmax' should be 'expand'")
     expand <- rmax
+  }
+    
+  ## Catch old argument name 'lmax'
+  if(is.null(kappamax) && !is.null(lmax <- list(...)$lmax)) {
+    warning("outdated usage in rNeymanScott: 'lmax' should be 'kappamax'")
+    kappamax <- lmax
+  }
     
   ## 'rcluster' may be
   ##
@@ -32,7 +45,7 @@ rNeymanScott <-
 
   if(is.function(rcluster))
     return(rPoissonCluster(kappa, expand, rcluster, win, ...,
-                           lmax=lmax, nsim=nsim, drop=drop,
+                           kappamax=kappamax, nsim=nsim, drop=drop,
                            saveparents=saveparents))
 
   ##     (2) a list(mu, f) where mu is a numeric value, function, or pixel image
@@ -43,18 +56,16 @@ rNeymanScott <-
   win <- as.owin(win)
   mu <- rcluster[[1]]
   rdisplace <- rcluster[[2]]
-  if(is.numeric(mu)) {
-    ## homogeneous
-    if(!(length(mu) == 1 && mu >= 0))
-      stop("rcluster[[1]] should be a single nonnegative number")
-    mumax <- mu
-  } else if (is.im(mu) || is.function(mu)) {
-      ## inhomogeneous
-    if(is.function(mu)) mu <- as.im(mu, W=win, ..., strict=TRUE)
-    mumax <- max(mu)
-  } else stop("rcluster[[1]] should be a number, a function or a pixel image")  
+  if(!(is.numeric(mu) || is.im(mu) || is.function(mu))) 
+    stop("rcluster[[1]] should be a number, a function or a pixel image")  
+  if(is.numeric(mu) && !(length(mu) == 1 && mu >= 0))
+    stop("rcluster[[1]] should be a single nonnegative number")
   if(!is.function(rdisplace))
     stop("rcluster[[2]] should be a function")
+  if(is.null(mumax))
+    mumax <- if(is.numeric(mu)) mu else
+             if(is.im(mu)) max(mu) else
+             (1.05 * max(as.im(mu, W=win, ..., strict=TRUE)))
 
   ## Generate parents in dilated window
   frame <- boundingbox(win)
@@ -68,13 +79,13 @@ rNeymanScott <-
   if(nonempty) {
     if(is.function(kappa)) {
       kappa <- as.im(kappa, W=dilated, ..., strict=TRUE)
-      lmax <- NULL
+      kappamax <- NULL
     }
     ## intensity of parents with at least one offspring point
     kappa <- kappa * (1 - exp(-mumax))
   }
   ## generate
-  parentlist <- rpoispp(kappa, lmax=lmax, win=dilated, nsim=nsim,
+  parentlist <- rpoispp(kappa, lmax=kappamax, win=dilated, nsim=nsim,
                         drop=FALSE, warnwin=FALSE)
 
   resultlist <- vector(mode="list", length=nsim)
@@ -131,8 +142,7 @@ rNeymanScott <-
 
     if(is.im(mu)) {
       ## inhomogeneously modulated clusters a la Waagepetersen
-      P <- eval.im(mu/mumax)
-      result <- rthin(result, P)
+      result <- rthin(result, P=mu, Pmax=mumax)
     }
 
     if(saveparents) {
