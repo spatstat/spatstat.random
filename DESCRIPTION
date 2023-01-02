@@ -1,5 +1,5 @@
 Package: spatstat.random
-Version: 3.1-0.009
+Version: 3.1-0.010
 Date: 2023-01-02
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 

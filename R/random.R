@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.111 $   $Date: 2022/12/29 02:50:04 $
+##    $Revision: 4.112 $   $Date: 2023/01/02 06:52:11 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -1036,14 +1036,18 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
 
   if(fatal || warn) {
     ## check for bad values of probability
-    ra <- range(pX)
+    ra <- range(pX)/Pmax
     if(ra[1] < 0) {
-      if(fatal) stop("some probabilities are negative")
-      if(warn) warning("some probabilities are negative")
+      gripe <- paste("some probabilities are negative",
+                     paren(paste("minimum", ra[1])))
+      if(fatal) stop(gripe)
+      if(warn) stop(gripe)
     }
-    if(ra[2] > Pmax) {
-      if(fatal) stop("some probabilities are greater than 1")
-      if(warn) warning("some probabilities are greater than 1")
+    if(ra[2] > 1) {
+      gripe <- paste("some probabilities are greater than 1",
+                     paren(paste("maximum", ra[2])))
+      if(fatal) stop(gripe)
+      if(warn) warning(gripe)
     }
   }
 
