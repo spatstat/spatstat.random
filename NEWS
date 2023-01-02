@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.008
+        CHANGES IN spatstat.random VERSION 3.1-0.009
 
 OVERVIEW
 
@@ -20,6 +20,10 @@ BUG FIXES
     If the model was very close to a Poisson process,
     and if saveLambda=TRUE was selected,
     the attribute "Lambda" was incorrectly labelled "lambda".
+    Fixed.
+
+    o clusterradius
+    Crashed sometimes with message about infinite values of the integrand.
     Fixed.
 
         CHANGES IN spatstat.random VERSION 3.1-0

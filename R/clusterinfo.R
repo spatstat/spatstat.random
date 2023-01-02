@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.56 $ $Date: 2022/11/13 06:03:45 $
+#'   $Revision: 1.57 $ $Date: 2023/01/02 02:57:50 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -678,7 +678,9 @@ resolve.vargamma.shape <- function(...,
   numer <- ((r/scale)^(nu+1)) * besselK(r/scale, nu)
   numer[r==0] <- 0
   denom <- (2^nu) * scale * gamma(nu + 1)
-  numer/denom
+  y <- numer/denom
+  y[!is.finite(y)] <- 0
+  return(y)
 }
 
 .VarGammaPdist <- function(r, scale, nu, ...) {
