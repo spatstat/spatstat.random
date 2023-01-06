@@ -1,16 +1,17 @@
 ##
 ##   randomNS.R
 ##
-##   simulating from Neyman-Scott processes
+##   Simulating from Neyman-Scott process
+##   'Naive' algorithm
 ##
-##   $Revision: 1.37 $  $Date: 2022/12/29 03:03:16 $
+##   $Revision: 1.38 $  $Date: 2023/01/06 10:55:18 $
 ##
-##    Generic code for Neyman-Scott by Adrian Baddeley
-##    Original code for rCauchy and rVarGamma by Abdollah Jalilian
+##    Original code for naive simulation of Neyman-Scott by Adrian Baddeley
+##    Original code for rCauchy and rVarGamma offspring by Abdollah Jalilian
 ##    Other code and modifications by Adrian Baddeley
 ##    Bug fixes by Abdollah, Adrian, and Rolf Turner
 ##
-##   Copyright (c) 2000-2022 Adrian Baddeley and Abdollah Jalilian
+##   Copyright (c) 2000-2023 Adrian Baddeley and Abdollah Jalilian
 ##   GNU Public Licence >= 2.0
 
 rNeymanScott <- 
@@ -182,299 +183,92 @@ fakeNeyScot <- function(Y, lambda, win, saveLambda, saveparents) {
   return(Y)
 }
 
-rMatClust <- local({
-  
-  ## like runifdisc but returns only the coordinates
-  rundisk <- function(n, radius) {
-    R <- radius * sqrt(runif(n, min=0, max=1))
-    Theta <- runif(n, min=0, max=2*pi)
-    cbind(R * cos(Theta), R * sin(Theta))
+thinParents <- function(X, P, Pmax=1) {
+  ## Thin the parents and remove orphans
+  Offspring <- X
+  Parents <- attr(Offspring, "parents")
+  Surname <- attr(Offspring, "parentid")
+  retainparents <- rthin(Parents,
+                         P=P, Pmax=Pmax,
+                         what="fate",
+                         na.zero=TRUE, fatal=FALSE)
+  retainoffspring <- retainparents[Surname]
+  Offspring <- Offspring[retainoffspring]
+  attr(Offspring, "parents") <- list(x=Parents$x[retainparents],
+                             y=Parents$y[retainparents])
+  newserial <- cumsum(retainparents)
+  attr(Offspring, "parentid") <- newserial[Surname[retainoffspring]]
+  return(Offspring)
+}
+
+
+validate.kappa.mu <- function(kappa, mu, kappamax=NULL, mumax=NULL,
+                              win, expand, ..., context="") {
+  #' validate 'kappa' and 'mu' arguments
+  if(!(is.numeric(mu) || is.im(mu) || is.function(mu)))
+    stop(paste(context,
+               "mu should be a number, a function or a pixel image"),
+         call.=FALSE)
+  if(is.numeric(mu)) {
+    check.1.real(mu)
+    check.finite(mu)
+    stopifnot(mu >= 0)
+  }
+  if(!(is.numeric(kappa) || is.im(kappa) || is.function(kappa)))
+    stop(paste(context,
+               "kappa should be a number, a function or a pixel image"),
+         call.=FALSE)
+  if(is.numeric(kappa)) {
+    check.1.real(kappa)
+    check.finite(kappa)
+    stopifnot(kappa >= 0)
   }
 
-  rMatClust <- 
-  function(kappa, scale, mu, win = owin(c(0,1),c(0,1)),
-           nsim=1, drop=TRUE, saveLambda=FALSE, expand = scale, ...,
-           poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
-    ## Matern Cluster Process with Poisson (mu) offspring distribution
-    ## Catch old scale syntax (r)
-    if(missing(scale)) scale <- list(...)$r
-    check.1.real(scale)
-    stopifnot(scale > 0)
+  if(is.im(kappa)) {
+    #' check domain 
+    frame <- boundingbox(win)
+    dilated <- grow.rectangle(frame, expand)
+    if(!is.subset.owin(dilated, as.owin(kappa)))
+      stop(paste("The window in which the image",
+                 sQuote("kappa"),
+                 "is defined\n",
+                 "is not large enough to contain",
+                 "the dilation of the window",
+                 sQuote("win")),
+             call.=FALSE)
+  }
 
-    check.1.integer(nsim)
-    stopifnot(nsim >= 0)
-    if(nsim == 0) return(simulationresult(list()))
-    
-    ## trap case of large clusters, close to Poisson
-    kok <- is.numeric(kappa) || is.im(kappa)
-    if(kok) {
+  ## get upper bounds on kappa and mu
+  if(is.null(kappamax)) {
+    if(is.numeric(kappa)) {
+      kappamax <- kappa
+    } else if(is.im(kappa)) {
       kappamax <- max(kappa)
-    } else {
-      kim <- as.im(kappa, W=win, ..., strict=TRUE)
+    } else if(is.function(kappa)) {
+      ## rough upper bound
+      frame <- boundingbox(win)
+      dilated <- grow.rectangle(frame, expand)
+      dotargs <- list(...)
+      kargs <- dotargs[names(dotargs) %in% names(args(kappa))]
+      kim <- do.call(as.im,
+                     append(list(kappa, W=dilated, strict=TRUE),
+                            kargs))
       kra <- range(kim)
       kappamax <- kra[2] + 0.05 * diff(kra)
     }
-    if(1/(pi * kappamax * scale^2) < poisthresh) {
-      kapmu <- mu * (if(kok) kappa else kim)
-      result <- rpoispp(kapmu, win=win, nsim=nsim, drop=drop, warnwin=FALSE)
-      result <- fakeNeyScot(result, kapmu, win, saveLambda, saveparents)
-      return(result)
-    }
-
-    result <- rNeymanScott(kappa, scale, list(mu, rundisk), win, radius=scale,
-                           nsim=nsim, drop=FALSE,
-                           nonempty=nonempty,
-                           saveparents = saveparents || saveLambda)
-    if(saveLambda){
-      for(i in 1:nsim) {
-        parents <- attr(result[[i]], "parents")
-        Lambda <- clusterfield("MatClust", parents, scale=scale, mu=mu, ...)
-        attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
-      }
-    }
-    return(simulationresult(result, nsim, drop))
   }
-
-  rMatClust
-})
-
-                  
-rThomas <- local({
-
-  ## random displacements
-  gaus <- function(n, sigma) {
-    matrix(rnorm(2 * n, mean=0, sd=sigma), ncol=2)
+  if(is.null(mumax)) {
+    if(is.numeric(mu)) {
+      mumax <- mu
+    } else if(is.im(mu)) {
+      mumax <- max(mu)
+    } else if(is.function(mu)) {
+      ## rough upper bound
+      mim <- as.im(mu, W=win, ..., strict=TRUE)
+      mra <- range(mim)
+      mumax <- mra[2] + 0.05 * diff(mra)
+    } 
   }
+  return(list(kappamax=kappamax, mumax=mumax))
+}
 
-  ## main function
-  rThomas <-
-      function(kappa, scale, mu, win = owin(c(0,1),c(0,1)), nsim=1, drop=TRUE, 
-               saveLambda=FALSE, expand = 4*scale, ...,
-               poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
-      ## Thomas process with Poisson(mu) number of offspring
-      ## at isotropic Normal(0,sigma^2) displacements from parent
-      check.1.integer(nsim)
-      stopifnot(nsim >= 0)
-      if(nsim == 0) return(simulationresult(list()))
-      ##
-      ## Catch old scale syntax (sigma)
-      if(missing(scale)) scale <- list(...)$sigma
-      check.1.real(scale)
-      stopifnot(scale > 0)
-
-      ## trap case of large clusters, close to Poisson
-      kok <- is.numeric(kappa) || is.im(kappa)
-      if(kok) {
-        kappamax <- max(kappa)
-      } else {
-        kim <- as.im(kappa, W=win, ..., strict=TRUE)
-        kra <- range(kim)
-        kappamax <- kra[2] + 0.05 * diff(kra)
-      }
-      if(1/(4*pi * kappamax * scale^2) < poisthresh) {
-        kapmu <- mu * (if(kok) kappa else kim)
-        result <- rpoispp(kapmu, win=win, nsim=nsim, drop=drop, warnwin=FALSE)
-        result <- fakeNeyScot(result, kapmu, win, saveLambda, saveparents)
-        return(result)
-      }
-      
-      ## determine the maximum radius of clusters
-      if(missing(expand))
-          expand <- clusterradius("Thomas", scale = scale, ...)
-
-      result <- rNeymanScott(kappa, expand, list(mu, gaus),
-                             win, sigma=scale,
-                             nsim=nsim, drop=FALSE,
-                             nonempty=nonempty,
-                             saveparents = saveparents || saveLambda)  
-      if(saveLambda){
-        for(i in 1:nsim) {
-          parents <- attr(result[[i]], "parents")
-          Lambda <- clusterfield("Thomas", parents, scale=scale, mu=mu, ...)
-          attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
-        }
-      }
-      return(simulationresult(result, nsim, drop))
-    }
-
-  rThomas
-})
-
-
-## ================================================
-## Neyman-Scott process with Cauchy kernel function
-## ================================================
-
-## scale / omega: scale parameter of Cauchy kernel function
-## eta: scale parameter of Cauchy pair correlation function
-## eta = 2 * omega
-
-rCauchy <- local({
-
-  ## simulate mixture of normals with inverse-gamma distributed variance
-  rnmix.invgam <- function(n = 1, rate) {
-    V <- matrix(rnorm(2 * n, 0, 1), nrow = n, ncol = 2)
-    s <- 1/rgamma(n, shape=1/2, rate=rate)
-    return(sqrt(s) * V)
-  }
-
-  ## main function
-  rCauchy <- function (kappa, scale, mu, win = owin(), thresh = 0.001,
-                       nsim=1, drop=TRUE, saveLambda=FALSE, expand = NULL,
-                       ..., poisthresh=1e-6, nonempty=TRUE, saveparents=TRUE) {
-    ## scale / omega: scale parameter of Cauchy kernel function
-    ## eta: scale parameter of Cauchy pair correlation function
-
-    check.1.integer(nsim)
-    stopifnot(nsim >= 0)
-    if(nsim == 0) return(simulationresult(list()))
-    
-    ## Catch old scale syntax (omega)
-    dots <- list(...)
-    if(missing(scale)) scale <- dots$omega
-    
-    ## Catch old name 'eps' for 'thresh':
-    if(missing(thresh))
-        thresh <- dots$eps %orifnull% 0.001
-
-    ## trap case of large clusters, close to Poisson
-    kok <- is.numeric(kappa) || is.im(kappa)
-    if(kok) {
-      kappamax <- max(kappa)
-    } else {
-      kim <- as.im(kappa, W=win, ..., strict=TRUE)
-      kra <- range(kim)
-      kappamax <- kra[2] + 0.05 * diff(kra)
-    }
-    if(1/(pi * kappamax * scale^2) < poisthresh) {
-      kapmu <- mu * (if(kok) kappa else kim)
-      result <- rpoispp(kapmu, win=win, nsim=nsim, drop=drop, warnwin=FALSE)
-      result <- fakeNeyScot(result, kapmu, win, saveLambda, saveparents)
-      return(result)
-    }
-    
-    ## determine the maximum radius of clusters
-    if(missing(expand)){
-        expand <- clusterradius("Cauchy", scale = scale, thresh = thresh, ...)
-    } else if(!missing(thresh)){
-        warning("Argument ", sQuote("thresh"), " is ignored when ", sQuote("expand"), " is given")
-    }
-
-    ## simulate
-    result <- rNeymanScott(kappa, expand,
-                           list(mu, rnmix.invgam),
-                           win, rate = scale^2/2, nsim=nsim, drop=FALSE,
-                           nonempty=nonempty,
-                           saveparents = saveparents || saveLambda)
-    ## correction from Abdollah: the rate is beta = omega^2 / 2 = eta^2 / 8.
-    if(saveLambda){
-      for(i in 1:nsim) {
-        parents <- attr(result[[i]], "parents")
-        Lambda <- clusterfield("Cauchy", parents, scale=scale, mu=mu, ...)
-        attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
-      }
-    }
-    return(simulationresult(result, nsim, drop))
-  }
-
-  rCauchy })
-
-##    
-## =================================================================
-## Neyman-Scott process with Variance Gamma (Bessel) kernel function
-## =================================================================
-
-## nu.ker: smoothness parameter of Variance Gamma kernel function
-## omega: scale parameter of kernel function
-## nu.pcf: smoothness parameter of Variance Gamma pair correlation function
-## eta: scale parameter of Variance Gamma pair correlation function
-## nu.pcf = 2 * nu.ker + 1    and    eta = omega
-
-rVarGamma <- local({
-  
-  ## simulates mixture of isotropic Normal points in 2D with gamma variances
-  rnmix.gamma <- function(n = 1, shape, rate) {
-    V <- matrix(rnorm(2 * n, 0, 1), nrow = n, ncol = 2)
-    s <- rgamma(n, shape=shape, rate=rate)
-    return(sqrt(s) * V)
-  }
-
-  ## main function
-  rVarGamma <- function(kappa, nu, scale, mu, win = owin(),
-                        thresh = 0.001, nsim=1, drop=TRUE, saveLambda=FALSE,
-                        expand = NULL, ..., poisthresh=1e-6,
-                        nonempty = TRUE,
-                        saveparents=TRUE) {
-    ## nu / nu.ker: smoothness parameter of Variance Gamma kernel function
-    ## scale / omega: scale parameter of kernel function
-    check.1.integer(nsim)
-    stopifnot(nsim >= 0)
-    if(nsim == 0) return(simulationresult(list()))
-    ## Catch old nu.ker/nu.pcf syntax and resolve nu-value.
-    dots <- list(...)
-    if(missing(nu)){
-      nu <- resolve.vargamma.shape(nu.ker=dots$nu.ker,
-                                   nu.pcf=dots$nu.pcf,
-                                   allow.default=TRUE)$nu.ker
-    } else {
-      check.1.real(nu)
-      stopifnot(nu > -1)
-    }
-    nu.ker <- nu
-    ## Catch old scale syntax (omega)
-    if(missing(scale)) scale <- dots$omega
-    
-    ## Catch old name 'eps' for 'thresh':
-    if(missthresh <- missing(thresh))
-        thresh <- dots$eps %orifnull% 0.001
-
-    ## trap case of large clusters, close to Poisson
-    kok <- is.numeric(kappa) || is.im(kappa)
-    if(kok) {
-      kappamax <- max(kappa)
-    } else {
-      kim <- as.im(kappa, W=win, ..., strict=TRUE)
-      kra <- range(kim)
-      kappamax <- kra[2] + 0.05 * diff(kra)
-    }
-    if(1/(4 * pi * kappamax * scale^2) < poisthresh) {
-      kapmu <- mu * (if(kok) kappa else kim)
-      result <- rpoispp(kapmu, win=win, nsim=nsim, drop=drop, warnwin=FALSE)
-      result <- fakeNeyScot(result, kapmu, win, saveLambda, saveparents)
-      return(result)
-    }
-    
-     ## determine the maximum radius of clusters
-    if(missing(expand)){
-        expand <- clusterradius("VarGamma", scale = scale, nu = nu.ker,
-                                thresh = thresh, ...)
-    } else if(!missthresh) {
-      warning("Argument ", sQuote("thresh"), " is ignored when ",
-              sQuote("expand"), " is given")
-    }
-
-    ## gamma mixture of normals
-    alpha <- 2 * (nu.ker + 1)
-    beta  <- 1/(2 * scale^2)
-    
-    ## simulate
-    result <- rNeymanScott(kappa, expand,
-                           list(mu, rnmix.gamma), win,
-                           shape = alpha/2, 
-                           rate = beta,
-                           nsim=nsim, drop=FALSE,
-                           nonempty = nonempty,
-                           saveparents = saveparents || saveLambda)
-    if(saveLambda){
-      for(i in 1:nsim) {
-        parents <- attr(result[[i]], "parents")
-        Lambda <- clusterfield("VarGamma", parents, scale=scale,
-                               nu=nu.ker, mu=mu, ...)
-        attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
-      }
-    }
-    return(simulationresult(result, nsim, drop))
-  }
-
-  rVarGamma
-})

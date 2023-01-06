@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.112 $   $Date: 2023/01/02 06:52:11 $
+##    $Revision: 4.113 $   $Date: 2023/01/06 11:57:39 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -976,6 +976,7 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
                  Y <- list(x=xx[retain], y=yy[retain])
                } else {
                  Y <- X[retain]
+                 attr(Y, "parents") <- attr(X, "parents")
                  ## also handle offspring-to-parent map if present
                  if(!is.null(parentid <- attr(X, "parentid")))
                    attr(Y, "parentid") <- parentid[retain]
@@ -1066,6 +1067,7 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
                Y <- list(x=xx[retain], y=yy[retain])
              } else {
                Y <- X[retain]
+               attr(Y, "parents") <- attr(X, "parents")
                ## also handle offspring-to-parent map if present
                if(!is.null(parentid <- attr(X, "parentid")))
                  attr(Y, "parentid") <- parentid[retain]

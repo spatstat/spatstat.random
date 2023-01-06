@@ -1,11 +1,39 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.010
+        CHANGES IN spatstat.random VERSION 3.1-0.011
 
 OVERVIEW
 
+    o We thank Ya-Mei Chang for substantial contributions.
+    
+    o Faster algorithms for simulating cluster processes.
+    
     o Bug fixes and internal improvements.
 
+NEW FUNCTIONS
+
+    o rpoisnonzero
+    Generate Poisson random variables conditioned to be positive.
+    
+    o rpoistrunc
+    Generate 'truncated' Poisson random variables,
+    conditioned to be greater than or equal to a specified minimum value.
+
+    o rclusterBKBC
+    (Advanced use) Internal algorithm to simulate any Neyman-Scott cluster
+    process using either the naive, Brix-Kendall, or Baddeley-Chang algorithm.
+    
 SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rCauchy, rThomas, rMatClust
+    These algorithms have been accelerated by several orders of magnitude
+    in the case where the cluster radius is large.
+    
+    o rCauchy, rThomas, rMatClust, rVarGamma
+    These functions now offer a choice of simulation algorithms
+    including the naive algorithm, Brix-Kendall and Baddeley-Chang algorithms.
+    
+    o rCauchy, rThomas, rMatClust, rVarGamma, rNeymanScott
+    Formal arguments have changed. 
 
     o rNeymanScott
     Argument 'lmax' has been replaced by 'kappamax'.

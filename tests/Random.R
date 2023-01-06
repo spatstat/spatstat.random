@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.16 $ $Date: 2022/10/23 06:20:10 $
+#'  $Revision: 1.17 $ $Date: 2023/01/06 15:13:10 $
 
 
 local({
@@ -90,12 +90,12 @@ local({
       stop("rThomas did not save Lambda image when kappa=0")
     X <- rMatClust(10, 0.05, 4, saveLambda=TRUE)
     X <- rCauchy(30, 0.01, 5, saveLambda=TRUE)
-    X <- rVarGamma(30, 2, 0.02, 5, saveLambda=TRUE)
+    X <- rVarGamma(30, 2, 5, nu=0.02, saveLambda=TRUE)
     Z <- as.im(function(x,y){ 5 * exp(2 * x - 1) }, owin())
     Y <- rThomas(10, 0.2, Z, saveLambda=TRUE)
     Y <- rMatClust(10, 0.05, Z, saveLambda=TRUE)
     Y <- rCauchy(30, 0.01, Z, saveLambda=TRUE)
-    Y <- rVarGamma(30, 2, 0.02, Z, saveLambda=TRUE)
+    Y <- rVarGamma(30, 2, Z, nu=0.02, saveLambda=TRUE)
     #' inhomogeneous
     Moo <- as.im(function(x,y) { 10 * x }, unit.square())
     X <- rMatClust(10, 0.2, Moo)
