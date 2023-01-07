@@ -149,7 +149,8 @@ rclusterBKBC(clusters="Thomas",
   and Monte Carlo proposal densities are defined with reference to \code{D}
   as described in Brix and Kendall (2002).
   Then \code{D} is inflated by the scale factor \code{inflate}
-  to produce a larger disc \code{E} (by default \code{inflate=1} and \code{E=D}).
+  to produce a larger disc \code{E} (by default \code{inflate=1}
+  implying \code{E=D}). 
   Then the parent points of the clusters are generated, possibly
   using different mechanisms inside and outside \code{E}.
 

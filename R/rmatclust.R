@@ -13,17 +13,19 @@
 #'   Licence: GNU Public Licence >= 2
 
 rMatClustHom <- function(kappa, mu, R, W=unit.square(), ...,
-                         nsim=1, drop=TRUE, inflate=2,
+                         nsim=1, drop=TRUE, inflate=NULL,
                          saveparents=FALSE) {
   check.1.real(kappa) && check.finite(kappa)
   check.1.real(mu) && check.finite(mu)
   check.1.real(R) && check.finite(R)
-  check.1.real(inflate) && check.finite(inflate)
+  if(!is.null(inflate)) {
+    check.1.real(inflate) && check.finite(inflate)
+    stopifnot(inflate >= 1)
+  }
   check.1.integer(nsim)
   stopifnot(kappa >= 0)
   stopifnot(mu >= 0)
   stopifnot(R > 0)
-  stopifnot(inflate >= 1)
   ## trivial cases
   if(nsim == 0) return(simulationresult(list()))
   if(kappa == 0 || mu == 0) {
@@ -43,6 +45,11 @@ rMatClustHom <- function(kappa, mu, R, W=unit.square(), ...,
   W <- shift(oldW, -oldcentre)
   ## enclose it in a disc
   rD <- with(vertices(Frame(W)), sqrt(max(x^2+y^2)))
+  ## optimal inflation
+  if(is.null(inflate)) {
+    rE <- if(R < rD) (rD + R) else rD
+    inflate <- rE/rD
+  }
   ## Prepare for C code
   storage.mode(kappa) <- "double"
   storage.mode(mu) <- "double"

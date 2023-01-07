@@ -23,9 +23,13 @@ rclusterBKBC <- function(clusters="Thomas",
   external.given <- !missing(external)
   integralmethod <- match.arg(integralmethod)
   if(!missing(inflate)) {
-    check.1.real(inflate)
-    stopifnot(inflate >= 1)
-    if(verbose && inflate > 1) splat("Inflating disc by factor", inflate)
+    if(is.numeric(inflate)) {
+      check.1.real(inflate)
+      stopifnot(inflate >= 1)
+      if(verbose && inflate > 1) splat("Inflating disc by factor", inflate)
+    } else if(is.function(inflate)) {
+      if(verbose) splat("Using an inflation rule")
+    } else stop("Argument 'inflate' should be a number or a function")
   }
   ## ............. Information about the model .............................
   cinfo <- spatstatClusterModelInfo(clusters) # error if unrecognised
@@ -52,9 +56,12 @@ rclusterBKBC <- function(clusters="Thomas",
   if(verbose) splat("Disc radius rD =", rD)
   ## D <- disc(radius=rD)
   ## inflated disc
-  check.1.real(inflate)
-  stopifnot(inflate >= 1)
-  if(inflate == 1) {
+  if(is.function(inflate)) {
+    rE <- inflate(mod, rD)
+    if(verbose) splat("Inflated radius rE =", rE)
+    if(rE < rD) stop("Function 'inflate' yielded rE < rD")
+    discEname <- "inflated disc"
+  } else if(inflate == 1) {
     ## default
     rE <- rD
     ## E <- D
@@ -720,3 +727,20 @@ rclusterBKBC <- function(clusters="Thomas",
   return(result)
 }
   
+optimalinflation <- function(clusters, kappa, scale, mu, ..., rD) {
+  ## experimental
+  cinfo <- spatstatClusterModelInfo(clusters) # error if unrecognised
+  par.generic <- c(kappa=kappa, scale=scale)
+  par.native <- cinfo$checkpar(par.generic, native=TRUE)
+  margs <- cinfo$resolveshape(...)[["margs"]]
+  a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
+  b <- a/(pi * rD^2)
+  h0 <- cinfo$kernel(par.native, 0, margs=margs)
+  if(h0 <= b)
+    return(rD)
+  kernel <- cinfo$kernel
+  f <- function(x) { b - kernel(par.native, x, margs=margs) }
+  u <- try(uniroot(f, c(0, 100 * scale)), silent=TRUE)
+  if(inherits(u, "try-error")) return(2 * rD)
+  return(rD + u$root)
+}

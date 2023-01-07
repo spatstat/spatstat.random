@@ -13,16 +13,18 @@
 #'   Licence: GNU Public Licence >= 2
 
 rThomasHom <-function(kappa, mu, sigma, W=unit.square(), ..., nsim=1, drop=TRUE,
-                      inflate=2, saveparents=FALSE) {
+                      inflate=NULL, saveparents=FALSE) {
   check.1.real(kappa) && check.finite(kappa)
   check.1.real(mu) && check.finite(mu)
   check.1.real(sigma) && check.finite(sigma)
-  check.1.real(inflate) && check.finite(inflate)
   check.1.integer(nsim)
   stopifnot(kappa >= 0)
   stopifnot(mu >= 0)
   stopifnot(sigma > 0)
-  stopifnot(inflate >= 1)
+  if(!is.null(inflate)) {
+    check.1.real(inflate) && check.finite(inflate)
+    stopifnot(inflate >= 1)
+  }
   ## trivial cases
   if(nsim == 0) return(simulationresult(list()))
   if(kappa == 0 || mu == 0) {
@@ -42,6 +44,18 @@ rThomasHom <-function(kappa, mu, sigma, W=unit.square(), ..., nsim=1, drop=TRUE,
   W <- shift(oldW, -oldcentre)
   ## enclose it in a disc
   rD <- with(vertices(Frame(W)), sqrt(max(x^2+y^2)))
+  ## optimal inflation
+  if(is.null(inflate)) {
+    a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
+    b <- (rD^2)/(2*a*sigma^2)
+    if(b <= 1) {
+      inflate <- 1
+    } else {
+      delta <- 2 * sigma * sqrt(log(b)/2)
+      rE <- rD + delta
+      inflate <- rE/rD
+    }
+  }
   ## Prepare for C code
   storage.mode(kappa) <- "double"
   storage.mode(mu) <- "double"

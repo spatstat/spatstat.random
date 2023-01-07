@@ -20,16 +20,18 @@
 #'
 
 rCauchyHom <-function(kappa, mu, scale, W=unit.square(), ..., nsim=1, drop=TRUE,
-                      inflate=2, saveparents=FALSE) {
+                      inflate=NULL, saveparents=FALSE) {
   check.1.real(kappa) && check.finite(kappa)
   check.1.real(mu) && check.finite(mu)
   check.1.real(scale) && check.finite(scale)
-  check.1.real(inflate) && check.finite(inflate)
   check.1.integer(nsim)
   stopifnot(kappa >= 0)
   stopifnot(mu >= 0)
   stopifnot(scale > 0)
-  stopifnot(inflate >= 1)
+  if(!is.null(inflate)) {
+    check.1.real(inflate) && check.finite(inflate)
+    stopifnot(inflate >= 1)
+  }
   ## trivial cases
   if(nsim == 0) return(simulationresult(list()))
   if(kappa == 0 || mu == 0) {
@@ -49,6 +51,18 @@ rCauchyHom <-function(kappa, mu, scale, W=unit.square(), ..., nsim=1, drop=TRUE,
   W <- shift(oldW, -oldcentre)
   ## enclose it in a disc
   rD <- with(vertices(Frame(W)), sqrt(max(x^2+y^2)))
+  ## optimal inflation
+  if(is.null(inflate)) {
+    a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
+    b <- (rD^2)/(2*a*scale^22)
+    if(b <= 1) {
+      inflate <- 1
+    } else {
+      delta <- scale * (b^(2/3) - 1)
+      rE <- rD + delta
+      inflate <- rE/rD
+    }
+  }
   ## Prepare for C code
   storage.mode(kappa) <- "double"
   storage.mode(mu) <- "double"

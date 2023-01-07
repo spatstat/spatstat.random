@@ -65,6 +65,10 @@
 #' 
 #'     invMplusplus = function(v, mod, rD, Minfty)
 #'          Inverse function of Mplusplus (IF KNOWN)
+#'
+#'     inflate = function(mod, rD)
+#'          Rule for determining optimal inflated radius rE
+#'          according to Baddeley and Chang (2023) section 6.6
 
 
 #' >>>>>>>>>>>>>>>>   THOMAS PROCESS   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -158,6 +162,16 @@
 
 ## inverse function requires numerical root-finding
 
+.Thomas.inflate <- function(mod, rD) {
+  mu <- mod$mu
+  sigma2 <- mod$par[["sigma2"]]
+  a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
+  b <- (rD^2)/(2*a*sigma2)
+  if(b <= 1) return(rD)
+  delta <- 2 * sqrt(sigma2) * sqrt(log(b)/2)
+  return(rD + delta)
+}
+  
 #' >>>>>>>>>>>>>>>>   MATERN CLUSTER PROCESS   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 .MatClust.roffspring <- function(n, mod) {
@@ -232,6 +246,12 @@
   (R/rD) * sqrt(v/(pi * kappa * mu))
 }
 
+.MatClust.inflate <- function(mod, rD) {
+  R <- mod$par[["R"]]
+  rE <- if(R < rD) (rD + R) else rD
+  return(rE)
+}
+  
   
 #' >>>>>>>>>>>>>>>>   CAUCHY CLUSTER PROCESS   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -315,6 +335,16 @@
   lambda * pi * rD^2 * (1 + sqrt(rdons2) + rdons2/2)
 }
 
+.Cauchy.inflate <- function(mod, rD) {
+  mu <- mod$mu
+  scale2 <- mod$par[["eta2"]]/4
+  a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
+  b <- (rD^2)/(2*a*scale2)
+  if(b <= 1) return(rD)
+  delta <- sqrt(scale2) * (b^(2/3) - 1)
+  return(rD + delta)
+}
+  
 
 
 #' ........................................................................
@@ -332,7 +362,8 @@
     rhoplusplus  = .Thomas.rhoplusplus,
     Mplusplus    = .Thomas.Mplusplus,
     MplusplusInf = .Thomas.MplusplusInf,
-    invMplusplus = NULL
+    invMplusplus = NULL,
+    inflate      = .Thomas.inflate
   ),
   MatClust = list(
     iscompact    = TRUE,
@@ -346,7 +377,8 @@
     rhoplusplus  = .MatClust.rhoplusplus,
     Mplusplus    = .MatClust.Mplusplus,
     MplusplusInf = .MatClust.MplusplusInf,
-    invMplusplus = .MatClust.inverseMplusplus
+    invMplusplus = .MatClust.inverseMplusplus,
+    inflate      = .MatClust.inflate
   ),
   Cauchy = list(
     iscompact    = FALSE,
@@ -360,7 +392,8 @@
     rhoplusplus  = .Cauchy.rhoplusplus,
     Mplusplus    = .Cauchy.Mplusplus,
     MplusplusInf = .Cauchy.MplusplusInf,
-    invMplusplus = NULL
+    invMplusplus = NULL,
+    inflate      = .Cauchy.inflate
   )
 )
 
