@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.4 $ $Date: 2023/01/06 15:08:56 $
+#'   $Revision: 1.5 $ $Date: 2023/01/07 03:04:53 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -119,14 +119,21 @@ rVarGamma <- local({
       ## ........ Fast algorithm (BKBC) .................................
       ## run BKBC algorithm for stationary model
       ## (generic R implementation using information from cluster model table)
-      result <- rclusterBKBC("VarGamma",
-                           kappa=kappamax,
-                           scale=scale,
-                           mu=mumax,
-                           nu.ker=nu.ker,
-                           internal="naive", external="super", inflate=2,
-                           nsim=nsim, drop=FALSE,
-                           verbose=FALSE)
+      result <- do.call(rclusterBKBC,
+                        resolve.defaults(
+                          list(clusters = "VarGamma",
+                               kappa    = kappamax,
+                               scale    = scale,
+                               mu       = mumax,
+                               nu.ker   = nu.ker,
+                               W        = quote(win),
+                               nsim     = nsim,
+                               drop     = FALSE),
+                          list(...),
+                          list(internal = "naive",
+                               external = "super",
+                               inflate  = 2,
+                               verbose=FALSE)))
       ## thin 
       if(!is.numeric(kappa))
         result <- solapply(result, thinParents,

@@ -263,13 +263,13 @@ For fitting the model, see
 }
 \examples{
  # homogeneous
- X <- rVarGamma(30, 2, 5, nu=0.02)
+ X <- rVarGamma(kappa=5, scale=2, mu=5, nu=0.02)
  # inhomogeneous
  ff <- function(x,y){ exp(2 - 3 * abs(x)) }
  fmax <- exp(2)
  Z <- as.im(ff, W= owin())
- Y <- rVarGamma(30, 2, Z, nu=0.02)
- YY <- rVarGamma(ff, 2, 3, nu=0.02, kappamax=fmax)
+ Y <- rVarGamma(kappa=5, scale=2, mu=Z, nu=0.02)
+ YY <- rVarGamma(kappa=ff, scale=2, mu=3, nu=0.02, kappamax=fmax)
 }
 \references{
   \baddchangclustersim

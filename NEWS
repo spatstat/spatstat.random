@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.011
+        CHANGES IN spatstat.random VERSION 3.1-0.012
 
 OVERVIEW
 
@@ -24,7 +24,7 @@ NEW FUNCTIONS
     
 SIGNIFICANT USER-VISIBLE CHANGES
 
-    o rCauchy, rThomas, rMatClust
+    o rCauchy, rThomas, rMatClust, rVarGamma
     These algorithms have been accelerated by several orders of magnitude
     in the case where the cluster radius is large.
     
