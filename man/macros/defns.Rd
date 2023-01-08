@@ -14,7 +14,7 @@
 \newcommand{\ottmar}{Ottmar Cronie \email{ottmar@chalmers.se}}
 \newcommand{\stephenEglen}{Stephen Eglen \email{S.J.Eglen@damtp.cam.ac.uk}}
 \newcommand{\mehdi}{Mehdi Moradi \email{m2.moradi@yahoo.com}}
-\newcommand{\yamei}{Ya-Mei Chang}
+\newcommand{\yamei}{Ya-Mei Chang \email{yamei628@gmail.com}}
 % Names with accents
 \newcommand{\Bogsted}{\ifelse{latex}{\out{B\o gsted}}{Bogsted}}
 \newcommand{\Cramer}{\ifelse{latex}{\out{Cram\'er}}{Cramer}}

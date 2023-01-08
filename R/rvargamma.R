@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.5 $ $Date: 2023/01/07 03:04:53 $
+#'   $Revision: 1.6 $ $Date: 2023/01/08 02:26:28 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -132,7 +132,7 @@ rVarGamma <- local({
                           list(...),
                           list(internal = "naive",
                                external = "super",
-                               inflate  = 2,
+                               inflate  = "optimal",
                                verbose=FALSE)))
       ## thin 
       if(!is.numeric(kappa))
@@ -185,5 +185,8 @@ rVarGamma <- local({
     return(simulationresult(result, nsim, drop))
   }
 
+  inflateVarGamma <- function(mod, rD) {
+    optimalinflation("VarGamma", mod, rD) 
+    }
   rVarGamma
 })

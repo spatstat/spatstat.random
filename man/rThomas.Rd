@@ -224,15 +224,22 @@
   of memory.
 }
 \section{Fitting cluster models to data}{
-  The Thomas process with homogeneous parents
-  (i.e. where \code{kappa} is a single number
-  but \code{mu} may be inhomogeneous)
-  can be fitted to data using \code{\link[spatstat.model]{kppm}}. 
-  Currently it is not possible to fit the Thomas model
+  The Thomas model with homogeneous parents
+  (i.e. where \code{kappa} is a single number)
+  where the offspring are either homogeneous or inhomogeneous (\code{mu}
+  is a single number, a function or pixel image)
+  can be fitted to point pattern data using \code{\link[spatstat.model]{kppm}},
+  or fitted to the inhomogeneous \eqn{K} function
+  using \code{\link[spatstat.model]{thomas.estK}}
+  or \code{\link[spatstat.model]{thomas.estpcf}}.
+  
+  Currently \pkg{spatstat} does not support fitting the
+  Thomas cluster process model
   with inhomogeneous parents.
 
-  A fitted Thomas model can be simulated automatically
-  using  \code{\link[spatstat.model]{simulate.kppm}}. 
+  A Thomas cluster process model fitted by \code{\link[spatstat.model]{kppm}}
+  can be simulated automatically using \code{\link[spatstat.model]{simulate.kppm}}
+  (which invokes \code{rThomas} to perform the simulation).
 }
 \seealso{
 \code{\link[spatstat.random]{rpoispp}},    

@@ -1,6 +1,6 @@
 #'   rclusterBKBC.R
 #'
-#'   $Revision: 1.3 $ $Date: 2023/01/06 11:12:46 $
+#'   $Revision: 1.4 $ $Date: 2023/01/08 02:38:59 $
 #' 
 #'   Simulation of stationary cluster process
 #'   using Brix-Kendall algorithm and Baddeley-Chang modification
@@ -28,7 +28,9 @@ rclusterBKBC <- function(clusters="Thomas",
       stopifnot(inflate >= 1)
       if(verbose && inflate > 1) splat("Inflating disc by factor", inflate)
     } else if(is.function(inflate)) {
-      if(verbose) splat("Using an inflation rule")
+      if(verbose) splat("Using a user-supplied inflation rule")
+    } else if(identical(inflate, "optimal")) {
+      if(verbose) splat("Using optimal inflation rule")
     } else stop("Argument 'inflate' should be a number or a function")
   }
   ## ............. Information about the model .............................
@@ -56,20 +58,16 @@ rclusterBKBC <- function(clusters="Thomas",
   if(verbose) splat("Disc radius rD =", rD)
   ## D <- disc(radius=rD)
   ## inflated disc
-  if(is.function(inflate)) {
+  if(identical(inflate, "optimal")) {
+    rE <- optimalinflation(clusters, mod, rD)
+  } else if(is.function(inflate)) {
     rE <- inflate(mod, rD)
-    if(verbose) splat("Inflated radius rE =", rE)
     if(rE < rD) stop("Function 'inflate' yielded rE < rD")
-    discEname <- "inflated disc"
   } else if(inflate == 1) {
     ## default
     rE <- rD
-    ## E <- D
-    discEname <- "disc"
-    if(verbose) splat("Disc will not be inflated")
   } else {
     rE <- inflate * rD
-    if(verbose) splat("Inflated radius rE =", rE)
     if(iscompact) {
       rmax <- cinfo$range(par=par.generic, margs=shapeargs)
       rEmax <- rD + rmax
@@ -79,7 +77,12 @@ rclusterBKBC <- function(clusters="Thomas",
         rE <- rEmax
       }
     }
-    ## E <- disc(radius=rE)
+  }
+  if(rE == rD) {
+    if(verbose) splat("Disc will not be inflated")
+    discEname <- "disc"
+  } else {
+    if(verbose) splat("Inflated radius rE =", rE)
     discEname <- "inflated disc"
   }
   
@@ -727,20 +730,27 @@ rclusterBKBC <- function(clusters="Thomas",
   return(result)
 }
   
-optimalinflation <- function(clusters, kappa, scale, mu, ..., rD) {
-  ## experimental
+optimalinflation <- function(clusters, mod, rD) {
+  ## Optimal inflated disc radius rE, determined by root-finding
+  ## as in section 6.6 of Baddeley and Chang (2023)
   cinfo <- spatstatClusterModelInfo(clusters) # error if unrecognised
-  par.generic <- c(kappa=kappa, scale=scale)
-  par.native <- cinfo$checkpar(par.generic, native=TRUE)
-  margs <- cinfo$resolveshape(...)[["margs"]]
+  par.native <- cinfo$checkpar(mod$par, native=TRUE)
+  mu    <- mod$mu
+  margs <- mod$shapeargs
   a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
   b <- a/(pi * rD^2)
   h0 <- cinfo$kernel(par.native, 0, margs=margs)
-  if(h0 <= b)
-    return(rD)
-  kernel <- cinfo$kernel
-  f <- function(x) { b - kernel(par.native, x, margs=margs) }
-  u <- try(uniroot(f, c(0, 100 * scale)), silent=TRUE)
-  if(inherits(u, "try-error")) return(2 * rD)
-  return(rD + u$root)
+  if(h0 <= b) {
+    rE <- rD
+  } else {
+    kernel <- cinfo$kernel
+    f <- function(x) { b - kernel(par.native, x, margs=margs) }
+    u <- try(uniroot(f, c(0, 100 * scale)), silent=TRUE)
+    if(inherits(u, "try-error")) {
+      rE <- 2 * rD
+    } else {
+      rE <- rD + u$root
+    }
+  }
+  return(rE)
 }

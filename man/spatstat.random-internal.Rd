@@ -18,6 +18,7 @@
 \alias{kraever}
 \alias{kraeverRandomFields}
 \alias{MultiPair.checkmatrix}
+\alias{optimalinflation}
 \alias{print.rmhcontrol}
 \alias{print.rmhexpand}
 \alias{print.rmhmodel}
@@ -89,6 +90,7 @@ is.expandable(x)
 kraever(package, fatal)
 kraeverRandomFields()
 MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
+optimalinflation(clusters, mod, rD)
 \method{print}{rmhcontrol}(x, \dots)
 \method{print}{rmhexpand}(x, \dots, prefix=TRUE)
 \method{print}{rmhmodel}(x, \dots)

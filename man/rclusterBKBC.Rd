@@ -7,6 +7,7 @@
   Generates simulated realisations of a stationary Neyman-Scott
   cluster point process, using the Brix-Kendall (2002) algorithm or various
   modifications proposed by Baddeley and Chang (2023).
+  For advanced research use.
 }
 \usage{
 rclusterBKBC(clusters="Thomas",
@@ -108,7 +109,8 @@ rclusterBKBC(clusters="Thomas",
   }
 }
 \details{
-  This function implements the algorithm of Brix and Kendall (2002)
+  This function is intended for advanced research use.
+  It implements the algorithm of Brix and Kendall (2002)
   for generating simulated realisations of a stationary Neyman-Scott
   process, and various modifications of this algorithm proposed
   in Baddeley and Chang (2023).
@@ -133,7 +135,7 @@ rclusterBKBC(clusters="Thomas",
     \code{\link[spatstat.model]{kppm}}. 
   }
 
-  By default, the code executes the original algorithm
+  By default, the code executes the original Brix-Kendall algorithm
   described in Sections 2.3 and 3.1 of Brix and Kendall (2002).
 
   Modifications of this algorithm, proposed in Baddeley and Chang

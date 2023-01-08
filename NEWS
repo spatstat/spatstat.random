@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-0.013
+        CHANGES IN spatstat.random VERSION 3.1-0.014
 
 OVERVIEW
 
@@ -29,8 +29,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
     in the case where the cluster radius is large.
     
     o rCauchy, rThomas, rMatClust, rVarGamma
-    These functions now offer a choice of simulation algorithms
-    including the naive algorithm, Brix-Kendall and Baddeley-Chang algorithms.
+    These functions now offer a choice of simulation algorithms.
     
     o rCauchy, rThomas, rMatClust, rVarGamma, rNeymanScott
     Formal arguments have changed. 
