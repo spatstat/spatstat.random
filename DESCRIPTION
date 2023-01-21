@@ -1,6 +1,6 @@
 Package: spatstat.random
-Version: 3.1-0.014
-Date: 2023-01-08
+Version: 3.1-0.015
+Date: 2023-01-14
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 
                     role = c("aut", "cre"),
@@ -30,18 +30,20 @@ Authors@R: c(person("Adrian", "Baddeley",
 	     person("Rasmus", "Plenge Waagepetersen",
 	            role = "ctb"))
 Maintainer: Adrian Baddeley <Adrian.Baddeley@curtin.edu.au>
-Depends: R (>= 3.5.0), spatstat.data (>= 3.0), spatstat.geom (>= 3.0), stats, utils, methods, grDevices
+Depends: R (>= 3.5.0), spatstat.data (>= 3.0), spatstat.geom (>= 3.0-4.007), stats, utils, methods, grDevices
 Imports: spatstat.utils (>= 3.0)
 Suggests: spatial, RandomFields (>= 3.1.24.1), RandomFieldsUtils (>= 0.3.3.1), spatstat.linnet (>= 3.0), spatstat.explore, spatstat.model, spatstat (>= 3.0)
 Additional_repositories: https://spatstat.r-universe.dev
 Description: Functionality for random generation of spatial data in the 'spatstat' family of packages.
 	     Generates random spatial patterns of points according to many simple rules (complete spatial randomness,
 	     Poisson, binomial, random grid, systematic, cell), randomised alteration of patterns
-	     (thinning, random shift, jittering),  simulated realisations of random point processes
-	     (simple sequential inhibition, Matern inhibition models, Matern cluster process,
-	     Neyman-Scott cluster processes, log-Gaussian Cox processes, product shot noise cluster processes)
-	     and simulation of Gibbs point processes (Metropolis-Hastings birth-death-shift algorithm,
-	     alternating Gibbs sampler). Also generates random spatial patterns of line segments,
+	     (thinning, random shift, jittering),  simulated realisations of random point processes including
+	     simple sequential inhibition, Matern inhibition models, Neyman-Scott cluster processes
+	     (using direct, Brix-Kendall, or hybrid algorithms),
+	     log-Gaussian Cox processes, product shot noise cluster processes
+	     and Gibbs point processes (using Metropolis-Hastings birth-death-shift algorithm,
+	     alternating Gibbs sampler, or coupling-from-the-past perfect simulation).
+	     Also generates random spatial patterns of line segments,
 	     random tessellations, and random images (random noise, random mosaics).
 	     Excludes random generation on a linear network,
 	     which is covered by the separate package 'spatstat.linnet'.

@@ -20,32 +20,40 @@
   and simulation of random point processes:
   \itemize{
     \item
-    generating random spatial patterns of points
+    generation of random spatial patterns of points
     according to many simple rules
-    (complete spatial randomness, Poisson, binomial, random grid,
-    systematic, cell);
+    (completely random patterns, random grids, systematic random
+    points);
     \item
     randomised alteration of spatial patterns (thinning, random shifting,
     jittering, random labelling);
     \item
-    simulated realisations of random point processes
-    (simple sequential inhibition,
-    \Matern inhibition models,
-    \Matern cluster process,
-    Neyman-Scott cluster processes,
-    log-Gaussian Cox processes,
-    product shot noise cluster processes);
+    generation of quasirandom patterns;
+    \item
+    direct simulation of random point processes
+    (Poisson process, binomial process, cell process,
+    simple sequential inhibition, \Matern inhibition models,
+    log-Gaussian Cox processes;
+    \item
+    simulation of Neyman-Scott cluster processes
+    (truncated direct algorithm, Brix-Kendall and hybrid algorithms)
+    and product shot noise cluster processes;
     \item
     simulation of Gibbs point processes
     (Metropolis-Hastings birth-death-shift algorithm,
     perfect simulation/ dominated coupling from the past,
-    alternating Gibbs sampler);
+    alternating Gibbs sampler).
+  }
+  Some other types of spatial object are also supported:
+  \itemize{
     \item
-    generating random spatial patterns of line segments;
+    generation of random patterns of points in 3 dimensions;
     \item
-    generating random tessellations;
+    generation of random spatial patterns of line segments;
     \item
-    generating random images (random noise, random mosaics).
+    generation of random tessellations;
+    \item
+    generation of random images (random noise, random mosaics).
   }
   (Functions for linear networks
   are in the separate sub-package \pkg{spatstat.linnet}.)
@@ -179,7 +187,9 @@
 	point pattern \cr
         \code{\link[spatstat.random]{quadratresample}} \tab block resampling 
       }
-
+      See also \code{\link[spatstat.geom]{rjitter}} and \code{\link[spatstat.geom]{rexplode}} in the
+      \pkg{spatstat.geom} package.
+      
       \bold{Random pixel images:}
 
       An object of class \code{"im"} represents a pixel image.
@@ -343,9 +353,11 @@
 }
 \section{Acknowledgements}{
   Kasper Klitgaard Berthelsen,
+  Ya-Mei Chang,
   Tilman Davies,
   Ute Hahn,
   Abdollah Jalilian,
+  Dominic Schuhmacher
   and
   Rasmus Waagepetersen
   made substantial contributions of code.
