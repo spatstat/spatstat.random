@@ -14,7 +14,7 @@
              poisthresh=1e-6,
              expand = 4*scale,
              saveparents=FALSE, saveLambda=FALSE,
-             kappamax=NULL, mumax=NULL) 
+             kappamax=NULL, mumax=NULL, sigma) 
 }
 \arguments{
   \item{kappa}{
@@ -87,6 +87,9 @@
     Optional. Numerical value which is an upper bound for the
     values of \code{mu}, when \code{mu} is a pixel image or a
     function.
+  }
+  \item{sigma}{
+    Deprecated. Equivalent to \code{scale}.
   }
 }
 \value{

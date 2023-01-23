@@ -135,7 +135,7 @@ rThomas <- local({
              poisthresh=1e-6,
              expand = 4*scale,
              saveparents=FALSE, saveLambda=FALSE,
-             kappamax=NULL, mumax=NULL) {
+             kappamax=NULL, mumax=NULL, sigma) {
       ## modified Thomas process
       ## Poisson(mu) number of offspring
       ## at isotropic Normal(0,sigma^2) displacements from parent
@@ -145,7 +145,10 @@ rThomas <- local({
       if(nsim == 0) return(simulationresult(list()))
 
       ## Catch old scale syntax (sigma)
-      if(missing(scale)) scale <- list(...)$sigma
+      if((missing(scale) || is.null(scale)) && !missing(sigma)) {
+        ## message("Argument 'sigma' is deprecated; it has been replaced by 'scale'")
+        scale <- sigma
+      }
       check.1.real(scale)
       stopifnot(scale > 0)
 
