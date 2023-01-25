@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.57 $ $Date: 2023/01/02 02:57:50 $
+#'   $Revision: 1.58 $ $Date: 2023/01/25 01:58:09 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -1058,11 +1058,15 @@ resolve.vargamma.shape <- function(...,
   },
   Dpcf= function(par,rvals, ..., model){
     ## 'par' is in native format
-    if(!identical(model, "exponential")) {
-      stop("Gradient of the pcf not available for this model.")
-    } 
-    dsigma2 <- exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))
-    dalpha <- rvals * par[1L] * exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))/par[2L]^2
+    if(!(model %in% c("exponential", "stable")))
+      stop("Gradient of the pcf is not available for this model")
+    if(model=="exponential") {
+      dsigma2 <- exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))
+      dalpha <- rvals * par[1L] * exp(-rvals/par[2L]) * exp(par[1L]*exp(-rvals/par[2L]))/par[2L]^2
+    } else if(model=="stable"){
+      dsigma2 <- exp(-sqrt(rvals/par[2L])) * exp(par[1L]*exp(-sqrt(rvals/par[2L])))
+      dalpha <- sqrt(rvals/par[2L]^3) * par[1L] * exp(-sqrt(rvals/par[2L])) * exp(par[1L] * exp(-sqrt(rvals/par[2L])))
+    }
     out <- rbind(dsigma2, dalpha)
     rownames(out) <- c("sigma2","alpha")
     return(out)
