@@ -2,7 +2,7 @@
 
   rtruncpois.c
 
-  $Revision: 1.2 $ $Date: 2023/01/06 11:26:25 $
+  $Revision: 1.3 $ $Date: 2023/01/25 01:17:56 $
 
   Generate random variate with zero-truncated Poisson distribution
 
@@ -20,10 +20,12 @@
 /* ============== Functions for use in C code, to generate a single realisation =================== */
 
 /*
+   Names begin with 'r1'
+
    If used alone, these functions should be preceded by GetRNGState() and succeeded by PutRNGState()
 */
 
-int rnzpoisHarding(
+int r1nzpoisHarding(
      double lambda  /* mean parameter */
 ) {
   /* from a post by Ted Harding (2005) */
@@ -34,7 +36,7 @@ int rnzpoisHarding(
   return(x);
 }
 
-int rnzpoisDalgaard(
+int r1nzpoisDalgaard(
   double lambda  /* mean parameter */
 ) {
   /* from a post by Peter Dalgaard (2005) in response to Harding */
@@ -43,7 +45,7 @@ int rnzpoisDalgaard(
   return(x);
 }
 
-int rtruncpoisHarding(
+int r1truncpoisHarding(
   double lambda,  /* mean parameter */
   int k           /* truncation value (minimum value of x) */
 ) {
@@ -59,7 +61,7 @@ int rtruncpoisHarding(
   return(x);
 }
 
-int rtruncpoisDalgaard(
+int r1truncpoisDalgaard(
   double lambda,  /* mean parameter */
   int k           /* truncation value (minimum value of x) */
 ) {
@@ -72,6 +74,8 @@ int rtruncpoisDalgaard(
 }
 
 /* ============  Interface to R, with efficiencies ================ */
+
+/*  Names begin with 'Rr'                                           */
 
 SEXP RrnzpoisHarding(SEXP N, SEXP LAMBDA) 
 {
@@ -119,7 +123,7 @@ SEXP RrnzpoisDalgaard(SEXP N, SEXP LAMBDA)
 {
   int n, i, nlambda;
   double *lambdavector;
-  double lambda, lambdadash, expmlam;
+  double lambda, expmlam;
   SEXP y;
   int *yp;
 
@@ -244,7 +248,7 @@ SEXP RrtruncpoisHarding(SEXP N, SEXP LAMBDA, SEXP TRUNC)
 
 SEXP RrtruncpoisDalgaard(SEXP N, SEXP LAMBDA, SEXP TRUNC) 
 {
-  int n, i, k, nlambda, ntrunc;
+  int n, i, nlambda, ntrunc;
   double *lambdavector;
   int *truncvector;
   int trunc;

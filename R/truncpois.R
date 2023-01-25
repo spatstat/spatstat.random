@@ -29,12 +29,12 @@ rpoisnonzero <- function(n, lambda, method=c("harding", "transform"), implem=c("
            storage.mode(lambda) <- "double"
            switch(method,
                   harding = {
-                    y <- .Call(SR_rnzpoisHarding,
+                    y <- .Call(SR_RrnzpoisHarding,
                                n, lambda,
                                PACKAGE="spatstat.random")
                   },
                   transform = {
-                    y <- .Call(SR_rnzpoisDalgaard,
+                    y <- .Call(SR_RrnzpoisDalgaard,
                                n, lambda,
                                PACKAGE="spatstat.random")
                   })
@@ -75,12 +75,12 @@ rpoistrunc <- function(n, lambda, minimum=1, method=c("harding", "transform"), i
            storage.mode(minimum) <- "integer"
            switch(method,
                   harding = {
-                    y <- .Call(SR_rtruncpoisHarding,
+                    y <- .Call(SR_RrtruncpoisHarding,
                                n, lambda, minimum, 
                                PACKAGE="spatstat.random")
                   },
                   transform = {
-                    y <- .Call(SR_rtruncpoisDalgaard,
+                    y <- .Call(SR_RrtruncpoisDalgaard,
                                n, lambda, minimum, 
                                PACKAGE="spatstat.random")
                   })

@@ -2,7 +2,7 @@
 
   rthomas.h
 
-  $Revision: 1.1 $ $Date: 2023/01/06 10:47:43 $
+  $Revision: 1.3 $ $Date: 2023/01/25 00:59:28 $
 
   Generate realisation of stationary Thomas cluster process in a disc D
 
@@ -56,12 +56,12 @@ SEXP FNAME(SEXP KAPPA,
 #endif  
 
   /* quantities/variables used in generic algorithm */
-  double rE, rD2, rE2, rDE, areaD;
+  double rE, rD2, rE2, areaD;
   double rhoplus, rhoplusplus, muplus;
   double lambda, kappadag, edag, Minf, MrE, diffM, p0;
-  double rpi, xpi, ypi, mi, roj, xoj, yoj, theta, dx, dy, dop;
+  double rpi, xpi, ypi, mi, roj, xoj, yoj, theta, dx, dy;
   int NoMax, Npmax, newmax, no, i, j, k, n, m;
-  double rhi, rlo, rtry, mlo, mhi, mtry;
+  double rhi, rlo, rtry, mhi, mtry, tmp;
   double dxD, ktrue, kdom;
 #ifdef SAVEPARENTS  
   int np, added, ipcurrent;
@@ -71,7 +71,7 @@ SEXP FNAME(SEXP KAPPA,
   double sigma, sigma2;
 
   /* model-specific quantities */
-  double inv2sig2, A, B, sigr2pi;
+  double inv2sig2, B, sigr2pi;
   
   PROTECT(KAPPA = AS_NUMERIC(KAPPA));
   PROTECT(MU = AS_NUMERIC(MU));
@@ -114,8 +114,8 @@ SEXP FNAME(SEXP KAPPA,
   sigr2pi = sigma * sqrt(2.0 * M_PI);
   inv2sig2 = 1.0/(2.0 * sigma2);
   B = inv2sig2/M_PI;
-  A = mu * rD2 * inv2sig2;
-  rDE = rE - rD;
+  /* A = mu * rD2 * inv2sig2; */
+  /* rDE = rE - rD; */
   
   /* superdominating intensity */
   Minf = lambda * M_PI * rD2 * inv2sig2 * (rD2 + 2.0 * sigma2 + rD * sigr2pi);
@@ -140,7 +140,8 @@ SEXP FNAME(SEXP KAPPA,
 
   /* -----------  parents inside E ------------------- */
   edag = M_PI * rE2 * kappadag;
-  n = rpois(edag);
+  tmp = rpois(edag);
+  n = (tmp > 2147483647.0) ? 2147483647 : ((int) tmp);
 #ifdef BUGGER
   Rprintf("Expect %lf parents inside E\n", edag);
   Rprintf("Generated %d parents inside E\n", n);
@@ -280,7 +281,7 @@ SEXP FNAME(SEXP KAPPA,
 	      rE, rhi);
 #endif
       rlo = rE;
-      mlo = MrE;
+      /* mlo = MrE; */
       for(k = 0; k < 512; k++) {
 	rtry = (rlo + rhi)/2.0;
 	mtry = MPLUSPLUS(rtry);

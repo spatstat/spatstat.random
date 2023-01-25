@@ -1,7 +1,7 @@
 #'
 #'    rcauchy.R
 #'
-#'   $Revision: 1.5 $ $Date: 2023/01/06 15:08:37 $
+#'   $Revision: 1.7 $ $Date: 2023/01/24 23:31:38 $
 #'
 #'   Simulation of Cauchy cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -20,7 +20,7 @@
 #'
 
 rCauchyHom <-function(kappa, mu, scale, W=unit.square(), ..., nsim=1, drop=TRUE,
-                      inflate=NULL, saveparents=FALSE) {
+                      inflate=NULL, saveparents=FALSE, maxinflate=10) {
   check.1.real(kappa) && check.finite(kappa)
   check.1.real(mu) && check.finite(mu)
   check.1.real(scale) && check.finite(scale)
@@ -54,13 +54,13 @@ rCauchyHom <-function(kappa, mu, scale, W=unit.square(), ..., nsim=1, drop=TRUE,
   ## optimal inflation
   if(is.null(inflate)) {
     a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
-    b <- (rD^2)/(2*a*scale^22)
+    b <- (rD^2)/(2*a*scale^2)
     if(b <= 1) {
       inflate <- 1
     } else {
       delta <- scale * (b^(2/3) - 1)
-      rE <- rD + delta
-      inflate <- rE/rD
+      inflate <- 1 + delta/rD
+      inflate <- min(inflate, maxinflate)
     }
   }
   ## Prepare for C code

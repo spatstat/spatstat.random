@@ -2,7 +2,7 @@
 
   rcauchy.h
 
-  $Revision: 1.1 $ $Date: 2023/01/06 10:48:17 $
+  $Revision: 1.3 $ $Date: 2023/01/25 01:00:42 $
 
   Generate realisation of stationary Cluster cluster process in a disc D
 
@@ -61,12 +61,12 @@ SEXP FNAME(SEXP KAPPA,
 #endif
   
   /* quantities/variables used in generic algorithm */
-  double rE, rD2, rE2, rDE, areaD;
+  double rE, rD2, rE2, areaD;
   double rhoplus, rhoplusplus, muplus;
   double lambda, kappadag, edag, Minf, MrE, diffM, p0;
   double rpi, xpi, ypi, mi, roj, xoj, yoj, theta, dx, dy, d2;
   int NoMax, Npmax, newmax, no, i, j, k, n, m;
-  double rhi, rlo, rtry, mlo, mhi, mtry;
+  double rhi, rlo, rtry, mhi, mtry, tmp;
   double dxD, ktrue, kdom;
 #ifdef SAVEPARENTS  
   int np, added, ipcurrent;
@@ -75,7 +75,7 @@ SEXP FNAME(SEXP KAPPA,
   /* model parameters (for readability) */
 
   /* model-specific quantities */
-  double scale2, eta2, gammascale, rd2ons2;
+  double scale2, gammascale, rd2ons2;
   double inv2ps2, g;
   
   PROTECT(KAPPA = AS_NUMERIC(KAPPA));
@@ -112,11 +112,11 @@ SEXP FNAME(SEXP KAPPA,
   rD2      = rD * rD;
   rE2      = rE * rE;
   areaD    = M_PI * rD2;
-  rDE      = rE - rD;
+  /* rDE      = rE - rD; */
 
   /* model-specific constants */
   scale2 = scale * scale;
-  eta2 = 4.0 * scale2;
+  /* eta2 = 4.0 * scale2; */
   gammascale = 2.0/scale2; /* gamma distribution parameter, scale=1/rate */
   rd2ons2 = rD2/scale2;
   inv2ps2 = 1.0/(M_2PI * scale2);
@@ -144,7 +144,8 @@ SEXP FNAME(SEXP KAPPA,
 
   /* -----------  parents inside E ------------------- */
   edag = M_PI * rE2 * kappadag;
-  n = rpois(edag);
+  tmp = rpois(edag);
+  n = (tmp > 2147483647.0) ? 2147483647 : ((int) tmp);
 #ifdef BUGGER
   Rprintf("Expect %lf parents inside E\n", edag);
   Rprintf("Generating %d parents inside E\n", n);
@@ -288,7 +289,7 @@ SEXP FNAME(SEXP KAPPA,
 	      rE, rhi);
 #endif
       rlo = rE;
-      mlo = MrE;
+      /* mlo = MrE; */
       for(k = 0; k < 512; k++) {
 	rtry = (rlo + rhi)/2.0;
 	mtry = MPLUSPLUS(rtry);

@@ -2,7 +2,7 @@
 
   rmatclus.h
 
-  $Revision: 1.1 $ $Date: 2023/01/06 10:48:37 $
+  $Revision: 1.3 $ $Date: 2023/01/25 00:56:04 $
 
   Generate realisation of stationary Matern cluster process in a disc D
 
@@ -45,8 +45,8 @@ SEXP FNAME(SEXP KAPPA,
 #endif  
   
   /* quantities/variables used in generic algorithm */
-  double lambda, kappadag, rE, rD2, rE2, Minf, MrE, diffM, p0, p0plus;
-  double rpi, xpi, ypi, mi, roj, xoj, yoj, theta, muplus, dx, dy;
+  double lambda, kappadag, rE, rD2, rE2, Minf, MrE, p0, p0plus;
+  double rpi, xpi, ypi, mi, roj, xoj, yoj, theta, muplus, dx, dy, tmp;
   int NoMax, newmax, no, i, j, n, m;
 #ifdef SAVEPARENTS
   int np, added, ipcurrent;
@@ -131,7 +131,8 @@ SEXP FNAME(SEXP KAPPA,
 #endif  
 
   /* -----------  parents inside E ------------------- */
-  n = rpois(M_PI * rE2 * kappadag);
+  tmp = rpois(M_PI * rE2 * kappadag);
+  n = (tmp > 2147483647.0) ? 2147483647 : ((int) tmp);
 #ifdef BUGGER
   Rprintf("Generating %d parents inside E\n", n);
 #endif
@@ -268,7 +269,7 @@ SEXP FNAME(SEXP KAPPA,
 	  dx = xoj - xpi;
 	  dy = yoj - ypi;
 	  /* model specific */
-	  /* true kernel: k(u|x) = 1/(pi R2) if |u-x| < R, 0 otherwise
+	  /* true kernel: k(u|x) = 1/(pi R2) if |u-x| < R, 0 otherwise */
 	  /* dominating kernel: ktil(u|x) = 1/(pi R2) if |x| < R+rD, 0 otherwise */
 	  if(dx * dx + dy * dy < R2) {
 	    /* offspring will be retained */

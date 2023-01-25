@@ -1,7 +1,7 @@
 #'
 #'    rthomas.R
 #'
-#'   $Revision: 1.4 $ $Date: 2023/01/06 15:08:29 $
+#'   $Revision: 1.6 $ $Date: 2023/01/25 00:41:02 $
 #' 
 #'   Simulation of modified Thomas cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -13,7 +13,7 @@
 #'   Licence: GNU Public Licence >= 2
 
 rThomasHom <-function(kappa, mu, sigma, W=unit.square(), ..., nsim=1, drop=TRUE,
-                      inflate=NULL, saveparents=FALSE) {
+                      inflate=NULL, saveparents=FALSE, maxinflate=10) {
   check.1.real(kappa) && check.finite(kappa)
   check.1.real(mu) && check.finite(mu)
   check.1.real(sigma) && check.finite(sigma)
@@ -52,8 +52,8 @@ rThomasHom <-function(kappa, mu, sigma, W=unit.square(), ..., nsim=1, drop=TRUE,
       inflate <- 1
     } else {
       delta <- 2 * sigma * sqrt(log(b)/2)
-      rE <- rD + delta
-      inflate <- rE/rD
+      inflate <- 1 + delta/rD
+      inflate <- min(inflate, maxinflate)
     }
   }
   ## Prepare for C code

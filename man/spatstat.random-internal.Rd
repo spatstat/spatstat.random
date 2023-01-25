@@ -103,8 +103,10 @@ resolve.vargamma.shape(\dots, nu.ker, nu.pcf, nu, allow.nu, allow.default)
 retrieve.param(desired, aliases, \dots, par)
 rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
 rMatClustHom(kappa, mu, R, W, \dots, nsim, drop, inflate, saveparents)
-rThomasHom(kappa, mu, sigma, W, \dots, nsim, drop, inflate, saveparents)
-rCauchyHom(kappa, mu, scale, W, \dots, nsim, drop, inflate, saveparents)
+rThomasHom(kappa, mu, sigma, W, \dots,
+           nsim, drop, inflate, saveparents, maxinflate)
+rCauchyHom(kappa, mu, scale, W, \dots,
+           nsim, drop, inflate, saveparents, maxinflate)
 rPoissonClusterEngine(kappa, expand, rcluster, win, \dots,
                       nsim, drop, saveparents, kappamax, lmax, rmax) 
 RmhExpandRule(nama)
