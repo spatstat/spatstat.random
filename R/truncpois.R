@@ -1,6 +1,6 @@
 #' Truncated Poisson random variables
 #'
-#'  $Revision: 1.2 $ $Date: 2023/01/06 11:27:55 $
+#'  $Revision: 1.5 $ $Date: 2023/02/13 10:57:29 $
 #' 
 #'   Copyright (C) Adrian Baddeley and Ya-Mei Chang 2022 
 #'   GNU Public Licence >= 2
@@ -88,3 +88,18 @@ rpoistrunc <- function(n, lambda, minimum=1, method=c("harding", "transform"), i
   return(y)
 }
 
+recipEnzpois <- function(mu, exact=TRUE) {
+  ## first reciprocal moment of nzpois
+  if(exact && isNamespaceLoaded("gsl")) {
+    gamma <- -digamma(1)
+    ans <- (gsl::expint_Ei(mu) - log(mu) - gamma) * exp(-mu) /(1 - exp(-mu))
+    return(ans)
+  } else {
+    n <- length(mu)
+    ans <- numeric(n)
+    xx <- 1:max(ceiling(mu + 6 * sqrt(mu)), 100)
+    for(i in 1:n) 
+      ans[i] <- sum(dpois(xx, mu[i])/xx)/(1 - exp(-mu[i]))
+  }
+  return(ans)
+}

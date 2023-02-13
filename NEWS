@@ -1,4 +1,26 @@
 
+        CHANGES IN spatstat.random VERSION 3.1-3.001
+
+OVERVIEW
+
+    o spatstat.random now suggests the package 'gsl'.
+    
+    o Generate truncated Poisson random variables.
+
+    o reciprocal moment of Poisson variable conditioned to be positive.
+
+NEW FUNCTIONS
+
+    o rpoisnonzero
+    Generate Poisson random variables conditioned to be positive.
+    
+    o rpoistrunc
+    Generate 'truncated' Poisson random variables,
+    conditioned to be greater than or equal to a specified minimum value.
+
+    o recipEnzpois
+    Calculate the first reciprocal moment of nonzero Poisson variable
+    
         CHANGES IN spatstat.random VERSION 3.1-3
 
 OVERVIEW
@@ -18,13 +40,6 @@ OVERVIEW
     o Bug fixes and internal improvements.
 
 NEW FUNCTIONS
-
-    o rpoisnonzero
-    Generate Poisson random variables conditioned to be positive.
-    
-    o rpoistrunc
-    Generate 'truncated' Poisson random variables,
-    conditioned to be greater than or equal to a specified minimum value.
 
     o rclusterBKBC
     (Advanced use) Internal algorithm to simulate any Neyman-Scott cluster
