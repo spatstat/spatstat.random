@@ -2,7 +2,7 @@
 
 ## Random Generation and Simulation for the spatstat family
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/spatstat.random)](http://cran.r-project.org/web/packages/spatstat.random) 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/spatstat.random)](http://CRAN.R-project.org/package=spatstat.random) 
 [![GitHub R package version](https://img.shields.io/github/r-package/v/spatstat/spatstat.random)](https://github.com/spatstat/spatstat.random)
 
 The original `spatstat` package has been split into
