@@ -12,7 +12,6 @@
 \usage{
 clusterradius(model, \dots)
 
-
 \method{clusterradius}{character}(model, \dots, thresh = NULL, precision = FALSE)
 }
 \arguments{
@@ -72,15 +71,7 @@ clusterradius(model, \dots)
   Additionally, the precision related to this range value is returned as
   an attribute \code{"prec"}, if \code{precision=TRUE}.
 }
-\author{
-\adrian
-
-
-\rolf
-
-and \ege
-
-}
+\author{\spatstatAuthors.}
 \seealso{
   \code{\link{clusterkernel}}, \code{\link[spatstat.model]{kppm}},
   \code{\link[spatstat.random]{rMatClust}}, \code{\link[spatstat.random]{rThomas}},
@@ -88,7 +79,6 @@ and \ege
   \code{\link[spatstat.random]{rVarGamma}}, \code{\link[spatstat.random]{rNeymanScott}}.
 }
 \examples{
-
   clusterradius("Thomas", scale = .1)
   clusterradius("Thomas", scale = .1, thresh = 0.001)
   clusterradius("VarGamma", scale = .1, nu = 2, precision = TRUE)

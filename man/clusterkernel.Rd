@@ -28,6 +28,10 @@ clusterkernel(model, \dots)
   returns a \code{function(x,y)} giving the two-dimensional
   probability density of the cluster offspring points assuming a cluster parent
   located at the origin.
+
+  The function \code{clusterkernel} is generic,
+  with methods for class \code{"character"} (described here)
+  and \code{"kppm"} (described in \code{\link[spatstat.model]{clusterkernel.kppm}}).
 }
 \value{
   A function in the \R language with arguments \code{x,y,\dots}.
@@ -36,7 +40,8 @@ clusterkernel(model, \dots)
   \spatstatAuthors.
 }
 \seealso{
-  \code{\link{clusterfield}}, \code{\link[spatstat.model]{kppm}}
+  \code{\link[spatstat.model]{clusterkernel.kppm}}),
+  \code{\link{clusterfield}}, \code{\link[spatstat.model]{kppm}}.
 }
 \examples{
   f <- clusterkernel("Thomas", kappa=10, scale=0.5)

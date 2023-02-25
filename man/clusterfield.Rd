@@ -13,7 +13,6 @@
   \method{clusterfield}{character}(model, locations = NULL, \dots)
 
   \method{clusterfield}{function}(model, locations = NULL, \dots, mu = NULL)
-
 }
 \arguments{
   \item{model}{
@@ -36,8 +35,12 @@
   }
 }
 \details{
-  The actual calculations are performed
-  by \code{\link[spatstat.explore]{density.ppp}} and
+  The function \code{clusterfield} is generic,
+  with methods for \code{"character"} and \code{"function"} (described here)
+  and a method for \code{"kppm"}
+  (described in \code{\link[spatstat.model]{clusterfield.kppm}}).
+  
+  The calculations are performed by \code{\link[spatstat.explore]{density.ppp}} and
   \code{\dots} arguments are passed thereto for control over the pixel
   resolution etc.
   (These arguments are then passed on to \code{\link[spatstat.geom]{pixellate.ppp}}
@@ -48,7 +51,8 @@
   vectors of x and y coordinates as its first two arguments. Any
   additional arguments may be passed through the \code{\dots}.
 
-  The function method also accepts the optional parameter \code{mu}
+  The method \code{clusterfield.function}
+  also accepts the optional parameter \code{mu}
   (defaulting to 1) specifying the mean number of points per cluster (as
   a numeric) or the inhomogeneous reference cluster intensity (as an
   \code{"im"} object or a \code{function(x,y)}). The interpretation of
@@ -68,12 +72,13 @@
   method calls \code{clusterfield.function} so the parameter \code{mu}
   may also be passed through \code{\dots} and will be interpreted as
   explained above.
-
 }
 \value{
   A pixel image (object of class \code{"im"}).
 }
 \seealso{
+  \code{\link[spatstat.model]{clusterfield.kppm}}.
+  
   \code{\link[spatstat.explore]{density.ppp}} and \code{\link[spatstat.model]{kppm}}.
 
   Simulation algorithms for cluster models:
@@ -83,8 +88,6 @@
   \code{\link{rVarGamma}}
 }
 \examples{
-  if(require(spatstat.model)) {
-
   # method for functions
   kernel <- function(x,y,scal) { 
       r <- sqrt(x^2 + y^2)
@@ -94,7 +97,6 @@
   }
   X <- runifpoint(10)
   clusterfield(kernel, X, scal=0.05)
-  }
 }
 \author{
   \spatstatAuthors.

@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.58 $ $Date: 2023/01/25 01:58:09 $
+#'   $Revision: 1.61 $ $Date: 2023/02/25 10:39:10 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -867,9 +867,9 @@ resolve.vargamma.shape <- function(...,
   cmod <- dots$covmodel
   model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
   margs <- NULL
-  shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+  shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))))
   if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-     (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
+     (shortcut && (model %in% c("gauss", "stable", "gencauchy")))) {
     ## avoid RandomFields package
     ## extract shape parameters and validate them
     switch(model,
@@ -899,6 +899,7 @@ resolve.vargamma.shape <- function(...,
              })
            })
   } else {
+    ## use RandomFields package
     ## get the 'model generator' 
     modgen <- getRandomFieldsModelGen(model)
     attr(model, "modgen") <- modgen
@@ -918,6 +919,7 @@ resolve.vargamma.shape <- function(...,
       stop("Anisotropic covariance models cannot be used",
            call.=FALSE)
   }
+  attr(model, "RFshortcut") <- shortcut
   out$margs <- margs
   out$model <- model
   out$covmodel <- list(type="Covariance", model=model, margs=margs)
@@ -961,7 +963,7 @@ resolve.vargamma.shape <- function(...,
     ## 'par' is in native format
     if(any(par <= 0))
       return(rep.int(Inf, length(rvals)))
-    shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+    shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && getSpatstatVariable("RFshortcut")))
     if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) || 
        (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
       ## For efficiency and to avoid need for RandomFields package
@@ -1016,9 +1018,9 @@ resolve.vargamma.shape <- function(...,
     ## 'par' is in native format
     if(any(par <= 0))
       return(rep.int(Inf, length(rvals)))
-    shortcut <- existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))
+    shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && getSpatstatVariable("RFshortcut")))
     if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-       (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
+       (shortcut && (model %in% c("gauss", "stable", "gencauchy")))) {
       ## For efficiency and to avoid need for RandomFields package
       switch(model,
              exponential = {
