@@ -2,7 +2,7 @@
 #
 #   rmhmodel.R
 #
-#   $Revision: 1.81 $  $Date: 2022/05/21 08:53:38 $
+#   $Revision: 1.82 $  $Date: 2023/03/03 06:29:14 $
 #
 #
 
@@ -406,7 +406,7 @@ spatstatRmhInfo <- function(cifname) {
             parhandler=function(par, ...) {
               ctxt <- "For the Poisson process"
               with(par, forbidNA(beta, ctxt))
-              par <- check.named.list(par, "beta", ctxt)
+              par <- check.named.list(par, "beta", ctxt, xtitle="par")
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               return(par)
             },
@@ -429,7 +429,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the strauss cif"
-              par <- check.named.list(par, c("beta","gamma","r"), ctxt)
+              par <- check.named.list(par, c("beta","gamma","r"), 
+				      ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
               with(par, check.finite(beta, ctxt))
@@ -478,7 +479,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the straush cif"
-              par <- check.named.list(par, c("beta","gamma","r","hc"), ctxt)
+              par <- check.named.list(par, c("beta","gamma","r","hc"), 
+                                      ctxt, xtitle="par")
               # treat hc=NA as absence of hard core
               par <- within(par, if(is.na(hc)) { hc <- 0 } )
               # treat r=NA as absence of interaction
@@ -536,7 +538,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the sftcr cif"
-              par <- check.named.list(par, c("beta","sigma","kappa"), ctxt)
+              par <- check.named.list(par, c("beta","sigma","kappa"),
+                                      ctxt, xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(sigma, ctxt))
               with(par, check.finite(kappa, ctxt))
@@ -583,8 +586,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=TRUE,
             parhandler=function(par, types) {
               ctxt <- "For the straussm cif"
-              par <- check.named.list(par, c("beta","gamma","radii"), ctxt)
-
+              par <- check.named.list(par, c("beta","gamma","radii"),
+                                      ctxt, xtitle="par")
               beta <- par$beta
               gamma <- par$gamma
               r <- par$radii
@@ -656,8 +659,7 @@ spatstatRmhInfo <- function(cifname) {
               ctxt="For the straushm cif"
               par <- check.named.list(par,
                                       c("beta","gamma","iradii","hradii"),
-                                      ctxt)
-
+                                      ctxt, xtitle="par")
               beta <- par$beta
               gamma <- par$gamma
               iradii <- par$iradii
@@ -748,7 +750,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the dgs cif"
-              par <- check.named.list(par, c("beta","rho"), ctxt)
+              par <- check.named.list(par, c("beta","rho"),
+                                      ctxt, xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(rho, ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
@@ -782,7 +785,7 @@ spatstatRmhInfo <- function(cifname) {
             parhandler=function(par, ...) {
               ctxt <- "For the diggra cif"
               par <- check.named.list(par, c("beta","kappa","delta","rho"),
-                                      ctxt)
+                                      ctxt, xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(kappa, ctxt))
               with(par, check.finite(delta, ctxt))
@@ -823,7 +826,9 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the geyer cif"
-              par <- check.named.list(par, c("beta","gamma","r","sat"), ctxt)
+              par <- check.named.list(par,
+                                      c("beta","gamma","r","sat"),
+                                      ctxt, xtitle="par")
               with(par, check.1.real(gamma, ctxt))
               with(par, check.1.real(r,     ctxt))
               with(par, check.1.real(sat,   ctxt))
@@ -873,7 +878,9 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the lookup cif"
-              par <- check.named.list(par, c("beta","h"), ctxt, "r")
+              par <- check.named.list(par,
+                                      c("beta","h"),
+                                      ctxt, "r", xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               beta   <- par[["beta"]]
@@ -982,7 +989,8 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the areaint cif"
-              par <- check.named.list(par, c("beta","eta","r"), ctxt)
+              par <- check.named.list(par, c("beta","eta","r"),
+                                      ctxt, xtitle="par")
               par <- within(par, if(is.na(r)) { r <- 0 })
               with(par, check.finite(beta, ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
@@ -1029,7 +1037,9 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the badgey cif"
-              par <- check.named.list(par, c("beta","gamma","r","sat"), ctxt)
+              par <- check.named.list(par,
+                                      c("beta","gamma","r","sat"),
+                                      ctxt, xtitle="par")
               par <- within(par, sat <- pmin(sat, .Machine$integer.max-100))
               par <- within(par, gamma[is.na(gamma) | is.na(r)] <- 1)
               par <- within(par, r[is.na(r)] <- 0)
@@ -1085,7 +1095,7 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the hardcore cif"
-              par <- check.named.list(par, c("beta", "hc"), ctxt)
+              par <- check.named.list(par, c("beta", "hc"), ctxt, xtitle="par")
               par <- within(par, if(is.na(hc)) { hc <- 0 })
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(hc, ctxt))
@@ -1124,7 +1134,7 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the Fiksel cif"
               par <- check.named.list(par,
                                       c("beta", "r", "hc", "kappa", "a"),
-                                      ctxt)
+                                      ctxt, xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(r, ctxt))
               with(par, check.finite(hc, ctxt))
@@ -1175,7 +1185,7 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the Lennard-Jones cif"
               par <- check.named.list(par,
                                       c("beta", "sigma", "epsilon"),
-                                      ctxt)
+                                      ctxt, xtitle="par")
               with(par, check.finite(beta, ctxt))
               with(par, check.finite(sigma, ctxt))
               with(par, check.finite(epsilon, ctxt))
@@ -1220,7 +1230,7 @@ spatstatRmhInfo <- function(cifname) {
               ctxt="For the multihard cif"
               par <- check.named.list(par,
                                       c("beta","hradii"),
-                                      ctxt)
+                                      ctxt, xtitle="par")
 
               beta <- par$beta
               hradii <- par$hradii
@@ -1272,7 +1282,9 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the triplets cif"
-              par <- check.named.list(par, c("beta","gamma","r"), ctxt)
+              par <- check.named.list(par,
+                                      c("beta","gamma","r"),
+                                      ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
               with(par, check.finite(beta, ctxt))
@@ -1319,7 +1331,9 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the penttinen cif"
-              par <- check.named.list(par, c("beta", "gamma", "r"), ctxt)
+              par <- check.named.list(par,
+                                      c("beta", "gamma", "r"),
+                                      ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
               with(par, check.finite(beta, ctxt))
