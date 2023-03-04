@@ -41,11 +41,12 @@
   }{
     Ei(x) = int_[-infty]^x t * exp(-t) dt
   }
-  is the first exponential integral, and \eqn{\gamma}
+  is the first exponential integral, and
+  \eqn{\gamma \approx 0.577}{\gamma ~= 0.577}
   is the Euler-Mascheroni constant.
 
   If \pkg{gsl} is not loaded, or if \code{exact=FALSE} is specified,
-  the value is computed approximately
+  the value is computed approximately (and more slowly)
   by summing over the possible values of \eqn{N} up to a finite limit.
 }
 \value{

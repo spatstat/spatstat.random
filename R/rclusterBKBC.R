@@ -1,6 +1,6 @@
 #'   rclusterBKBC.R
 #'
-#'   $Revision: 1.4 $ $Date: 2023/01/08 02:38:59 $
+#'   $Revision: 1.5 $ $Date: 2023/03/04 02:24:51 $
 #' 
 #'   Simulation of stationary cluster process
 #'   using Brix-Kendall algorithm and Baddeley-Chang modification
@@ -246,14 +246,17 @@ rclusterBKBC <- function(clusters="Thomas",
              splat("\tDifference:", MplusInf - Mmin)
            }
            ## use a slightly lower maximum, to ensure finite radii
-           if(MplusInf >= Mmin) {
-             delta <- 1e-4 * (MplusInf - Mmin)
-             delta <- max(min(delta, 0.1), sqrt(.Machine$double.eps))
+           Margin <- MplusInf - Mmin
+           eps <- sqrt(.Machine$double.eps)
+           if(Margin >= 0) {
+             delta <- 1e-4 * Margin
+             delta <- max(min(delta, 0.1), eps)
              Mmax <- MplusInf - delta
            } else {
-             warning(paste("Internal numerical error: MplusInf < Mmin",
-                           paren(paste("difference", MplusInf-Mmin)),
-                           "; reset MplusInf = Mmin"))
+             if(abs(Margin) > eps)
+               warning(paste0("Internal numerical problem: MplusInf < Mmin ",
+                              paren(paste("difference", Margin)), 
+                              "; reset MplusInf = Mmin"))
              Mmax <- MplusInf <- Mmin 
            }
            if(Mmin >= Mmax) {
