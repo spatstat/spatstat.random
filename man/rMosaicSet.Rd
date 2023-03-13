@@ -36,12 +36,7 @@ rMosaicSet(X, p=0.5)
   A random set process in the plane with a Markovian property.
   \emph{Annals of Mathematical Statistics} \bold{36} (1965) 1859--1863.
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
-}
+\author{\adrian and \rolf}
 \seealso{
   \code{\link{rpoislinetess}},
   \code{\link{rMosaicField}}
@@ -52,7 +47,7 @@ rMosaicSet(X, p=0.5)
    plot(rMosaicSet(X, 0.5), col="green", border=NA)
 
    # another example
-   plot(rMosaicSet(dirichlet(runifpoint(30)), 0.4))
+   plot(rMosaicSet(dirichlet(runifpoint(20)), 0.4))
 }
 \keyword{spatial}
 \keyword{datagen}

@@ -135,7 +135,12 @@
   kappa <- c(30, 25, 20, 25)
   omega <- c(0.02, 0.025, 0.03, 0.02)
   alpha <- matrix(runif(16, -1, 1), nrow=4, ncol=4)
-  if(!online) lambda <- lambda/10
+  if(!online) {
+     lambda <- lambda[1:3]/10
+     kappa  <- kappa[1:3]
+     omega  <- omega[1:3]
+     alpha  <- alpha[1:3, 1:3]
+  }
   X <- rPSNCP(lambda, kappa, omega, alpha)
   if(online) {
     plot(X)
@@ -158,9 +163,15 @@
   kappa <- c(35, 30, 20, 25) / (1000 * 500)
   omega <- c(15, 35, 40, 25)
   alpha <- matrix(runif(16, -1, 1), nrow=4, ncol=4)
-  if(!online) lambda <- lapply(lambda, "/", e2=10)
-  sapply(lambda, integral)
-  X <- rPSNCP(lambda, kappa, omega, alpha, win = bei$window, dimyx=dim(z1))
+  if(!online) {
+     lambda <- lapply(lambda[1:3], "/", e2=10)
+     kappa  <- kappa[1:3]
+     omega  <- omega[1:3]
+     alpha  <- alpha[1:3, 1:3]
+  } else {
+     sapply(lambda, integral)
+  }
+  X <- rPSNCP(lambda, kappa, omega, alpha, win = Window(bei), dimyx=dim(z1))
   if(online) {
     plot(X)
     plot(split(X), cex=0.5)

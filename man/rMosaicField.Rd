@@ -38,12 +38,7 @@ rMosaicField(X,
 \value{
   A pixel image (object of class \code{"im"}).
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
-}
+\author{\adrian and \rolf}
 \seealso{
   \code{\link{rpoislinetess}},
   \code{\link{rMosaicSet}}
@@ -51,7 +46,8 @@ rMosaicField(X,
 \examples{
    X <- rpoislinetess(3)
    plot(rMosaicField(X, runif))
-   plot(rMosaicField(X, runif, dimyx=256))
+   d <- if(interactive()) 32 else 256
+   plot(rMosaicField(X, runif, dimyx=d))
    plot(rMosaicField(X, rnorm, rgenargs=list(mean=10, sd=2)))
 
    plot(rMosaicField(dirichlet(runifpoint(30)), rnorm))
