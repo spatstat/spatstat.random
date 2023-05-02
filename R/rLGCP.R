@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.25 $    $Date: 2022/04/06 07:19:52 $
+#'  $Revision: 1.26 $    $Date: 2023/05/02 06:19:29 $
 #'
 
 rLGCP <- local({
@@ -32,6 +32,7 @@ rLGCP <- local({
   do.rLGCP <- function(model="exp", mu = 0, param = NULL, ...,
                        win=NULL, saveLambda=TRUE,
                        eps = NULL, dimyx = NULL, xy = NULL,
+                       rule.eps = c("adjust.eps", "grow.frame", "shrink.frame"),
                        modelonly=FALSE, Lambdaonly=FALSE,
                        nsim=1, drop=TRUE) {
     ## make RF model object from RandomFields package
@@ -59,7 +60,8 @@ rLGCP <- local({
                  "does not cover the simulation window", sQuote("win")))
 
     ## convert win to a mask
-    w <- as.mask(w=win, eps=eps, dimyx=dimyx, xy=xy)
+    rule.eps <- match.arg(rule.eps)
+    w <- as.mask(w=win, eps=eps, dimyx=dimyx, xy=xy, rule.eps=rule.eps)
     xcol <- w$xcol
     yrow <- w$yrow
     dimw <- w$dim
