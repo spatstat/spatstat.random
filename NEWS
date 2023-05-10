@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.1-4.001
+        CHANGES IN spatstat.random VERSION 3.1-5
 
 OVERVIEW
 
@@ -9,6 +9,7 @@ SIGNIFICANT USER-VISIBLE CHANGES
 
     o rLGCP
     Now recognises argument 'rule.eps' passed to 'as.mask'.
+    
 
         CHANGES IN spatstat.random VERSION 3.1-4
 
