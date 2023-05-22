@@ -1,7 +1,7 @@
 #'
 #'    rmatclust.R
 #'
-#'   $Revision: 1.3 $ $Date: 2023/01/06 11:37:11 $
+#'   $Revision: 1.5 $ $Date: 2023/05/22 09:33:57 $
 #'
 #'   Simulation of Matern cluster process
 #'   naive algorithm or BKBC algorithm
@@ -124,6 +124,7 @@ rMatClust <- local({
   function(kappa, scale, mu, win = square(1),
            nsim=1, drop=TRUE, 
            ...,
+           n.cond=NULL, w.cond=NULL, 
            algorithm=c("BKBC", "naive"),
            nonempty=TRUE, 
            poisthresh=1e-6,
@@ -147,6 +148,27 @@ rMatClust <- local({
                             context="In rMatClust")
     kappamax <- km[["kappamax"]]
     mumax    <- km[["mumax"]]
+
+    #' conditional simulation?
+    if(!is.null(n.cond)) {
+      result <- CondSimMatClust(kappa=kappa,
+                                scale=scale,
+                                mu=mu,
+                                win=win,
+                                nsim=nsim,
+                                drop=drop,
+                                ...,
+                                n.cond=n.cond,
+                                w.cond=w.cond,
+                                algorithm=algorithm,
+                                nonempty=nonempty,
+                                poisthresh=poisthresh,
+                                saveparents=saveparents,
+                                saveLambda=saveLambda,
+                                kappamax=kappamax,
+                                mumax=mumax)
+      return(result)
+    }
 
     ## detect trivial case where patterns are empty
     if(kappamax == 0 || mumax == 0) {
@@ -216,6 +238,121 @@ rMatClust <- local({
       }
     }
     return(simulationresult(result, nsim, drop))
+  }
+
+  CondSimMatClust <- function(kappa, scale, mu, win = square(1),
+                              ...,
+                              n.cond=NULL, w.cond=NULL,
+                              nsim=1, drop=TRUE,
+                              kappamax=NULL, mumax=NULL,
+                              maxchunk=100, giveup=1000, verbose=FALSE,
+                              saveparents=FALSE, saveLambda=FALSE) {
+    #' validate conditioning information
+    check.1.integer(n.cond) && check.finite(n.cond)
+    stopifnot(n.cond >= 0)
+    
+    w.sim <- as.owin(win)
+    fullwindow <- is.null(w.cond)
+    if(fullwindow) {
+      w.cond <- w.sim
+      w.free <- NULL
+    } else {
+      stopifnot(is.owin(w.cond))
+      w.free <- setminus.owin(w.sim, w.cond)
+    }
+  
+    if(verbose <- isTRUE(verbose))
+      splat("Conditional simulation given", n.cond, "points...")
+
+    ## detect trivial cases where patterns are empty
+    allempty <- (kappamax == 0) || (mumax == 0)
+    if(allempty && n.cond > 0)
+      stop(paste("Impossible condition: ntensity is zero but n.cond =", n.cond))
+    if(allempty || n.cond == 0) {
+      empt <- ppp(window=win)
+      if(saveparents) {
+        attr(empt, "parents") <- list(x=numeric(0), y=numeric(0))
+        attr(empt, "parentid") <- integer(0)
+        attr(empt, "cost") <- 0
+      }
+      if(saveLambda) 
+        attr(empt, "Lambda") <- as.im(0, W=win)
+      result <- rep(list(empt), nsim)
+      return(simulationresult(result, nsim=nsim, drop=drop))
+    }
+
+    ## start simulation
+    nremaining <- nsim
+    ntried <- 0
+    accept <- FALSE
+    nchunk <- 1
+    phistory <- mhistory <- numeric(0)
+    results <- list()
+    while(nremaining > 0) {
+      ## increase chunk length
+      nchunk <- min(maxchunk, giveup - ntried, 2 * nchunk)
+      ## bite off next chunk of simulations
+      if(verbose) splat("Generating", nchunk, "trial simulations...")
+      Xlist <- rMatClust(kappa, scale, mu, w.sim,
+                         nsim=nchunk,
+                         saveLambda=TRUE, nonempty=FALSE,
+                         kappamax=kappamax, mumax=mumax,
+                         ..., drop=FALSE, verbose=FALSE)
+      lamlist <- lapply(unname(Xlist), attr, which="Lambda", exact=TRUE)
+      ## compute acceptance probabilities
+      lamlist <- lapply(lamlist, "[", i=w.sim, drop=FALSE, tight=TRUE)
+      if(fullwindow) {
+        EN <- sapply(lamlist, integral)
+      } else {
+        EN <- sapply(lamlist, integral, domain=w.cond)
+      }
+      p <- exp(n.cond * log(EN/n.cond) + n.cond - EN)
+      phistory <- c(phistory, p)
+      mhistory <- c(mhistory, EN)
+      ## accept/reject
+      accept <- (runif(length(p)) < p)
+      if(any(accept)) {
+        jaccept <- which(accept)
+        if(length(jaccept) > nremaining)
+          jaccept <- jaccept[seq_len(nremaining)]
+        naccepted <- length(jaccept)
+        if(verbose)
+          splat("Accepted the",
+                commasep(ordinal(ntried + jaccept)),
+                ngettext(naccepted, "proposal", "proposals"))
+        nremaining <- nremaining - naccepted
+        for(j in jaccept) {
+          lamj <- lamlist[[j]]
+          if(min(lamj) < 0)
+            lamj <- eval.im(pmax(lamj, 0))
+          if(fullwindow) {
+            Y <- rpoint(n.cond, lamj, win=w.sim, forcewin=TRUE)
+          } else {
+            lamj.cond <- lamj[w.cond, drop=FALSE, tight=TRUE]
+            lamj.free <- lamj[w.free, drop=FALSE, tight=TRUE]
+            Ycond <- rpoint(n.cond, lamj.cond, win=w.cond)
+            Yfree <- rpoispp(lamj.free)
+            Y <- superimpose(Ycond, Yfree, W=w.sim)
+          }
+          if(saveLambda) attr(Y, "Lambda") <- lamj
+          results <- append(results, list(Y))
+        }
+      }
+      ntried <- ntried + nchunk
+      if(ntried >= giveup && nremaining > 0) {
+        message(paste("Gave up after", ntried,
+                      "proposals with", nsim - nremaining, "accepted"))
+        message(paste("Mean acceptance probability =",
+                      signif(mean(phistory), 3)))
+        break
+      }
+    }
+    nresults <- length(results)
+    results <- simulationresult(results, nresults, drop)
+    attr(results, "history") <- data.frame(mu=mhistory, p=phistory)
+    if(verbose && nresults == nsim)
+      splat("Mean acceptance probability", signif(mean(phistory), 3))
+    return(results)
   }
 
   rMatClust

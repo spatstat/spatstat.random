@@ -1,4 +1,16 @@
 
+        CHANGES IN spatstat.random VERSION 3.1-5.001
+
+OVERVIEW
+
+    o Conditional simulation for Matern cluster process.
+    
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rMatClust
+    Can now perform conditional simulation given a fixed number of points.
+    New arguments n.cond and w.cond.
+
         CHANGES IN spatstat.random VERSION 3.1-5
 
 OVERVIEW
