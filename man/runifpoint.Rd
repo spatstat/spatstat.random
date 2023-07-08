@@ -17,6 +17,8 @@
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
     or something acceptable to \code{\link{as.owin}}.
+    (Alternatively a tessellation; see the section on
+    tessellations).
   }
   \item{giveup}{
     Number of attempts in the rejection method after which
@@ -42,7 +44,7 @@
 }
 \value{
   A point pattern (an object of class \code{"ppp"})
-  if \code{nsim=1}, or a list of point patterns if \code{nsim > 1}.
+  or a list of point patterns.
 }
 \details{
   This function generates \code{n} independent random points,
@@ -76,6 +78,15 @@
   This warning has no consequences,
   but it helps to trap a number of common errors.
 }
+\section{Tessellation}{
+  The argument \code{win} may be a tessellation
+  (object of class \code{"tess"}, see \code{\link{tess}}).
+  Then the specified number of points \code{n} will be randomly generated
+  inside each tile of the tessellation. The argument \code{n} may be
+  either a single integer, or an integer vector specifying the number
+  of points to be generated in each individual tile. The result will
+  be a point pattern in the window \code{as.owin(win)}.
+}
 \seealso{
 \code{\link{ppp.object}},
 \code{\link{owin.object}},
@@ -91,10 +102,15 @@
  pp <- runifpoint(100, letterR)
  # binary image mask
  pp <- runifpoint(100, as.mask(letterR))
- ##
+
  # randomising an existing point pattern
  runifpoint(npoints(cells), win=Window(cells))
  runifpoint(ex=cells)
+
+ # tessellation
+ A <- quadrats(unit.square(), 2, 3)
+ # different numbers of points in each cell
+ X <- runifpoint(1:6, A)
 }
 \author{\adrian
   and \rolf

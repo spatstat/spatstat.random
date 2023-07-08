@@ -8,7 +8,8 @@
 }
 \usage{
  rpoispp(lambda, lmax=NULL, win=owin(), \dots,
-         nsim=1, drop=TRUE, ex=NULL, warnwin=TRUE)
+         nsim=1, drop=TRUE, ex=NULL,
+         forcewin=FALSE, warnwin=TRUE)
 }
 \arguments{
   \item{lambda}{
@@ -24,7 +25,8 @@
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
     or something acceptable to \code{\link{as.owin}}.
-    Ignored if \code{lambda} is a pixel image.
+    (Ignored if \code{lambda} is a pixel image
+    unless \code{forcewin=TRUE}.)
   }
   \item{\dots}{
     Arguments passed to \code{lambda} if it is a function.
@@ -41,10 +43,14 @@
     then \code{lambda} and \code{win} will be calculated from
     the point pattern \code{ex}.
   }
+  \item{forcewin}{
+    Logical value specifying whether to use the argument \code{win}
+    as the simulation window when \code{lambda} is an image.
+  }
   \item{warnwin}{
     Logical value specifying whether to issue a warning
     when \code{win} is ignored (which occurs when \code{lambda}
-    is an image and \code{win} is present).
+    is an image, \code{win} is present and \code{forcewin=FALSE}).
   }
 }
 \value{
@@ -64,7 +70,7 @@
   inside the window \code{win}.
   The function \code{lambda} must work correctly with vectors \code{x}
   and \code{y}.
-  
+
   If \code{lmax} is given,
   it must be an upper bound on the values of \code{lambda(x,y,\dots)}
   for all locations \code{(x, y)}
@@ -86,16 +92,11 @@
   of the inhomogeneous Poisson process with intensity equal to the
   pixel values of the image. (The value of the intensity function at an
   arbitrary location is the pixel value of the nearest pixel.)
-  The argument \code{win} is ignored;
-  the window of the pixel image is used instead. It will be converted
-  to a rectangle if possible, using \code{\link{rescue.rectangle}}.
-  
-  To generate an inhomogeneous Poisson process
-  the algorithm uses ``thinning'': it first generates a uniform
-  Poisson process of intensity \code{lmax},
-  then randomly deletes or retains each point, independently of other points,
-  with retention probability
-  \eqn{p(x,y) = \lambda(x,y)/\mbox{lmax}}{p(x,y) = lambda(x,y)/lmax}.
+  If \code{forcewin=FALSE} (the default),
+  the simulation window will be the window of the pixel image
+  (converted to a rectangle if possible using \code{\link{rescue.rectangle}}).
+  If \code{forcewin=TRUE}, the simulation window will be the argument
+  \code{win}.
 
   For \emph{marked} point patterns, use \code{\link{rmpoispp}}.
 }
@@ -112,6 +113,17 @@
   version \code{1.42-3}. Set \code{spatstat.options(fastpois=FALSE)}
   to use the previous, slower algorithm, if it is desired to reproduce
   results obtained with earlier versions.
+
+  The previous slower algorithm uses ``thinning'': it first generates a uniform
+  Poisson process of intensity \code{lmax},
+  then randomly deletes or retains each point, independently of other points,
+  with retention probability
+  \eqn{p(x,y) = \lambda(x,y)/\mbox{lmax}}{p(x,y) = lambda(x,y)/lmax}.
+  The new faster algorithm randomly selects pixels with
+  probability proportional to intensity, and generates point locations
+  inside the selected pixels.
+
+  Thinning is still used when \code{lambda} is a \code{function(x,y,\dots)}.
 }
 \seealso{
   \code{\link{rmpoispp}} for Poisson \emph{marked} point patterns,

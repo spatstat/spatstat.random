@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.113 $   $Date: 2023/01/06 11:57:39 $
+##    $Revision: 4.116 $   $Date: 2023/07/08 03:28:28 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -74,7 +74,23 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
     stopifnot(is.ppp(ex))
     n <- npoints(ex)
     win <- Window(ex)
+  } else if(is.tess(win)) {
+    W <- Window(win)
+    pieces <- tiles(win)
+    ntiles <- length(pieces)
+    check.nvector(n, ntiles, things="tiles", oneok=TRUE)
+    if(length(n) == 1) n <- rep(n, ntiles)
+    Y <- mapply(runifpoint, n=n, win=pieces,
+                MoreArgs=list(nsim=nsim, drop=FALSE, giveup=giveup, warn=warn),
+                SIMPLIFY=FALSE, USE.NAMES=FALSE)
+    result <- vector(mode="list", length=nsim)
+    for(isim in seq_len(nsim)) {
+      result[[isim]] <- superimpose(solapply(Y, "[[", i=isim), W=W, check=FALSE)
+    }
+    result <- simulationresult(result, nsim, drop)
+    return(result)
   } else {
+    ## usual case
     win <- as.owin(win)
     check.1.integer(n)
     stopifnot(n >= 0)
@@ -359,7 +375,8 @@ rpoint <- function(n, f, fmax=NULL,
 }
 
 rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
-                    nsim=1, drop=TRUE, ex=NULL, warnwin=TRUE) {
+                    nsim=1, drop=TRUE, ex=NULL,
+                    forcewin=FALSE, warnwin=TRUE) {
   ## arguments:
   ##     lambda  intensity: constant, function(x,y,...) or image
   ##     lmax     maximum possible value of lambda(x,y,...)
@@ -388,12 +405,18 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
       if(length(lmax) > 1)
         stop("lmax should be a single number")
     }
+    win.given <- !missing(win) && !is.null(win)
+    if(win.given) win <- as.owin(win)
     if(is.im(lambda)) {
-      if(warnwin && !missing(win))
-        warning("Argument win ignored", call.=FALSE)
-      win <- rescue.rectangle(as.owin(lambda))
-    } else {
-      win <- as.owin(win)
+      if(win.given && forcewin) {
+        ## user-specified 'win' overrides default
+        lambda <- lambda[win, drop=FALSE]
+      } else {
+        ## default 
+        win <- rescue.rectangle(as.owin(lambda))
+        if(warnwin)
+          warning("Argument win ignored", call.=FALSE)
+      }
     }
   }
   
@@ -420,7 +443,7 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
       if(X$n > 0) {
         prob <- lambda(X$x, X$y, ...)/lmax
         u <- runif(X$n)
-        retain <- (u <= prob)
+        retain <- is.finite(prob) & (u <= prob)
         result[[isim]] <- X[retain]
       }
     }
@@ -457,9 +480,9 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
       for(isim in seq_len(nsim)) {
         X <- result[[isim]]
         if(X$n > 0) {
-          prob <- lambda[X]/lmax
+          prob <- lambda[X, drop=FALSE]/lmax
           u <- runif(X$n)
-          retain <- (u <= prob)
+          retain <- is.finite(prob) & (u <= prob)
           result[[isim]] <- X[retain]
         }
       }
