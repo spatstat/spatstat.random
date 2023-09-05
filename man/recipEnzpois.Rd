@@ -35,6 +35,7 @@
   }{
     nu = (exp(-mu)/(1 - exp(-mu))) (Ei(mu) - log(mu) - gamma)
   }
+  (see e.g. Grab and Savage, 1954)
   where \eqn{\nu} is the desired reciprocal moment, and
   \deqn{
     Ei(x) = \int_{-\infty}^x t e^{-t} dt
@@ -64,6 +65,13 @@
     print(v)
   }
   recipEnzpois(10, exact=FALSE)
+}
+\references{
+  Grab, E.L. and Savage, I.R. (1954)
+  Tables of the expected value of 1/X for positive
+  Bernoulli and Poisson variables.
+  \emph{Journal of the American Statistical Association}
+  \bold{49}, 169--177.
 }
 \keyword{math}
 \keyword{distribution}
