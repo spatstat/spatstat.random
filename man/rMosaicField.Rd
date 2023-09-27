@@ -44,13 +44,20 @@ rMosaicField(X,
   \code{\link{rMosaicSet}}
 }
 \examples{
-   X <- rpoislinetess(3)
-   plot(rMosaicField(X, runif))
-   d <- if(interactive()) 32 else 256
+   if(interactive()) {
+     lambda <- 3
+     d <- 256
+     n <- 30
+   } else {
+     lambda <- 1
+     d <- 32
+     n <- 5
+   }
+   X <- rpoislinetess(lambda)
    plot(rMosaicField(X, runif, dimyx=d))
-   plot(rMosaicField(X, rnorm, rgenargs=list(mean=10, sd=2)))
-
-   plot(rMosaicField(dirichlet(runifpoint(30)), rnorm))
+   plot(rMosaicField(X, rnorm, rgenargs=list(mean=10, sd=2), dimyx=d))
+   Y <- dirichlet(runifpoint(n))
+   plot(rMosaicField(Y, rnorm, dimyx=d))
 }
 \keyword{spatial}
 \keyword{datagen}

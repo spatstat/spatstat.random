@@ -42,12 +42,20 @@ rMosaicSet(X, p=0.5)
   \code{\link{rMosaicField}}
 }
 \examples{
-   # Switzer's random set
-   X <- rpoislinetess(3)
+    if(interactive()) {
+     lambda <- 3
+     n <- 30
+   } else {
+     lambda <- 1
+     n <- 5
+   }
+  # Switzer's random set
+   X <- rpoislinetess(lambda)
    plot(rMosaicSet(X, 0.5), col="green", border=NA)
 
    # another example
-   plot(rMosaicSet(dirichlet(runifpoint(20)), 0.4))
+   Y <- dirichlet(runifpoint(n))
+   plot(rMosaicSet(Y, 0.4))
 }
 \keyword{spatial}
 \keyword{datagen}

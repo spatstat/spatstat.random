@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.61 $ $Date: 2023/02/25 10:39:10 $
+#'   $Revision: 1.62 $ $Date: 2023/09/11 04:13:29 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -807,7 +807,7 @@ resolve.vargamma.shape <- function(...,
     fr <- ifelseXB(rr > 0,
                   (rr^nu.pcf) * besselK(rr, nu.pcf) / denom,
                   1)
-    return(1 + sig2 * fr)
+    return(as.numeric(1 + sig2 * fr))
   },
   Dpcf = NULL,
   ## Convert to/from canonical cluster parameters

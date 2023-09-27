@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.116 $   $Date: 2023/07/08 03:28:28 $
+##    $Revision: 4.117 $   $Date: 2023/09/25 03:10:32 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -414,15 +414,17 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
       } else {
         ## default 
         win <- rescue.rectangle(as.owin(lambda))
-        if(warnwin)
-          warning("Argument win ignored", call.=FALSE)
+        if(win.given && warnwin)
+          warning(paste("Argument", sQuote("win"), "ignored in rpoispp"),
+                  call.=FALSE)
       }
     }
   }
   
-  if(is.numeric(lambda)) 
+  if(is.numeric(lambda)) {
     ## uniform Poisson
     return(runifpoispp(lambda, win, nsim=nsim, drop=drop))
+  }
 
   ## inhomogeneous Poisson
   ## perform thinning of uniform Poisson
