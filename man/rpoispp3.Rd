@@ -60,3 +60,4 @@ rpoispp3(lambda, domain = box3(), nsim=1, drop=TRUE)
 }
 \keyword{spatial}
 \keyword{datagen}
+\concept{Three-dimensional}

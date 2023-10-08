@@ -55,3 +55,4 @@ rpoislinetess(lambda, win = owin())
 }
 \keyword{spatial}
 \keyword{datagen}
+\concept{Tessellation}

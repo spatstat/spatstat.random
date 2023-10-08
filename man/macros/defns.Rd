@@ -1,7 +1,7 @@
 %% macro definitions for spatstat man pages
 %% Authors
 \newcommand{\adrian}{Adrian Baddeley \email{Adrian.Baddeley@curtin.edu.au}}
-\newcommand{\rolf}{Rolf Turner \email{r.turner@auckland.ac.nz}}
+\newcommand{\rolf}{Rolf Turner \email{rolfturner@posteo.net}}
 \newcommand{\ege}{Ege Rubak \email{rubak@math.aau.dk}}
 \newcommand{\spatstatAuthors}{\adrian, \rolf and \ege}
 \newcommand{\spatstatAuthorsComma}{\adrian, \rolf, \ege}
