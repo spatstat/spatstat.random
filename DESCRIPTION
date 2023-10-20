@@ -1,6 +1,6 @@
 Package: spatstat.random
-Version: 3.1-6.004
-Date: 2023-10-08
+Version: 3.1-6.005
+Date: 2023-10-20
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 
                     role = c("aut", "cre"),
@@ -14,13 +14,14 @@ Authors@R: c(person("Adrian", "Baddeley",
                     role = "aut",
 		    email = "rubak@math.aau.dk",
 		    comment=c(ORCID="0000-0002-6675-533X")),
+	     person("Tilman", "Davies",
+	            role = c("aut", "ctb"),
+		    comment=c(ORCID="0000-0003-0565-1825")),
 	     person("Kasper", "Klitgaard Berthelsen",
 	            role = "ctb"),
 	     person("Ya-Mei", "Chang",
 	            role = "ctb",
 		    email = "yamei628@gmail.com"),
-	     person("Tilman", "Davies",
-	            role = "ctb"),
 	     person("Ute", "Hahn",
 	            role = "ctb"),
 	     person("Abdollah", "Jalilian", 
@@ -32,7 +33,7 @@ Authors@R: c(person("Adrian", "Baddeley",
 Maintainer: Adrian Baddeley <Adrian.Baddeley@curtin.edu.au>
 Depends: R (>= 3.5.0), spatstat.data (>= 3.0), spatstat.geom (>= 3.2-1), stats, utils, methods, grDevices
 Imports: spatstat.utils (>= 3.0-2)
-Suggests: spatial, RandomFields (>= 3.1.24.1), RandomFieldsUtils (>= 0.3.3.1), spatstat.linnet (>= 3.0), spatstat.explore, spatstat.model, spatstat (>= 3.0), gsl
+Suggests: spatial, spatstat.linnet (>= 3.0), spatstat.explore, spatstat.model, spatstat (>= 3.0), gsl
 Additional_repositories: https://spatstat.r-universe.dev
 Description: Functionality for random generation of spatial data in the 'spatstat' family of packages.
 	     Generates random spatial patterns of points according to many simple rules (complete spatial randomness,

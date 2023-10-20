@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.62 $ $Date: 2023/09/11 04:13:29 $
+#'   $Revision: 1.63 $ $Date: 2023/10/20 11:06:21 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -867,50 +867,49 @@ resolve.vargamma.shape <- function(...,
   cmod <- dots$covmodel
   model <- cmod$model %orifnull% dots$model %orifnull% "exponential"
   margs <- NULL
-  shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && isTRUE(getSpatstatVariable("RFshortcut"))))
-  if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-     (shortcut && (model %in% c("gauss", "stable", "gencauchy")))) {
-    ## avoid RandomFields package
-    ## extract shape parameters and validate them
-    switch(model,
-           stable = ,
-           fastStable = {
-             stuff <- cmod %orifnull% dots
-             ok <- "alpha" %in% names(stuff)
-             if(!ok) stop("Parameter 'alpha' is required")
-             margs <- stuff["alpha"]
-             with(margs, {
-               check.1.real(alpha)
-               stopifnot(0 < alpha && alpha <= 2)
-             })
-           },
-           gencauchy = ,
-           fastGencauchy = {
-             stuff <- cmod %orifnull% dots
-             ok <- c("alpha", "beta") %in% names(stuff)
-             if(!ok[1]) stop("Parameter 'alpha' is required")
-             if(!ok[2]) stop("Parameter 'beta' is required")
-             margs <- stuff[c("alpha", "beta")]
-             with(margs, {
-               check.1.real(alpha)
-               check.1.real(beta)
-               stopifnot(0 < alpha && alpha <= 2)
-               stopifnot(beta > 0)
-             })
+  ## extract shape parameters and validate them
+  switch(model,
+         exponential = ,
+         gauss = {
+           ## no shape parameters
+         },
+         stable = ,
+         fastStable = {
+           stuff <- cmod %orifnull% dots
+           ok <- "alpha" %in% names(stuff)
+           if(!ok) stop("Parameter 'alpha' is required")
+           margs <- stuff["alpha"]
+           with(margs, {
+             check.1.real(alpha)
+             stopifnot(0 < alpha && alpha <= 2)
            })
-  } else {
-    ## use RandomFields package
-    ## get the 'model generator' 
-    modgen <- getRandomFieldsModelGen(model)
-    attr(model, "modgen") <- modgen
-    if(is.null(cmod)){
-      margsnam <- names(formals(modgen))
-      margsnam <- margsnam[!(margsnam %in% c("var", "scale"))]
-      margs <- dots[nam %in% margsnam]
-    } else{
-      margs <- cmod[names(cmod)!="model"]
-    }
-  }
+         },
+         gencauchy = ,
+         fastGencauchy = {
+           stuff <- cmod %orifnull% dots
+           ok <- c("alpha", "beta") %in% names(stuff)
+           if(!ok[1]) stop("Parameter 'alpha' is required")
+           if(!ok[2]) stop("Parameter 'beta' is required")
+           margs <- stuff[c("alpha", "beta")]
+           with(margs, {
+             check.1.real(alpha)
+             check.1.real(beta)
+             stopifnot(0 < alpha && alpha <= 2)
+             stopifnot(beta > 0)
+           })
+         },
+         matern = {
+           stuff <- cmod %orifnull% dots
+           ok <- "nu" %in% names(stuff)
+           if(!ok) stop("Parameter 'nu' is required")
+           margs <- stuff["nu"]
+           with(margs, {
+             check.1.real(nu)
+           })
+         },
+         stop(paste("Covariance model", sQuote(model),
+                    "is not yet supported"), call.=FALSE)
+         )
   if(length(margs)==0) {
     margs <- NULL
   } else {
@@ -919,7 +918,6 @@ resolve.vargamma.shape <- function(...,
       stop("Anisotropic covariance models cannot be used",
            call.=FALSE)
   }
-  attr(model, "RFshortcut") <- shortcut
   out$margs <- margs
   out$model <- model
   out$covmodel <- list(type="Covariance", model=model, margs=margs)
@@ -958,57 +956,43 @@ resolve.vargamma.shape <- function(...,
   isPCP=FALSE,
   iscompact=FALSE,
   roffspring=NULL,
-  ## calls relevant covariance function from RandomFields package
   K = function(par, rvals, ..., model, margs) {
     ## 'par' is in native format
     if(any(par <= 0))
       return(rep.int(Inf, length(rvals)))
-    shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && getSpatstatVariable("RFshortcut")))
-    if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) || 
-       (shortcut && (model %in% c("gauss", "stable", "cauchy")))) {
-      ## For efficiency and to avoid need for RandomFields package
-      switch(model,
-             exponential = {
-               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-r/par[2L])) }
-             },
-             gauss = ,
-             fastGauss = {
-               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^2)) }
-             },
-             stable = ,
-             fastStable = {
-               alpha <- margs[["alpha"]]
-               integrand <- function(r) { 2*pi*r*exp(par[1L]*exp(-(r/par[2L])^alpha)) }
-             },
-             gencauchy = ,
-             fastGencauchy = {
-               alpha <- margs[["alpha"]]
-               beta  <- margs[["beta"]]
-               integrand <- function(r) { 2*pi*r*exp(par[1L] * (1 + (r/par[2L])^alpha)^(-beta/alpha)) }
-             })
-    } else {
-      ## Use RandomFields package
-      kraeverRandomFields()
-      modgen <- attr(model, "modgen")
-      ## create the model with the specified parameters
-      if(length(margs) == 0) {
-        mod <- modgen(var=par[1L], scale=par[2L])
-      } else {
-        mod <- do.call(modgen,
-                       append(list(var=par[1L], scale=par[2L]),
-                              margs))
-      }
-      ## Encode integrand 
-      ## RandomFields does not like evaluating covariance at r=0
-      integrand <- function(r) {
-        z <- numeric(length(r))
-        if(any(ok <- (r != 0))) {
-          rok <- r[ok]
-          z[ok] <- 2*pi*rok*exp(RandomFields::RFcov(model=mod, x=rok))
-        }
-        return(z)
-      }
-    }
+    ## Determine covariance function 
+    switch(model,
+           exponential = {
+             Cfun <- function(x) exp(-x)
+           },
+           gauss = ,
+           fastGauss = {
+             Cfun <- function(x) exp(-x^2)
+           },
+           stable = ,
+           fastStable = {
+             alpha <- margs[["alpha"]]
+             Cfun <- function(x) exp(-x^alpha)
+           },
+           gencauchy = ,
+           fastGencauchy = {
+             alpha <- margs[["alpha"]]
+             beta  <- margs[["beta"]]
+             Cfun <- function(x) { (1 + x^alpha)^(-beta/alpha) }
+           },
+           matern = {
+             nu <- margs[["nu"]]
+             Cfun <- function(x) {
+               z <- x * sqrt(2 * nu)
+               ifelse(x == 0,
+                      1, 
+                      (z^nu) * besselK(z, nu) * (2^(1-nu))/gamma(nu))
+             }
+           },
+           stop(paste("Model", sQuote(model), "is not recognised"))
+           )
+    ## hence determine integrand for K function
+    integrand <- function(r) 2 * pi * r * exp(par[1L] * Cfun(r/par[2L]))
     ## compute indefinite integral
     imethod <- if(spatstat.options("fastK.lgcp")) "trapezoid" else "quadrature"
     th <- indefinteg(integrand, rvals, lower=0, method=imethod)
@@ -1018,44 +1002,39 @@ resolve.vargamma.shape <- function(...,
     ## 'par' is in native format
     if(any(par <= 0))
       return(rep.int(Inf, length(rvals)))
-    shortcut <- isTRUE(attr(model, "RFshortcut") %orifnull% (existsSpatstatVariable("RFshortcut") && getSpatstatVariable("RFshortcut")))
-    if((model %in% c("exponential", "fastGauss", "fastStable", "fastGencauchy")) ||
-       (shortcut && (model %in% c("gauss", "stable", "gencauchy")))) {
-      ## For efficiency and to avoid need for RandomFields package
-      switch(model,
-             exponential = {
-               gtheo <- exp(par[1L]*exp(-rvals/par[2L]))
-             },
-             gauss = ,
-             fastGauss = {
-               gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^2))
-             },
-             stable = ,
-             fastStable = {
-               alpha <- margs[["alpha"]]
-               gtheo <- exp(par[1L]*exp(-(rvals/par[2L])^alpha))
-             },
-             gencauchy = ,
-             fastGencauchy = {
-               alpha <- margs[["alpha"]]
-               beta  <- margs[["beta"]]
-               gtheo <- exp(par[1L] * (1 + (rvals/par[2L])^alpha)^(-beta/alpha))
-             })
-    } else {
-      ## use RandomFields
-      kraeverRandomFields()
-      modgen <- attr(model, "modgen")
-      ## create the model with the specified parameters
-      if(length(margs) == 0) {
-        mod <- modgen(var=par[1L], scale=par[2L])
-      } else {
-        mod <- do.call(modgen,
-                       append(list(var=par[1L], scale=par[2L]),
-                              margs))
-      }
-      ## calculate pcf
-      gtheo <- exp(RandomFields::RFcov(model=mod, x=rvals))
-    }
+    ## Determine covariance function 
+    switch(model,
+           exponential = {
+             Cfun <- function(x) exp(-x)
+           },
+           gauss = ,
+           fastGauss = {
+             Cfun <- function(x) exp(-x^2)
+           },
+           stable = ,
+           fastStable = {
+             alpha <- margs[["alpha"]]
+             Cfun <- function(x) exp(-x^alpha)
+           },
+           gencauchy = ,
+           fastGencauchy = {
+             alpha <- margs[["alpha"]]
+             beta  <- margs[["beta"]]
+             Cfun <- function(x) { (1 + x^alpha)^(-beta/alpha) }
+           },
+           matern = {
+             nu <- margs[["nu"]]
+             Cfun <- function(x) {
+               z <- x * sqrt(2 * nu)
+               ifelse(x == 0,
+                      1, 
+                      (z^nu) * besselK(z, nu) * (2^(1-nu))/gamma(nu))
+             }
+           },
+           stop(paste("Model", sQuote(model), "is not recognised"))
+           )
+    ## Hence evaluate pcf
+    gtheo <- exp(par[1L] * Cfun(rvals/par[2L]))
     return(gtheo)
   },
   Dpcf= function(par,rvals, ..., model){

@@ -3,16 +3,14 @@
 #
 # Random tessellations
 #
-# $Revision: 1.7 $  $Date: 2015/10/21 09:06:57 $
+# $Revision: 1.8 $  $Date: 2023/10/20 03:38:34 $
 #
 
 # Poisson line tessellation
 
 rpoislinetess <- function(lambda, win=owin()) {
   win <- as.owin(win)
-  if(win$type == "mask")
-    stop("Not implemented for masks")
-  # determine circumcircle
+  ## determine circumcircle
   xr <- win$xrange
   yr <- win$yrange
   xmid <- mean(xr)
@@ -21,12 +19,19 @@ rpoislinetess <- function(lambda, win=owin()) {
   height <- diff(yr)
   rmax <- sqrt(width^2 + height^2)/2
   boundbox <- owin(xmid + c(-1,1) * rmax, ymid + c(-1,1) * rmax)
-  # generate poisson lines through circumcircle
+  ## generate poisson lines through circumcircle
   n <- rpois(1, lambda * 2 * pi * rmax)
-  if(n == 0)
-    return(tess(tiles=list(win)))
+  if(n == 0) {
+    ## single tile
+    if(is.mask(win)) {
+      M <- as.im(factor(1), W=win)
+      return(tess(image=M))
+    } else {
+      return(tess(tiles=list(win)))
+    }
+  }
   theta <- runif(n, max= 2 * pi)
-  p <- runif(n, max=rmax)
+  p <- runif(n, max=rmax) + xmid * cos(theta) + ymid * sin(theta)
   Y <- infline(p=p, theta=theta)
   # form the induced tessellation in bounding box
   Z <- chop.tess(boundbox, Y)

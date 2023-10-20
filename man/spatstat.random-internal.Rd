@@ -33,6 +33,12 @@
 \alias{rMatClustHom}
 \alias{rThomasHom}
 \alias{rCauchyHom}
+\alias{rGRFcircembed}
+\alias{rGRFgauss}
+\alias{rGRFexpo}
+\alias{rGRFstable}
+\alias{rGRFgencauchy}
+\alias{rGRFmatern}
 \alias{rPoissonClusterEngine}
 \alias{RmhExpandRule}
 \alias{rmhsnoop}
@@ -107,6 +113,12 @@ rThomasHom(kappa, mu, sigma, W, \dots,
            nsim, drop, inflate, saveparents, maxinflate)
 rCauchyHom(kappa, mu, scale, W, \dots,
            nsim, drop, inflate, saveparents, maxinflate)
+rGRFcircembed(W, mu, var, corrfun, \dots, nsim, drop)
+rGRFgauss(W, mu, var, scale, \dots, nsim, drop)
+rGRFexpo(W, mu, var, scale, \dots, nsim, drop)
+rGRFstable(W, mu, var, scale, alpha, \dots, nsim, drop)
+rGRFgencauchy(W, mu, var, scale, alpha, beta, \dots, nsim, drop)
+rGRFmatern(W, mu, var, scale, nu, \dots, nsim, drop)
 rPoissonClusterEngine(kappa, expand, rcluster, win, \dots,
                       nsim, drop, saveparents, kappamax, lmax, rmax) 
 RmhExpandRule(nama)

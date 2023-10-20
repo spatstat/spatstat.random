@@ -1,13 +1,14 @@
 #'
 #'           pkgRandomFields.R
 #' 
-#'    Dealing with the Random Fields package
-#' 
-#'    $Revision: 1.3 $  $Date: 2020/11/30 10:14:04 $
+#'    Dealing with the (DEFUNCT) Random Fields package
+#'
+#'    $Revision: 1.6 $  $Date: 2023/10/20 11:17:19 $
 
 kraeverRandomFields <- function() {
-  kraever("RandomFieldsUtils")
-  kraever("RandomFields")
+  stop("The package RandomFields is no longer available.")
+##  kraever("RandomFieldsUtils")
+##  kraever("RandomFields")
 # should no longer be needed:  
 #  capture.output(RandomFieldsUtils:::.onLoad())
 #  capture.output(RandomFields:::.onLoad())
@@ -34,42 +35,12 @@ kraever <- function(package, fatal=TRUE) {
   return(TRUE)
 }
 
+# legacy functions
+
+RandomFieldsSafe <- function() { FALSE }
+
 getRandomFieldsModelGen <- function(model) {
-  kraeverRandomFields()
-  if(inherits(model, "RMmodelgenerator"))
-    return(model)
-  if(!is.character(model))
-    stop(paste("'model' should be a character string",
-               "or one of the functions in the RandomFields package",
-               "with a name beginning 'RM'"),
-         call.=FALSE)
-  f <- switch(model,
-              cauchy    = RandomFields::RMcauchy,
-              exponential = ,
-              exp       = RandomFields::RMexp,
-              gencauchy = RandomFields::RMgencauchy,
-              gauss     = RandomFields::RMgauss,
-              gneiting  = RandomFields::RMgneiting,
-              matern    = RandomFields::RMmatern,
-              nugget    = RandomFields::RMnugget,
-              spheric   = RandomFields::RMspheric,
-              stable    = RandomFields::RMstable,
-              whittle   = RandomFields::RMwhittle,
-              {
-                modgen <- try(getExportedValue("RandomFields", 
-                                               paste0("RM", model)),
-                              silent=TRUE)
-                if(inherits(modgen, "try-error") ||
-                   !inherits(modgen, "RMmodelgenerator"))
-                  stop(paste("Model", sQuote(model), "is not recognised"))
-                modgen
-              })
-  if(!is.function(f))
-    stop(paste0("Unable to retrieve RandomFields::RM", model))
-  return(f)
+  return(NULL)
 }
 
-# legacy function
-
-RandomFieldsSafe <- function() { TRUE }
 
