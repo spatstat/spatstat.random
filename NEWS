@@ -1,4 +1,11 @@
 
+        CHANGES IN spatstat.random VERSION 3.2-1
+
+OVERVIEW
+
+    o Minor changes to appease the package checker.
+
+
         CHANGES IN spatstat.random VERSION 3.2-0
 
 OVERVIEW

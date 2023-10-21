@@ -145,6 +145,17 @@
   
   The LGCP model can be fitted to data using \code{\link[spatstat.model]{kppm}}.
 }
+\section{Warning: new implementation}{
+  The simulation algorithm for \code{rLGCP} has been completely re-written
+  in \pkg{spatstat.random} version \code{3.2-0} to avoid depending on
+  the package \pkg{RandomFields} which is now defunct (and is sadly missed).
+
+  It is no longer possible to replicate results that were obtained using
+  \code{rLGCP} in previous versions of \pkg{spatstat.random}.
+
+  The current code is a new implementation and should be considered
+  vulnerable to new bugs. 
+}
 \seealso{
 \code{\link[spatstat.random]{rpoispp}},
 \code{\link[spatstat.random]{rMatClust}},

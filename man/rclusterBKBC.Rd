@@ -238,10 +238,10 @@ rclusterBKBC(clusters="Thomas",
 }
 \seealso{
   \code{\link[spatstat.random]{rNeymanScott}},
-  \code{\link{spatstat.random}}{rMatClust},
-  \code{\link{spatstat.random}}{rThomas},
-  \code{\link{spatstat.random}}{rCauchy},
-  \code{\link{spatstat.random}}{rVarGamma}
+  \code{\link[spatstat.random]{rMatClust}},
+  \code{\link[spatstat.random]{rThomas}},
+  \code{\link[spatstat.random]{rCauchy}},
+  \code{\link[spatstat.random]{rVarGamma}}
 }
 \examples{
   Y <- rclusterBKBC("Thomas", 10,5,0.2)

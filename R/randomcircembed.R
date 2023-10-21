@@ -11,7 +11,7 @@
 #'
 #' Modified by Adrian Baddeley
 #'
-#'   $Revision: 1.4 $ $Date: 2023/10/20 15:31:10 $
+#'   $Revision: 1.6 $ $Date: 2023/10/21 02:20:28 $
 #' 
 #'   Copyright (c) 2023 Tilman M. Davies, David Bryant and Adrian Baddeley
 #'   GNU Public Licence (>= 2.0)
@@ -29,6 +29,7 @@ rGRFcircembed <- local({
                                dimyx=NULL, eps=NULL, xy=NULL,
                                rule.eps = c("adjust.eps", 
                                             "grow.frame", "shrink.frame"),
+                               warn=TRUE, maxrelerr=1e-6,
                                nsim=1, drop=TRUE) {
     ## determine discretisation
     M <- as.mask(W, dimyx=dimyx, eps=eps, xy=xy, rule.eps=rule.eps)
@@ -37,12 +38,12 @@ rGRFcircembed <- local({
     gp <- grid.prep(W, ncol(M), nrow(M))
     ## calculate covariance matrix
     Sigma <- covariance.prep(gp=gp,
-                             variance=var,
+                             var=var,
                              corr.func=corrfun,
                              wrap=TRUE,
                              ...)
     ## generate (centred) pixel values for all nsim realisations
-    z <- generate.normals(nsim, Sigma)
+    z <- generate.normals(nsim, Sigma, warn, maxrelerr)
     ## reshape
     z <- array(as.numeric(z), dim=c(gp$N.ext, gp$M.ext, nsim))
     z <- z[1:(gp$N), 1:(gp$M), , drop=FALSE]
@@ -110,13 +111,13 @@ rGRFcircembed <- local({
   ##  return(result)
   ## }
 
-  covariance.prep <- function(gp,variance,corr.func,wrap,...){
+  covariance.prep <- function(gp, var, corr.func, wrap=FALSE, ...){
     if(!wrap){
       cent <- expand.grid(gp$mcens,gp$ncens)
       mmat <- matrix(rep(cent[,1],gp$M*gp$N),gp$M*gp$N,gp$M*gp$N)
       nmat <- matrix(rep(cent[,2],gp$M*gp$N),gp$M*gp$N,gp$M*gp$N)
       D <- sqrt((mmat-t(mmat))^2+(nmat-t(nmat))^2)
-      covmat <- variance*corr.func(D,...)
+      covmat <- var*corr.func(D,...)
       return(covmat)
     } else {
       Rx <- gp$M.ext*gp$cell.width
@@ -128,35 +129,43 @@ rGRFcircembed <- local({
       cent.ext.row1 <- expand.grid(m.diff.row1,n.diff.row1)
       D.ext.row1 <- matrix(sqrt(cent.ext.row1[,1]^2+cent.ext.row1[,2]^2),
                            gp$M.ext,gp$N.ext)
-      C.tilde <- variance*corr.func(D.ext.row1,...)
+      C.tilde <- var*corr.func(D.ext.row1,...)
       return(C.tilde)
     }
   }
 
-  generate.normals <- function(nsim, Sigma, warn=TRUE) {
-    ncell <- prod(dim(Sigma))
-    sqrtncell <- sqrt(ncell)
+  generate.normals <- function(nsim, Sigma, warn=TRUE, maxrelerr=1e-6) {
+    ## calculate fft of covariance matrix
     refft <- Re(fft(Sigma, inverse=TRUE))
     if(min(refft) < 0) {
-      ## small negative values are possible 
-      if(warn && (-min(refft))/max(refft) > .Machine$double.eps) {
-        bad <- (refft < 0)
-        warning(paste(sum(bad), "out of", length(bad), "terms",
-                      paren(percentage(mean(bad))),
-                      "in FFT calculation were negative",
-                      "and were set to zero.",
-                      "Range:", prange(signif(range(refft), 3))),
-                call.=FALSE)
+      ## in theory this is impossible because Sigma is positive definite, 
+      ## but small negative values do occur
+      if(warn) {
+        ra <- range(refft)
+        if(-ra[1]/ra[2] > maxrelerr) {
+          bad <- (refft < 0)
+          warning(paste(sum(bad), "out of", length(bad), "terms",
+                        paren(percentage(mean(bad))),
+                        "in FFT calculation of matrix square root",
+                        "were negative, and were set to zero.",
+                        "Range:", prange(signif(ra, 3))),
+                  call.=FALSE)
+        }
       }
       refft <- pmax(0, refft)
     }
-    prefix <- sqrt(refft)
+    ## fft of square root of matrix Sigma
+    sqrtFFTsigma <- sqrt(refft)
+    ## set up simulation 
     nr <- nrow(Sigma)
     nc <- ncol(Sigma)
+    ncell <- prod(dim(Sigma))
+    sqrtncell <- sqrt(ncell)
+    ## run
     realisations <- matrix(, ncell, nsim)
+    noise <- array(rnorm(ncell * nsim), dim=c(nr, nc, nsim))
     for(i in 1:nsim) {
-      noise <- rnorm(ncell)
-      field <- prefix * fft(matrix(noise,nr,nc))/sqrtncell
+      field <- sqrtFFTsigma * fft(noise[,,i])/sqrtncell
       realisations[,i] <- Re(fft(field,inverse=TRUE)/sqrtncell)
     }
     return(realisations)
