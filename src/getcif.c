@@ -1,8 +1,6 @@
 #include <R.h>
 #include "methas.h"
 
-void fexitc(const char *msg);
-
 extern Cifns AreaIntCifns, BadGeyCifns, DgsCifns, DiggraCifns, 
   FikselCifns, GeyerCifns, HardcoreCifns, 
   LennardCifns, LookupCifns, 
@@ -46,7 +44,7 @@ Cifns getcif(char *cifname) {
     if(strcmp(cifname, cp.name) == 0)
       return(*(cp.p));
   }
-  fexitc("Unrecognised cif name; bailing out.\n");
+  error("Unrecognised cif name; bailing out.\n");
   /* control never passes to here, but compilers don't know that */
   return(NullCifns);
 }

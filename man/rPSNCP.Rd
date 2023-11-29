@@ -136,10 +136,10 @@
   omega <- c(0.02, 0.025, 0.03, 0.02)
   alpha <- matrix(runif(16, -1, 1), nrow=4, ncol=4)
   if(!online) {
-     lambda <- lambda[1:3]/10
-     kappa  <- kappa[1:3]
-     omega  <- omega[1:3]
-     alpha  <- alpha[1:3, 1:3]
+     lambda <- lambda[1:2]/10
+     kappa  <- kappa[1:2]
+     omega  <- omega[1:2]
+     alpha  <- alpha[1:2, 1:2]
   }
   X <- rPSNCP(lambda, kappa, omega, alpha)
   if(online) {
@@ -164,10 +164,10 @@
   omega <- c(15, 35, 40, 25)
   alpha <- matrix(runif(16, -1, 1), nrow=4, ncol=4)
   if(!online) {
-     lambda <- lapply(lambda[1:3], "/", e2=10)
-     kappa  <- kappa[1:3]
-     omega  <- omega[1:3]
-     alpha  <- alpha[1:3, 1:3]
+     lambda <- lapply(lambda[1:2], "/", e2=10)
+     kappa  <- kappa[1:2]
+     omega  <- omega[1:2]
+     alpha  <- alpha[1:2, 1:2]
   } else {
      sapply(lambda, integral)
   }

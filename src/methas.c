@@ -5,8 +5,6 @@
 #include "chunkloop.h"
 #include "mhsnoop.h"
 
-void fexitc(const char *msg);
-
 
 /* 
    To switch on debugging code, 
@@ -206,7 +204,7 @@ SEXP xmethas(
     thecif = getcif(cifstring);
     mustupdate = NEED_UPDATE(thecif);
     if(thecif.marked && !marked)
-      fexitc("cif is for a marked point process, but proposal data are not marked points; bailing out.");
+      error("cif is for a marked point process, but proposal data are not marked points; bailing out.");
     /* Keep compiler happy*/
     cif[0] = thecif;
     needupd[0] = mustupdate;
@@ -219,7 +217,7 @@ SEXP xmethas(
       if(needupd[k])
 	mustupdate = YES;
       if(cif[k].marked && !marked)
-	fexitc("component cif is for a marked point process, but proposal data are not marked points; bailing out.");
+	error("component cif is for a marked point process, but proposal data are not marked points; bailing out.");
     }
   }
   /* ============= Initialise transition history ========== */

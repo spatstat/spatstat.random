@@ -6,8 +6,6 @@
 
 /* To get debug output, insert the line:  #define DEBUG 1  */
 
-void fexitc(const char *msg);
-
 /*
   Conditional intensity function for a multiscale saturation process. 
 
@@ -495,7 +493,7 @@ void badgeyupd(State state, Propo prop, Cdata *cdata) {
 #endif
     return;
   }
-  fexitc("Unrecognised transition type; bailing out.\n");
+  error("Unrecognised transition type; bailing out.\n");
 }
 
 Cifns BadGeyCifns = { &badgeyinit, &badgeycif, &badgeyupd, NO};

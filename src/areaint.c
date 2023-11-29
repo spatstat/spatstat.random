@@ -101,10 +101,6 @@ Cdata *areaintInit(State state, Model model, Algor algo) {
   return((Cdata *) areaint);
 }
 
-#ifdef BADBUG
-void fexitc(const char *msg);
-#endif
-
 /* conditional intensity evaluator */
 
 double areaintCif(Propo prop, State state, Cdata *cdata) {
@@ -292,7 +288,7 @@ double areaintCif(Propo prop, State state, Cdata *cdata) {
       Rprintf("kount=%ld, kdisc=%ld, covfrac=%lf, areaint->logeta=%lf\n", 
 	      kount, kdisc, covfrac, areaint->logeta);
       Rprintf("u=%lf, v=%lf\n", u, v);
-      fexitc("Non-finite CIF");
+      error("Non-finite CIF");
     }
 #endif
 

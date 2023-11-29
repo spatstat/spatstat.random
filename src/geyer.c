@@ -4,8 +4,6 @@
 #include "methas.h"
 #include "dist2.h"
 
-void fexitc(const char *msg);
-
 #undef MH_DEBUG 
 
 /*
@@ -413,7 +411,7 @@ void geyerupd(State state, Propo prop, Cdata *cdata) {
 	  aux[j] -= 1; /* point j loses a neighbour */
       }
     }
-  } else fexitc("Unrecognised transition type; bailing out.\n");
+  } else error("Unrecognised transition type; bailing out.\n");
 
   return;
 }
