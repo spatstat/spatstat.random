@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.117 $   $Date: 2023/09/25 03:10:32 $
+##    $Revision: 4.118 $   $Date: 2024/02/04 08:04:51 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -740,7 +740,7 @@ rPoissonClusterEngine <- function(kappa, expand=rmax, rcluster, win, ...,
   ## Generate parents in dilated window
   win <- as.owin(win)
   frame <- boundingbox(win)
-  dilated <- owin(frame$xrange + c(-expand, expand),
+  dilated <- owinInternalRect(frame$xrange + c(-expand, expand),
                   frame$yrange + c(-expand, expand))
 
   if(is.im(kappa) && !is.subset.owin(dilated, as.owin(kappa)))

@@ -3,7 +3,7 @@
 #
 # Random tessellations
 #
-# $Revision: 1.8 $  $Date: 2023/10/20 03:38:34 $
+# $Revision: 1.9 $  $Date: 2024/02/04 08:04:51 $
 #
 
 # Poisson line tessellation
@@ -18,7 +18,7 @@ rpoislinetess <- function(lambda, win=owin()) {
   width <- diff(xr)
   height <- diff(yr)
   rmax <- sqrt(width^2 + height^2)/2
-  boundbox <- owin(xmid + c(-1,1) * rmax, ymid + c(-1,1) * rmax)
+  boundbox <- owinInternalRect(xmid + c(-1,1) * rmax, ymid + c(-1,1) * rmax)
   ## generate poisson lines through circumcircle
   n <- rpois(1, lambda * 2 * pi * rmax)
   if(n == 0) {
