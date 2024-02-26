@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.17 $ $Date: 2023/01/06 15:13:10 $
+#'  $Revision: 1.18 $ $Date: 2024/02/26 05:43:36 $
 
 
 local({
@@ -112,6 +112,36 @@ local({
   }
 
 })
+
+local({
+  if(ALWAYS) {
+    #' Bug in rLGCP spotted by Tilman Davies
+    X <- rLGCP("matern", function(x,y) { 1 - 0.4* y },
+               var=2, scale=0.7, nu=0.5, win = square(10),
+               dimyx=c(32,64))
+  }
+  if(FULLTEST) {
+    ## Bug in rGRFcircembed
+    ## when handling incompatible data for 'mu' and 'win'
+    win <- owin(c(0, 3), c(0, 3))
+    npix <- 300
+    spatstat.options(npixel = npix)
+    beta0 <- 3
+    beta1 <- 0
+    sigma2x <- 0.2
+    range <- 1.2
+    nu <- 1
+    set.seed(7)
+    x0 <- seq(0, 3, length=npix)
+    y0 <- seq(0, 3, length=npix)
+    gridcov <- outer(x0, y0, function(x,y) cos(x) - sin(y - 2))
+    MU <- im(beta0 + beta1 * gridcov, xcol = x0, yrow = y0)
+    lg.s.c <- rLGCP('matern', mu=MU,
+                    var = sigma2x, scale = range / sqrt(8), 
+                    nu = 1, win = win)
+  }
+})
+
 reset.spatstat.options()
 
 

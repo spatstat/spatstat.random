@@ -11,7 +11,7 @@
 #'
 #' Modified by Adrian Baddeley
 #'
-#'   $Revision: 1.6 $ $Date: 2023/10/21 02:20:28 $
+#'   $Revision: 1.7 $ $Date: 2024/02/26 05:33:18 $
 #' 
 #'   Copyright (c) 2023 Tilman M. Davies, David Bryant and Adrian Baddeley
 #'   GNU Public Licence (>= 2.0)
@@ -36,6 +36,9 @@ rGRFcircembed <- local({
     if(needclip <- !is.rectangle(W))
       outsideM <- !as.vector(as.matrix(M))
     gp <- grid.prep(W, ncol(M), nrow(M))
+    ## convert 'mu' to an image on same raster (unless it is a single number)
+    if(is.function(mu) || is.im(mu))
+      mu <- as.im(mu, W=M, ...)
     ## calculate covariance matrix
     Sigma <- covariance.prep(gp=gp,
                              var=var,
@@ -50,7 +53,7 @@ rGRFcircembed <- local({
     ## pack up and add 'mu'
     results <- vector(mode="list", length=nsim)
     R0 <- as.im(0, W=M)
-    if(is.function(mu)) mu <- as.im(mu, W=M, ...)
+        
     for(isim in 1:nsim) {
       zmat <- z[,,isim]
       if(needclip) zmat[outsideM] <- NA

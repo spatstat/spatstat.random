@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.30 $    $Date: 2023/10/20 15:36:57 $
+#'  $Revision: 1.31 $    $Date: 2024/02/26 05:33:48 $
 #'
 
 rLGCP <- local({
@@ -54,11 +54,11 @@ rLGCP <- local({
     win.given <- !is.null(win)
     mu.image <- is.im(mu)
     win <- if(win.given) as.owin(win) else if(mu.image) as.owin(mu) else owin()
-  
+
     if(win.given && mu.image && !is.subset.owin(win, as.owin(mu)))
       stop(paste("The spatial domain of the pixel image", sQuote("mu"),
                  "does not cover the simulation window", sQuote("win")))
-
+    
     ## get shape parameters
     needed <- switch(model,
                      exponential = ,

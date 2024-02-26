@@ -1,15 +1,26 @@
 
-        CHANGES IN spatstat.random VERSION 3.2-2.001
+        CHANGES IN spatstat.random VERSION 3.2-2.002
 
 OVERVIEW
 
     o Slightly accelerated.
+
+    o Minor bug fixes.
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
     o spatstat.random
     Some computations are slightly accelerated.
 
+BUG FIXES
+
+    o rLGCP
+    In certain special cases, an error message about incompatible images
+    was issued, and in the resulting point pattern object X,
+    the driving intensity image attr(X,"Lambda") had incorrect dimensions
+    or spatial coordinates.
+    Fixed.
+    
 
         CHANGES IN spatstat.random VERSION 3.2-2
 
