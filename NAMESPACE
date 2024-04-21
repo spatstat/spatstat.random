@@ -3,7 +3,7 @@
 ## ................  Import packages ..................
 
 import(stats,utils,methods)
-import(spatstat.utils,spatstat.data,spatstat.geom)
+import(spatstat.utils,spatstat.data,spatstat.univar,spatstat.geom)
 ## import(spatstat.sparse) currently not needed
 
 importFrom("grDevices", "xy.coords")
@@ -51,7 +51,6 @@ export("gauss.hermite")
 export("getRandomFieldsModelGen")
 export("handle.rshift.args")
 export("HermiteCoefs")
-export("indefinteg")
 export("is.cadlag")
 export("is.expandable")
 export("is.expandable.rmhmodel")

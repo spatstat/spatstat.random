@@ -1,4 +1,21 @@
 
+        CHANGES IN spatstat.random VERSION 3.2-3.001
+
+OVERVIEW
+
+    o Now depends on 'spatstat.univar'
+
+    o Some functions have been removed.
+    
+PACKAGE DEPENDENCE
+
+    o spatstat.random now depends on the new package 'spatstat.univar'
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o indefinteg
+    This function has been moved to the new package 'spatstat.univar'.
+
         CHANGES IN spatstat.random VERSION 3.2-3
 
 OVERVIEW
