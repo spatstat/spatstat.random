@@ -1,11 +1,15 @@
 
-        CHANGES IN spatstat.random VERSION 3.2-3.001
+        CHANGES IN spatstat.random VERSION 3.2-3.002
 
 OVERVIEW
 
+    o We thank Abdollah Jalilian for contributions.
+    
     o Now depends on 'spatstat.univar'
 
     o Some functions have been removed.
+
+    o Bug fix in Gaussian random field simulation.
     
 PACKAGE DEPENDENCE
 
@@ -16,6 +20,15 @@ SIGNIFICANT USER-VISIBLE CHANGES
     o indefinteg
     This function has been moved to the new package 'spatstat.univar'.
 
+BUG FIXES
+
+    o rLGCP
+    The underlying simulation of the random field was incorrect
+    if the pixel raster dimensions were not equal (i.e. number of columns
+    not equal to number of rows).
+    [Spotted by Abdollah Jalilian.]
+    Fixed.
+    
         CHANGES IN spatstat.random VERSION 3.2-3
 
 OVERVIEW

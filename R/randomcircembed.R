@@ -11,7 +11,7 @@
 #'
 #' Modified by Adrian Baddeley
 #'
-#'   $Revision: 1.7 $ $Date: 2024/02/26 05:33:18 $
+#'   $Revision: 1.8 $ $Date: 2024/05/09 01:24:56 $
 #' 
 #'   Copyright (c) 2023 Tilman M. Davies, David Bryant and Adrian Baddeley
 #'   GNU Public Licence (>= 2.0)
@@ -48,7 +48,11 @@ rGRFcircembed <- local({
     ## generate (centred) pixel values for all nsim realisations
     z <- generate.normals(nsim, Sigma, warn, maxrelerr)
     ## reshape
-    z <- array(as.numeric(z), dim=c(gp$N.ext, gp$M.ext, nsim))
+    ## bug fix
+    ## WAS: z <- array(as.numeric(z), dim=c(gp$N.ext, gp$M.ext, nsim))
+    z <- array(as.numeric(z), dim=c(gp$M.ext, gp$N.ext, nsim))
+    z <- aperm(z, c(2,1,3))
+    ## end bug fix 
     z <- z[1:(gp$N), 1:(gp$M), , drop=FALSE]
     ## pack up and add 'mu'
     results <- vector(mode="list", length=nsim)
