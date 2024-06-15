@@ -1,6 +1,6 @@
 Package: spatstat.random
-Version: 3.2-3.004
-Date: 2024-06-09
+Version: 3.2-3.005
+Date: 2024-06-15
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 
                     role = c("aut", "cre", "cph"),
