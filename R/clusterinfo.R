@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.63 $ $Date: 2023/10/20 11:06:21 $
+#'   $Revision: 1.64 $ $Date: 2024/06/09 00:05:33 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -171,9 +171,9 @@ retrieve.param <- function(desired, aliases, ..., par=NULL) {
 }
 
 detect.par.format <- function(par, native, generic) {
-  a <- check.named.vector(par, native, onError="null")
+  a <- check.named.vector(par, native, onError="null", xtitle="par")
   if(!is.null(a)) return("native")
-  a <- check.named.vector(par, generic, onError="null")
+  a <- check.named.vector(par, generic, onError="null", xtitle="par")
   if(!is.null(a)) return("generic")
   whinge <- paste("'par' should be a named vector with elements",
                   paren(paste(sQuote(native), collapse=" and "), "["),

@@ -1,7 +1,7 @@
 #'
 #'    rcauchy.R
 #'
-#'   $Revision: 1.7 $ $Date: 2023/01/24 23:31:38 $
+#'   $Revision: 1.8 $ $Date: 2024/06/09 00:12:11 $
 #'
 #'   Simulation of Cauchy cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -21,15 +21,15 @@
 
 rCauchyHom <-function(kappa, mu, scale, W=unit.square(), ..., nsim=1, drop=TRUE,
                       inflate=NULL, saveparents=FALSE, maxinflate=10) {
-  check.1.real(kappa) && check.finite(kappa)
-  check.1.real(mu) && check.finite(mu)
-  check.1.real(scale) && check.finite(scale)
+  check.1.real(kappa) && check.finite(kappa, xname="kappa")
+  check.1.real(mu) && check.finite(mu, xname="mu")
+  check.1.real(scale) && check.finite(scale, xname="scale")
   check.1.integer(nsim)
   stopifnot(kappa >= 0)
   stopifnot(mu >= 0)
   stopifnot(scale > 0)
   if(!is.null(inflate)) {
-    check.1.real(inflate) && check.finite(inflate)
+    check.1.real(inflate) && check.finite(inflate, xname="inflate")
     stopifnot(inflate >= 1)
   }
   ## trivial cases

@@ -2,7 +2,7 @@
 #
 #   rmhmodel.R
 #
-#   $Revision: 1.82 $  $Date: 2023/03/03 06:29:14 $
+#   $Revision: 1.84 $  $Date: 2024/06/09 00:19:27 $
 #
 #
 
@@ -405,7 +405,7 @@ spatstatRmhInfo <- function(cifname) {
             multitype=FALSE,
             parhandler=function(par, ...) {
               ctxt <- "For the Poisson process"
-              with(par, forbidNA(beta, ctxt))
+              with(par, forbidNA(beta, ctxt, xname="beta"))
               par <- check.named.list(par, "beta", ctxt, xtitle="par")
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               return(par)
@@ -433,9 +433,9 @@ spatstatRmhInfo <- function(cifname) {
 				      ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
               with(par, check.1.real(gamma, ctxt))
               with(par, check.1.real(r,     ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
@@ -485,10 +485,10 @@ spatstatRmhInfo <- function(cifname) {
               par <- within(par, if(is.na(hc)) { hc <- 0 } )
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- hc; gamma <- 1 } )
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
-              with(par, check.finite(hc, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
+              with(par, check.finite(hc, ctxt, "hc"))
               with(par, check.1.real(gamma, ctxt))
               with(par, check.1.real(r,     ctxt))
               with(par, check.1.real(hc,     ctxt))
@@ -540,9 +540,9 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the sftcr cif"
               par <- check.named.list(par, c("beta","sigma","kappa"),
                                       ctxt, xtitle="par")
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(sigma, ctxt))
-              with(par, check.finite(kappa, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(sigma, ctxt, "sigma"))
+              with(par, check.finite(kappa, ctxt, "kappa"))
               with(par, check.1.real(sigma, ctxt))
               with(par, check.1.real(kappa, ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
@@ -593,19 +593,19 @@ spatstatRmhInfo <- function(cifname) {
               r <- par$radii
               ntypes <- length(types)
 
-              check.finite(beta, ctxt)
+              check.finite(beta, ctxt, "beta")
               check.nvector(beta, ntypes, TRUE, "types", vname="beta")
 
               MultiPair.checkmatrix(gamma, ntypes, "par$gamma")
 	      gamma[is.na(gamma)] <- 1
-              check.finite(gamma, ctxt)
+              check.finite(gamma, ctxt, "gamma")
 
               MultiPair.checkmatrix(r, ntypes, "par$radii")
               if(any(nar <- is.na(r))) {
                 r[nar] <- 0
                 gamma[nar] <- 1
               }
-              check.finite(r, ctxt)
+              check.finite(r, ctxt, "r")
 
               explain.ifnot(all(beta >= 0), ctxt)
               explain.ifnot(all(gamma >= 0), ctxt)
@@ -667,23 +667,23 @@ spatstatRmhInfo <- function(cifname) {
               ntypes <- length(types)
 
               check.nvector(beta, ntypes, TRUE, "types", vname="beta")
-              check.finite(beta, ctxt)
+              check.finite(beta, ctxt, "beta")
               
               MultiPair.checkmatrix(gamma, ntypes, "par$gamma")
               gamma[is.na(gamma)] <- 1
-              check.finite(gamma, ctxt)
+              check.finite(gamma, ctxt, "gamma")
 
               MultiPair.checkmatrix(iradii, ntypes, "par$iradii")
               if(any(nar <- is.na(iradii))) {
                 iradii[nar] <- 0
                 gamma[nar] <- 1
               }
-              check.finite(iradii, ctxt)
+              check.finite(iradii, ctxt, "iradii")
 
               MultiPair.checkmatrix(hradii, ntypes, "par$hradii")
               nah <- is.na(hradii)
               hradii[nah] <- 0
-              check.finite(hradii, ctxt)
+              check.finite(hradii, ctxt, "hradii")
 
               explain.ifnot(all(beta >= 0), ctxt)
               explain.ifnot(all(gamma >= 0), ctxt)
@@ -752,8 +752,8 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the dgs cif"
               par <- check.named.list(par, c("beta","rho"),
                                       ctxt, xtitle="par")
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(rho, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(rho, ctxt, "rho"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, check.1.real(rho, ctxt))
               with(par, explain.ifnot(rho >= 0, ctxt))
@@ -786,10 +786,10 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the diggra cif"
               par <- check.named.list(par, c("beta","kappa","delta","rho"),
                                       ctxt, xtitle="par")
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(kappa, ctxt))
-              with(par, check.finite(delta, ctxt))
-              with(par, check.finite(rho, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(kappa, ctxt, "kappa"))
+              with(par, check.finite(delta, ctxt, "delta"))
+              with(par, check.finite(rho, ctxt, "rho"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, check.1.real(kappa, ctxt))
               with(par, check.1.real(delta, ctxt))
@@ -834,10 +834,10 @@ spatstatRmhInfo <- function(cifname) {
               with(par, check.1.real(sat,   ctxt))
               par <- within(par, sat <- min(sat, .Machine$integer.max-100))
               par <- within(par, if(is.na(gamma)) { r <- 0; gamma <- 1 })
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
-              with(par, check.finite(sat, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
+              with(par, check.finite(sat, ctxt, "sat"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               return(par)
             },
@@ -881,7 +881,7 @@ spatstatRmhInfo <- function(cifname) {
               par <- check.named.list(par,
                                       c("beta","h"),
                                       ctxt, "r", xtitle="par")
-              with(par, check.finite(beta, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               beta   <- par[["beta"]]
               h.init <- par[["h"]]
@@ -992,12 +992,12 @@ spatstatRmhInfo <- function(cifname) {
               par <- check.named.list(par, c("beta","eta","r"),
                                       ctxt, xtitle="par")
               par <- within(par, if(is.na(r)) { r <- 0 })
-              with(par, check.finite(beta, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, check.1.real(eta, ctxt))
               with(par, check.1.real(r,   ctxt))
-              with(par, check.finite(eta, ctxt))
-              with(par, check.finite(r,   ctxt))
+              with(par, check.finite(eta, ctxt, "eta"))
+              with(par, check.finite(r,   ctxt, "r"))
               with(par, explain.ifnot(eta >= 0, ctxt))
               with(par, explain.ifnot(r >= 0,   ctxt))
               return(par)
@@ -1043,10 +1043,10 @@ spatstatRmhInfo <- function(cifname) {
               par <- within(par, sat <- pmin(sat, .Machine$integer.max-100))
               par <- within(par, gamma[is.na(gamma) | is.na(r)] <- 1)
               par <- within(par, r[is.na(r)] <- 0)
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
-              with(par, check.finite(sat, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
+              with(par, check.finite(sat, ctxt, "sat"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, explain.ifnot(all(gamma >= 0), ctxt))
               with(par, explain.ifnot(all(r >= 0), ctxt))
@@ -1097,8 +1097,8 @@ spatstatRmhInfo <- function(cifname) {
               ctxt <- "For the hardcore cif"
               par <- check.named.list(par, c("beta", "hc"), ctxt, xtitle="par")
               par <- within(par, if(is.na(hc)) { hc <- 0 })
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(hc, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(hc, ctxt, "hc"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, check.1.real(hc, ctxt))
               return(par)
@@ -1135,11 +1135,11 @@ spatstatRmhInfo <- function(cifname) {
               par <- check.named.list(par,
                                       c("beta", "r", "hc", "kappa", "a"),
                                       ctxt, xtitle="par")
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(r, ctxt))
-              with(par, check.finite(hc, ctxt))
-              with(par, check.finite(kappa, ctxt))
-              with(par, check.finite(a, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(r, ctxt, "r"))
+              with(par, check.finite(hc, ctxt, "hc"))
+              with(par, check.finite(kappa, ctxt, "kappa"))
+              with(par, check.finite(a, ctxt, "a"))
               with(par, check.1.real(r, ctxt))
               with(par, check.1.real(hc, ctxt))
               with(par, check.1.real(kappa, ctxt))
@@ -1186,9 +1186,9 @@ spatstatRmhInfo <- function(cifname) {
               par <- check.named.list(par,
                                       c("beta", "sigma", "epsilon"),
                                       ctxt, xtitle="par")
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(sigma, ctxt))
-              with(par, check.finite(epsilon, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(sigma, ctxt, "sigma"))
+              with(par, check.finite(epsilon, ctxt, "epsilon"))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
               with(par, check.1.real(sigma, ctxt))
               with(par, check.1.real(epsilon, ctxt))
@@ -1237,11 +1237,11 @@ spatstatRmhInfo <- function(cifname) {
               ntypes <- length(types)
 
               check.nvector(beta, ntypes, TRUE, "types", vname="beta")
-              check.finite(beta, ctxt)
+              check.finite(beta, ctxt, "beta")
               
               MultiPair.checkmatrix(hradii, ntypes, "par$hradii")
               hradii[is.na(hradii)] <- 0
-              check.finite(hradii, ctxt)
+              check.finite(hradii, ctxt, "hradii")
 
               explain.ifnot(all(beta >= 0), ctxt)
               explain.ifnot(all(hradii >= 0), ctxt)
@@ -1287,9 +1287,9 @@ spatstatRmhInfo <- function(cifname) {
                                       ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
               with(par, check.1.real(gamma, ctxt))
               with(par, check.1.real(r,     ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))
@@ -1336,9 +1336,9 @@ spatstatRmhInfo <- function(cifname) {
                                       ctxt, xtitle="par")
               # treat r=NA as absence of interaction
               par <- within(par, if(is.na(r)) { r <- 0; gamma <- 1 })
-              with(par, check.finite(beta, ctxt))
-              with(par, check.finite(gamma, ctxt))
-              with(par, check.finite(r, ctxt))
+              with(par, check.finite(beta, ctxt, "beta"))
+              with(par, check.finite(gamma, ctxt, "gamma"))
+              with(par, check.finite(r, ctxt, "r"))
               with(par, check.1.real(gamma, ctxt))
               with(par, check.1.real(r, ctxt))
               with(par, explain.ifnot(all(beta >= 0), ctxt))

@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.118 $   $Date: 2024/02/04 08:04:51 $
+##    $Revision: 4.119 $   $Date: 2024/06/08 23:48:41 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -78,7 +78,7 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
     W <- Window(win)
     pieces <- tiles(win)
     ntiles <- length(pieces)
-    check.nvector(n, ntiles, things="tiles", oneok=TRUE)
+    check.nvector(n, ntiles, things="tiles", oneok=TRUE, vname="n")
     if(length(n) == 1) n <- rep(n, ntiles)
     Y <- mapply(runifpoint, n=n, win=pieces,
                 MoreArgs=list(nsim=nsim, drop=FALSE, giveup=giveup, warn=warn),

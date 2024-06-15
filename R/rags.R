@@ -3,7 +3,7 @@
 #'
 #'   Alternating Gibbs Sampler
 #'
-#'      $Revision: 1.6 $  $Date: 2016/11/29 05:01:51 $
+#'      $Revision: 1.7 $  $Date: 2024/06/09 00:02:20 $
 #'
 #' Initial implementation for multitype hard core process
 #' without interaction within types
@@ -21,7 +21,7 @@ ragsMultiHard <- function(beta, hradii, ...,
   ## validate beta by generating first proposal points
   Xprop <- rmpoispp(lambda=beta, lmax=bmax, ..., types=types)
   ntypes <- length(levels(marks(Xprop)))
-  check.nmatrix(hradii, ntypes, things="types of points")
+  check.nmatrix(hradii, ntypes, things="types of points", mname="hradii")
   if(any(is.finite(dh <- diag(hradii)) & dh > 0))
     stop("Interaction between points of the same type is not permitted")
   ## initial state empty

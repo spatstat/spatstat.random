@@ -4,7 +4,7 @@
 ##   Simulating from Neyman-Scott process
 ##   'Naive' algorithm
 ##
-##   $Revision: 1.38 $  $Date: 2023/01/06 10:55:18 $
+##   $Revision: 1.39 $  $Date: 2024/06/09 00:11:29 $
 ##
 ##    Original code for naive simulation of Neyman-Scott by Adrian Baddeley
 ##    Original code for rCauchy and rVarGamma offspring by Abdollah Jalilian
@@ -211,7 +211,7 @@ validate.kappa.mu <- function(kappa, mu, kappamax=NULL, mumax=NULL,
          call.=FALSE)
   if(is.numeric(mu)) {
     check.1.real(mu)
-    check.finite(mu)
+    check.finite(mu, xname="mu")
     stopifnot(mu >= 0)
   }
   if(!(is.numeric(kappa) || is.im(kappa) || is.function(kappa)))
@@ -220,7 +220,7 @@ validate.kappa.mu <- function(kappa, mu, kappamax=NULL, mumax=NULL,
          call.=FALSE)
   if(is.numeric(kappa)) {
     check.1.real(kappa)
-    check.finite(kappa)
+    check.finite(kappa, xname="kappa")
     stopifnot(kappa >= 0)
   }
 

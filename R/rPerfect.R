@@ -1,7 +1,7 @@
 #
 #  Perfect Simulation 
 #
-#  $Revision: 1.26 $ $Date: 2022/05/21 08:53:38 $
+#  $Revision: 1.27 $ $Date: 2024/06/09 00:22:17 $
 #
 #  rStrauss
 #  rHardcore
@@ -20,9 +20,9 @@ rStrauss <- function(beta, gamma=1, R=0, W=owin(), expand=TRUE,
   check.1.real(gamma)
   check.1.real(R)
 
-  check.finite(beta)
-  check.finite(gamma)
-  check.finite(R)
+  check.finite(beta, xname="beta")
+  check.finite(gamma, xname="gamma")
+  check.finite(R, xname="R")
   
   stopifnot(beta > 0)
   stopifnot(gamma >= 0)
@@ -80,8 +80,8 @@ rHardcore <- function(beta, R=0, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
   check.1.real(beta)
   check.1.real(R)
 
-  check.finite(beta)
-  check.finite(R)
+  check.finite(beta, xname="beta")
+  check.finite(R, xname="R")
 
   stopifnot(beta > 0)
   stopifnot(R    >= 0)
@@ -139,10 +139,10 @@ rStraussHard <- function(beta, gamma=1, R=0, H=0, W=owin(),
   check.1.real(R)
   check.1.real(H)
 
-  check.finite(beta)
-  check.finite(gamma)
-  check.finite(R)
-  check.finite(H)
+  check.finite(beta, xname="beta")
+  check.finite(gamma, xname="gamma")
+  check.finite(R, xname="R")
+  check.finite(H, xname="H")
   
   stopifnot(beta > 0)
   stopifnot(gamma >= 0)
@@ -207,10 +207,10 @@ rDiggleGratton <- function(beta, delta, rho, kappa=1, W=owin(),
   check.1.real(rho)
   check.1.real(kappa)
 
-  check.finite(beta)
-  check.finite(delta)
-  check.finite(rho)
-  check.finite(kappa)
+  check.finite(beta, xname="beta")
+  check.finite(delta, xname="delta")
+  check.finite(rho, xname="rho")
+  check.finite(kappa, xname="kappa")
 
   stopifnot(beta > 0)
   stopifnot(delta >= 0)
@@ -271,8 +271,8 @@ rDGS <- function(beta, rho, W=owin(), expand=TRUE, nsim=1, drop=TRUE) {
   check.1.real(beta)
   check.1.real(rho)
 
-  check.finite(beta)
-  check.finite(rho)
+  check.finite(beta, xname="beta")
+  check.finite(rho, xname="rho")
 
   stopifnot(beta > 0)
   stopifnot(rho  >= 0)
@@ -330,9 +330,9 @@ rPenttinen <- function(beta, gamma=1, R, W=owin(),
   check.1.real(gamma)
   check.1.real(R)
 
-  check.finite(beta)
-  check.finite(gamma)
-  check.finite(R)
+  check.finite(beta, xname="beta")
+  check.finite(gamma, xname="gamma")
+  check.finite(R, xname="R")
 
   stopifnot(beta > 0)
   stopifnot(gamma >= 0)

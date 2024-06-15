@@ -1,7 +1,7 @@
 #'
 #'    rmatclust.R
 #'
-#'   $Revision: 1.5 $ $Date: 2023/05/22 09:33:57 $
+#'   $Revision: 1.6 $ $Date: 2024/06/09 00:13:02 $
 #'
 #'   Simulation of Matern cluster process
 #'   naive algorithm or BKBC algorithm
@@ -15,11 +15,11 @@
 rMatClustHom <- function(kappa, mu, R, W=unit.square(), ...,
                          nsim=1, drop=TRUE, inflate=NULL,
                          saveparents=FALSE) {
-  check.1.real(kappa) && check.finite(kappa)
-  check.1.real(mu) && check.finite(mu)
-  check.1.real(R) && check.finite(R)
+  check.1.real(kappa) && check.finite(kappa, xname="kappa")
+  check.1.real(mu) && check.finite(mu, xname="mu")
+  check.1.real(R) && check.finite(R, xname="R")
   if(!is.null(inflate)) {
-    check.1.real(inflate) && check.finite(inflate)
+    check.1.real(inflate) && check.finite(inflate, xname="inflate")
     stopifnot(inflate >= 1)
   }
   check.1.integer(nsim)
@@ -133,7 +133,7 @@ rMatClust <- local({
     ## Matern Cluster Process
     ## Poisson (mu) number of offspring, uniform inside disc
 
-    check.1.integer(nsim) && check.finite(nsim)
+    check.1.integer(nsim) && check.finite(nsim, xname="nsim")
     stopifnot(nsim >= 0)
     if(nsim == 0) return(simulationresult(list()))
 
@@ -248,7 +248,7 @@ rMatClust <- local({
                               maxchunk=100, giveup=1000, verbose=FALSE,
                               saveparents=FALSE, saveLambda=FALSE) {
     #' validate conditioning information
-    check.1.integer(n.cond) && check.finite(n.cond)
+    check.1.integer(n.cond) && check.finite(n.cond, xname="n.cond")
     stopifnot(n.cond >= 0)
     
     w.sim <- as.owin(win)
