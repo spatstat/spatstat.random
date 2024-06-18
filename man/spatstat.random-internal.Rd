@@ -1,5 +1,6 @@
 \name{spatstat.random-internal} 
 \title{Internal spatstat.random functions}
+\alias{spatstat.random-internal} %DoNotExport
 
 \alias{change.default.expand}          
 \alias{datagen.runifpointOnLines}
