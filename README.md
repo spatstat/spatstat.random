@@ -12,18 +12,19 @@ This package `spatstat.random` is one of these packages.
 It contains the functions for
 
 - generating random spatial patterns of points according to many simple rules
-(complete spatial randomness, Poisson, binomial, random grid,
-systematic, cell),
+(complete spatial randomness, binomial process, random grid,
+systematic random, stratified random, 
+simple sequential inhibition, cell process),
 
 - randomised alteration of patterns (thinning,
 random shift, jittering),
 
-- simulated realisations of random point processes
-(simple sequential inhibition, Matern inhibition models, Matern cluster process,
+- generating simulated realisations of spatial point processes
+(Poisson processes, Matern inhibition models, Matern cluster processes,
 Neyman-Scott cluster processes, log-Gaussian Cox processes,
-product shot noise cluster processes)
+product shot noise cluster processes, Gibbs point processes)
 
-- simulation of Gibbs point processes
+- generating simulated realisations of Gibbs point processes
 (Metropolis-Hastings birth-death-shift algorithm;
 perfect simulation/ dominated coupling from the past;
 alternating Gibbs sampler)
@@ -33,6 +34,12 @@ alternating Gibbs sampler)
 - generating random tessellations
 
 - generating random images (random noise, random mosaics).
+
+Exceptions:
+
+- generation of determinantal point processes is provided in `spatstat.model`
+
+- generation of quasi-random patterns is provided in `spatstat.geom`
 
 The reorganisation of `spatstat` into a family of packages is described
 on the GitHub repository
