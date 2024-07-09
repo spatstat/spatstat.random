@@ -17,19 +17,19 @@ rnoise(rgen = runif, w = square(1), \dots)
   }
   \item{w}{
     Window (region or pixel raster) in which to generate the image.
-    Any data acceptable to \code{\link{as.mask}}.
+    Any data acceptable to \code{\link[spatstat.geom]{as.mask}}.
   }
   \item{\dots}{
     Arguments, matched by name,
     to be passed to \code{rgen} to specify the parameters of the
-    probability distribution, or passed to \code{\link{as.mask}}
+    probability distribution, or passed to \code{\link[spatstat.geom]{as.mask}}
     to control the pixel resolution.
   }
 }
 \details{
   The argument \code{w} could be a window (class \code{"owin"}),
   a pixel image (class \code{"im"}) or other data. It is 
-  first converted to a binary mask by \code{\link{as.mask}}
+  first converted to a binary mask by \code{\link[spatstat.geom]{as.mask}}
   using any relevant arguments in \code{\dots}.
   
   Then each pixel inside the window (i.e. with logical value
@@ -55,8 +55,8 @@ and \ege
 
 }
 \seealso{
-  \code{\link{as.mask}},
-  \code{\link{as.im}},
+  \code{\link[spatstat.geom]{as.mask}},
+  \code{\link[spatstat.geom]{as.im}},
   \code{\link[stats]{Distributions}}.
 }
 \examples{

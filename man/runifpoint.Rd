@@ -16,7 +16,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     (Alternatively a tessellation; see the section on
     tessellations).
   }
@@ -74,22 +74,22 @@
   method but involves discretisation.
 
   If \code{warn=TRUE} (the default), a warning will be issued if \code{n} is very large.
-  The threshold is \code{\link{spatstat.options}("huge.npoints")}.
+  The threshold is \code{\link[spatstat.geom]{spatstat.options}("huge.npoints")}.
   This warning has no consequences,
   but it helps to trap a number of common errors.
 }
 \section{Tessellation}{
   The argument \code{win} may be a tessellation
-  (object of class \code{"tess"}, see \code{\link{tess}}).
+  (object of class \code{"tess"}, see \code{\link[spatstat.geom]{tess}}).
   Then the specified number of points \code{n} will be randomly generated
   inside each tile of the tessellation. The argument \code{n} may be
   either a single integer, or an integer vector specifying the number
   of points to be generated in each individual tile. The result will
-  be a point pattern in the window \code{as.owin(win)}.
+  be a point pattern in the window \code{\link[spatstat.geom]{as.owin}(win)}.
 }
 \seealso{
-\code{\link{ppp.object}},
-\code{\link{owin.object}},
+\code{\link[spatstat.geom]{ppp.object}},
+\code{\link[spatstat.geom]{owin.object}},
 \code{\link{rpoispp}},
 \code{\link{rpoint}}
 }

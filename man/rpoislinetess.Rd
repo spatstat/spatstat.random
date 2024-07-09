@@ -16,7 +16,7 @@ rpoislinetess(lambda, win = owin())
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     Currently, the window must be a rectangle.
   }
 }
@@ -38,11 +38,9 @@ rpoislinetess(lambda, win = owin())
   Also has an attribute \code{"lines"} containing the realisation of the
   Poisson line process, as an object of class \code{"infline"}.
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \seealso{
   \code{\link{rpoisline}}

@@ -24,7 +24,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     (Ignored if \code{lambda} is a pixel image
     unless \code{forcewin=TRUE}.)
   }
@@ -88,13 +88,14 @@
   so it is advisable to specify \code{lmax} if possible.
 
   If \code{lambda} is a pixel image object of class \code{"im"}
-  (see \code{\link{im.object}}), this algorithm generates a realisation
+  (see \code{\link[spatstat.geom]{im.object}}), this algorithm generates a realisation
   of the inhomogeneous Poisson process with intensity equal to the
   pixel values of the image. (The value of the intensity function at an
   arbitrary location is the pixel value of the nearest pixel.)
   If \code{forcewin=FALSE} (the default),
   the simulation window will be the window of the pixel image
-  (converted to a rectangle if possible using \code{\link{rescue.rectangle}}).
+  (converted to a rectangle if possible
+  using \code{\link[spatstat.geom]{rescue.rectangle}}).
   If \code{forcewin=TRUE}, the simulation window will be the argument
   \code{win}.
 
@@ -144,8 +145,8 @@
   \code{\link{rcell}}
   for random point processes exhibiting clustering;
   \code{\link{rmh.default}} for Gibbs processes.
-  See also \code{\link{ppp.object}},
-  \code{\link{owin.object}}.
+  See also \code{\link[spatstat.geom]{ppp.object}},
+  \code{\link[spatstat.geom]{owin.object}}.
 }
 \examples{
  # uniform Poisson process with intensity 100 in the unit square

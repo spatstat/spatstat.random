@@ -21,12 +21,12 @@ in any of several formats, into an object of class \code{"owin"}.
   \item{\dots}{Ignored.}
 }
 \value{
-  An object of class \code{"owin"} (see \code{\link{owin.object}})
+  An object of class \code{"owin"} (see \code{\link[spatstat.geom]{owin.object}})
   specifying an observation window.
 }
 \details{
   The class \code{"owin"} is a way of specifying the observation window
-  for a point pattern. See \code{\link{owin.object}} for an overview.
+  for a point pattern. See \code{\link[spatstat.geom]{owin.object}} for an overview.
  
   The generic function \code{as.owin} converts data in any of several formats 
   into an object of class \code{"owin"} for use by the \pkg{spatstat}
@@ -125,8 +125,8 @@ in any of several formats, into an object of class \code{"owin"}.
     \code{FALSE} for this method.
     \item
     an object of class \code{"layered"} representing a
-    list of spatial objects. See \code{\link{layered}}.
-    In this case, \code{as.owin} will be applied to each
+    list of spatial objects. See \code{\link[spatstat.geom]{layered}}.
+    In this case, \code{\link[spatstat.geom]{as.owin}} will be applied to each
     of the objects in the list, and the union of these windows
     will be returned.
     \item
@@ -147,10 +147,10 @@ in any of several formats, into an object of class \code{"owin"}.
   \code{\link[spatstat.model]{as.owin.ppm}},
   \code{\link[spatstat.linnet]{as.owin.lpp}}.
   
-  \code{\link{owin.object}},
-  \code{\link{owin}}.
+  \code{\link[spatstat.geom]{owin.object}},
+  \code{\link[spatstat.geom]{owin}}.
 
-  Additional methods for \code{as.owin} may be provided
+  Additional methods for \code{\link[spatstat.geom]{as.owin}} may be provided
   by other packages outside the \pkg{spatstat} family.
 }
 \examples{

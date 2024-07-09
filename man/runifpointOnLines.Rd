@@ -46,9 +46,9 @@ runifpointOnLines(n, L, nsim=1, drop=TRUE)
   If \code{nsim > 1}, a list of point patterns.
 }
 \seealso{
-  \code{\link{psp}},
-  \code{\link{ppp}},
-  \code{\link{pointsOnLines}},
+  \code{\link[spatstat.geom]{psp}},
+  \code{\link[spatstat.geom]{ppp}},
+  \code{\link[spatstat.geom]{pointsOnLines}},
   \code{\link{runifpoint}}
 }
 \examples{

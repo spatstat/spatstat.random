@@ -29,7 +29,7 @@
     Random relabelling will be performed separately within each group.
     See Details.
   }
-  \item{\dots}{Additional arguments passed to \code{\link{cut.ppp}} to
+  \item{\dots}{Additional arguments passed to \code{\link[spatstat.geom]{cut.ppp}} to
     determine the grouping factor, when \code{group} is given.
   }
   \item{nsim}{Number of simulated realisations to be generated.}
@@ -71,12 +71,12 @@
   divided into several different groups, and that the random labelling
   shall be performed separately on each group.
   The arguments \code{group} and \code{\dots} are passed to
-  \code{\link{cut.ppp}} to determine the grouping. Thus \code{group}
+  \code{\link[spatstat.geom]{cut.ppp}} to determine the grouping. Thus \code{group}
   could be a \code{factor}, or the name of a column of marks in
   \code{X}, or a tessellation, or a factor-valued pixel image, etc.
 }
 \seealso{
-  \code{\link{marks<-}} to assign arbitrary marks.
+  \code{\link[spatstat.geom]{marks<-}} to assign arbitrary marks.
 }
 \examples{
    amacrine

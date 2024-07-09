@@ -20,7 +20,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     Alternatively a higher-dimensional box of class
     \code{"box3"} or \code{"boxx"}.
   }
@@ -70,14 +70,8 @@
  Y <- rMaternI(20, 0.05, stationary=FALSE)
 }
 \author{
-  \adrian
-  
-  ,
   Ute Hahn,
-  \rolf
-  
-  and \ege
-  
+  \spatstatAuthors.
 }
 \keyword{spatial}
 \keyword{datagen}

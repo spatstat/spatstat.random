@@ -39,7 +39,7 @@
     \item
     an object of class \code{"splitppp"}
     (basically a list of point patterns, obtained from
-    \code{\link{split.ppp}}).
+    \code{\link[spatstat.geom]{split.ppp}}).
   }
   The function \code{rshift} is generic, with
   methods for the three classes \code{"ppp"},
@@ -54,11 +54,9 @@
   \code{\link{rshift.psp}},
   \code{\link{rshift.splitppp}}
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \keyword{spatial}
 \keyword{datagen}

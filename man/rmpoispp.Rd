@@ -23,7 +23,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     Ignored if \code{lambda} is a pixel image or list of images.
   }
   \item{types}{
@@ -109,7 +109,7 @@
     }
     \item{pixel image:}{
       If \code{lambda} is a pixel image object of class \code{"im"}
-      (see \code{\link{im.object}}), the intensity at a location
+      (see \code{\link[spatstat.geom]{im.object}}), the intensity at a location
       \code{(x,y)} for points of any type is equal to the pixel value
       of \code{lambda} for the pixel nearest to \code{(x,y)}.
       The argument \code{win} is ignored;
@@ -138,8 +138,9 @@
 \seealso{
   \code{\link{rpoispp}} for unmarked Poisson point process;
   \code{\link{rmpoint}} for a fixed number of random marked points;
-  \code{\link{ppp.object}},
-  \code{\link{owin.object}}.
+  \code{\link[spatstat.geom]{im.object}},
+  \code{\link[spatstat.geom]{owin.object}},
+  \code{\link[spatstat.geom]{ppp.object}}.
 }
 \examples{
  # uniform bivariate Poisson process with total intensity 100 in unit square

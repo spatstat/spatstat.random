@@ -213,7 +213,7 @@ rclusterBKBC(clusters="Thomas",
   If \code{warn=TRUE}, then a warning will be issued if
   the number of random proposal points (proposed parents and proposed
   offspring) is very large.
-  The threshold is \code{\link{spatstat.options}("huge.npoints")}.
+  The threshold is \code{\link[spatstat.geom]{spatstat.options}("huge.npoints")}.
   This warning has no consequences,
   but it helps to trap a number of common problems.
 }

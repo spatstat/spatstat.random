@@ -110,7 +110,7 @@ rmhexpand(x = NULL, ..., area = NULL, length = NULL, distance = NULL)
       rectangle.
       If the original data window is not a rectangle, then
       morphological dilation is applied using
-      \code{\link{dilation.owin}}
+      \code{\link[spatstat.geom]{dilation.owin}}
       so that a margin or buffer of width equal to \code{distance}
       is created around all sides of the original window. The result
       is a non-rectangular window, typically of a different shape.
@@ -132,11 +132,9 @@ rmhexpand(x = NULL, ..., area = NULL, length = NULL, distance = NULL)
   An object of class \code{"rmhexpand"} specifying the
   expansion rule. There is a \code{print} method for this class.
 }
-\author{\adrian
-  
-  
+\author{
+  \adrian
   and \rolf
-  
 }
 \seealso{
   \code{\link{expand.owin}} to apply the rule to a window.

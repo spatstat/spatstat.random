@@ -169,7 +169,7 @@
     }
     \item{pixel image:}{
       If \code{f} is a pixel image object of class \code{"im"}
-      (see \code{\link{im.object}}), the unnormalised density at a location
+      (see \code{\link[spatstat.geom]{im.object}}), the unnormalised density at a location
       \code{(x,y)} for points of any type is equal to the pixel value
       of \code{f} for the pixel nearest to \code{(x,y)}.
       In Model I, the marginal distribution of types is uniform.
@@ -200,8 +200,9 @@
   are generated using \code{\link{rpoint}}.
 }
 \seealso{
-\code{\link{ppp.object}},
-\code{\link{owin.object}}
+\code{\link[spatstat.geom]{im.object}},
+\code{\link[spatstat.geom]{owin.object}},
+\code{\link[spatstat.geom]{ppp.object}}.
 }
 \examples{
 

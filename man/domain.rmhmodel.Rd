@@ -53,8 +53,8 @@
   \code{\link[spatstat.model]{domain.ppm}},
   \code{\link[spatstat.explore]{domain.quadrattest}},
   \code{\link[spatstat.linnet]{domain.lpp}}.
-  \code{\link{Window}},
-  \code{\link{Frame}}.
+  \code{\link[spatstat.geom]{Window}},
+  \code{\link[spatstat.geom]{Frame}}.
 }
 \examples{
   domain(rmhmodel(cif='poisson', par=list(beta=1), w=square(2)))

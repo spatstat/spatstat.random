@@ -83,7 +83,7 @@
 \seealso{
   \code{\link{rcellnumber}},
   \code{\link{rstrat}},
-  \code{\link{rsyst}},
+  \code{\link[spatstat.geom]{rsyst}},
   \code{\link{runifpoint}},
   \code{\link[spatstat.explore]{Kest}}
 }

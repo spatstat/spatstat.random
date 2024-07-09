@@ -50,13 +50,13 @@
 
 \value{
   A point pattern (an object of class \code{"ppp"}, see
-  \code{\link{ppp.object}}) or a list of point patterns.
+  \code{\link[spatstat.geom]{ppp.object}}) or a list of point patterns.
 
   The returned value has an attribute \code{info} containing
   modified versions of the arguments
   \code{model}, \code{start}, and \code{control} which together specify
   the exact simulation procedure. The \code{info} attribute can be
-  printed (and is printed automatically by \code{\link{summary.ppp}}).
+  printed (and is printed automatically by \code{\link[spatstat.geom]{summary.ppp}}).
   For computational efficiency, the \code{info} attribute can be omitted
   by setting \code{saveinfo=FALSE}.
 
@@ -104,7 +104,7 @@
     \item{w}{
       (Optional) window in which the pattern is
       to be generated. An object of class \code{"owin"},
-      or data acceptable to \code{\link{as.owin}}.
+      or data acceptable to \code{\link[spatstat.geom]{as.owin}}.
     }
     \item{trend}{
       Data specifying the spatial trend in the model, if it has a trend.
@@ -141,7 +141,7 @@
 
       \code{x.start} may be a point pattern (an
       object of class \code{"ppp"}), or data which can be coerced
-      to this class by \code{\link{as.ppp}},  or an object with
+      to this class by \code{\link[spatstat.geom]{as.ppp}},  or an object with
       components \code{x} and \code{y}, or a two-column matrix.
       In the last two cases, the window for the pattern is determined
       by \code{model$w}.
@@ -344,7 +344,7 @@ trend corresponding to a particular type, there is still a component
   \code{\link{rmh}},
   \code{\link[spatstat.model]{rmh.ppm}},
   \code{\link{rStrauss}},
-  \code{\link{ppp}},
+  \code{\link[spatstat.geom]{ppp}},
   \code{\link[spatstat.model]{ppm}}
   
   Interactions: \rmhInteractionsList.

@@ -67,7 +67,7 @@ is.poisson(x)
   \spatstatAuthors.
 }
 \seealso{
-  \code{\link{is.marked}} to determine whether a model is a marked
+  \code{\link[spatstat.geom]{is.marked}} to determine whether a model is a marked
   point process. 
 
 }

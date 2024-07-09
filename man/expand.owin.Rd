@@ -29,15 +29,15 @@
   to determine the expansion rule.
 
   For other transformations of the scale, location and orientation
-  of a window, see \code{\link{shift}}, \code{\link{affine}}
-  and \code{\link{rotate}}.
+  of a window, see \code{\link[spatstat.geom]{shift}}, \code{\link[spatstat.geom]{affine}}
+  and \code{\link[spatstat.geom]{rotate}}.
 }
 \seealso{
   \code{\link{rmhexpand}} about expansion rules.
   
-  \code{\link{shift}},
-  \code{\link{rotate}},
-  \code{\link{affine}} for other types of manipulation.
+  \code{\link[spatstat.geom]{shift}},
+  \code{\link[spatstat.geom]{rotate}},
+  \code{\link[spatstat.geom]{affine}} for other types of manipulation.
 }
 \examples{
    expand.owin(square(1), 9)

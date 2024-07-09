@@ -41,7 +41,7 @@
   This function \code{rshift.splitppp}
   is the method for objects of class \code{"splitppp"}, which are
   essentially lists of point patterns, created by the function
-  \code{\link{split.ppp}}.
+  \code{\link[spatstat.geom]{split.ppp}}.
 
   By default, every pattern in the list \code{X} will be shifted.
   The argument \code{which} indicates that only some of the patterns

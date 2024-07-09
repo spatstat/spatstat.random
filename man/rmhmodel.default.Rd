@@ -362,7 +362,7 @@
       \bold{vector} of corresponding trend values.
     }
     \item{trend given as an image:}{
-      An image (see \code{\link{im.object}})
+      An image (see \code{\link[spatstat.geom]{im.object}})
       provides the trend values at a grid of
       points in the observation window and determines the trend
       value at other points as the value at the nearest grid point.
@@ -374,7 +374,7 @@
   The optional argument \code{w} specifies the window
   in which the pattern is to be generated.  If specified, it must be in
   a form which can be coerced to an object of class \code{owin}
-  by \code{\link{as.owin}}.
+  by \code{\link[spatstat.geom]{as.owin}}.
 
   The optional argument \code{types} specifies the possible
   types in a multitype point process. If the model being simulated

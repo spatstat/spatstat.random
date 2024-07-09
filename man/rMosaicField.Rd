@@ -16,7 +16,7 @@ rMosaicField(X,
     A tessellation (object of class \code{"tess"}).
   }
   \item{\dots}{
-    Arguments passed to \code{\link{as.mask}}
+    Arguments passed to \code{\link[spatstat.geom]{as.mask}}
     determining the pixel resolution.
   }
   \item{rgen}{

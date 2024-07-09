@@ -36,18 +36,16 @@ runifpointx(n, domain, nsim=1, drop=TRUE)
 }
 \seealso{
   \code{\link{rpoisppx}}, 
-  \code{\link{ppx}}, 
-  \code{\link{boxx}}
+  \code{\link[spatstat.geom]{ppx}}, 
+  \code{\link[spatstat.geom]{boxx}}
 }
 \examples{
    w <- boxx(x=c(0,1), y=c(0,1), z=c(0,1), t=c(0,3))
    X <- runifpointx(50, w)
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \keyword{spatial}
 \keyword{datagen}

@@ -15,9 +15,10 @@
 // FILE *out;
 // File i/o is deprecated in R implementation
 
+#define FEJL(MESSAGE) Rf_error(MESSAGE)
 
 #ifdef DBGS
-#define CHECK(PTR,MESSAGE) if(((void *) PTR) == ((void *) NULL)) error(MESSAGE)
+#define CHECK(PTR,MESSAGE) if(((void *) PTR) == ((void *) NULL)) FEJL(MESSAGE)
 #define CLAMP(X, LOW, HIGH, XNAME) \
   if((X) > (HIGH)) { \
      Rprintf("Value of %s exceeds upper limit %d\n", XNAME, HIGH); \
@@ -535,7 +536,7 @@ void Sampler::Forward(long int TS, long int TT, char TX, char TY,
       if(TempCell->next == TempCell) {
 	// Rprintf("internal error: unexpected self-reference. Dumping...\n"); 
 	// P2P->Print(); 
-        error("internal error: unexpected self-reference");
+        FEJL("internal error: unexpected self-reference");
 	break;
       }
     };

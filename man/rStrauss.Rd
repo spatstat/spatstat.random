@@ -130,7 +130,7 @@
 }
 \seealso{
   \code{\link{rmh}},
-  \code{\link{Strauss}},
+  \code{\link[spatstat.model]{Strauss}},
   \code{\link{rHardcore}},
   \code{\link{rStraussHard}},
   \code{\link{rDiggleGratton}},

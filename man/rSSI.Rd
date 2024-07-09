@@ -24,7 +24,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
     The default window is the unit square, unless 
     \code{x.init} is specified, when the default window 
     is the window of \code{x.init}.

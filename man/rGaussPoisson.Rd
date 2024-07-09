@@ -23,7 +23,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
   }
   \item{\dots}{Ignored.}
   \item{nsim}{Number of simulated realisations to be generated.}
@@ -65,11 +65,9 @@
 \examples{
  pp <- rGaussPoisson(30, 0.07, 0.5)
 }
-\author{\adrian
-  
-  
+\author{
+  \adrian
   and \rolf
-  
 }
 \keyword{spatial}
 \keyword{datagen}

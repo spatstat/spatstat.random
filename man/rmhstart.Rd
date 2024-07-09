@@ -81,7 +81,7 @@
 
 	\code{x.start} may be a point pattern (an object
 	of class \code{ppp}), or an object which can be coerced
-	to this class by \code{\link{as.ppp}}, or a dataset containing
+	to this class by \code{\link[spatstat.geom]{as.ppp}}, or a dataset containing
 	vectors \code{x} and \code{y}.  
 
 	If \code{x.start} is specified, then expansion of the

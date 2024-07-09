@@ -16,7 +16,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
   }
 }
 \value{
@@ -40,7 +40,7 @@
   is equal to \code{lambda * pi} times the area of the region.
 }
 \seealso{
-\code{\link{psp}}
+\code{\link[spatstat.geom]{psp}}
 }
 \examples{
  # uniform Poisson line process with intensity 10,

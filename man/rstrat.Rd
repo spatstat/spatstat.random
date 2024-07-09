@@ -12,8 +12,8 @@
 \arguments{
   \item{win}{
     A window. 
-    An object of class \code{\link{owin}},
-    or data in any format acceptable to \code{\link{as.owin}()}.
+    An object of class \code{\link[spatstat.geom]{owin}},
+    or data in any format acceptable to \code{\link[spatstat.geom]{as.owin}()}.
   }
   \item{nx}{Number of tiles in each column.
   }
@@ -48,13 +48,13 @@
   The result is a point pattern inside the window \code{win}.
 
   This function is useful in creating dummy points for quadrature
-  schemes (see \code{\link{quadscheme}}) as well as in simulating
+  schemes (see \code{\link[spatstat.geom]{quadscheme}}) as well as in simulating
   random point patterns.
 }
 \seealso{
-  \code{\link{rsyst}},
+  \code{\link[spatstat.geom]{rsyst}},
   \code{\link{runifpoint}},
-  \code{\link{quadscheme}}
+  \code{\link[spatstat.geom]{quadscheme}}
 }
 \examples{
   X <- rstrat(nx=10)
@@ -64,11 +64,9 @@
   X <- rstrat(letterR, 5, 10, k=3)
   plot(X)
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \keyword{spatial}
 \keyword{datagen}

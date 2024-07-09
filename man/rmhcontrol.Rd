@@ -107,21 +107,21 @@
       is allowed (see \code{expand} below).
 
       The default value of \code{p} can be changed by setting
-      the parameter \code{rmh.p} in \code{\link{spatstat.options}}.
+      the parameter \code{rmh.p} in \code{\link[spatstat.geom]{spatstat.options}}.
     }
     \item{q}{The conditional probability of proposing a death
       (rather than a birth) given that a shift is not proposed.
       This is of course ignored if \code{p} is equal to 1.
 
       The default value of \code{q} can be changed by setting
-      the parameter \code{rmh.q} in \code{\link{spatstat.options}}.
+      the parameter \code{rmh.q} in \code{\link[spatstat.geom]{spatstat.options}}.
     }
     \item{nrep}{The number of repetitions or iterations 
       to be made by the Metropolis-Hastings algorithm.  It should
       be large.
 
       The default value of \code{nrep} can be changed by setting
-      the parameter \code{rmh.nrep} in \code{\link{spatstat.options}}.
+      the parameter \code{rmh.nrep} in \code{\link[spatstat.geom]{spatstat.options}}.
     }
     \item{expand}{
       Either a number or a window (object of class \code{"owin"}).
@@ -314,7 +314,7 @@
   \code{\link{rmhmodel}},
   \code{\link{rmhstart}},
   \code{\link{rmhexpand}},
-  \code{\link{spatstat.options}}
+  \code{\link[spatstat.geom]{spatstat.options}}
 }
 \examples{
    # parameters given as named arguments

@@ -16,7 +16,7 @@
   \item{radius}{Radius of the circle.}
   \item{centre}{Coordinates of the centre of the circle.}
   \item{\dots}{
-    Arguments passed to \code{\link{disc}} controlling the
+    Arguments passed to \code{\link[spatstat.geom]{disc}} controlling the
     accuracy of approximation to the circle.
   }
   \item{nsim}{Number of simulated realisations to be generated.}
@@ -39,7 +39,7 @@
 
   To generate random points in an ellipse, first generate points in a
   circle using \code{runifdisc},
-  then transform to an ellipse using \code{\link{affine}},
+  then transform to an ellipse using \code{\link[spatstat.geom]{affine}},
   as shown in the examples.
   
   To generate random points in other windows, use
@@ -47,7 +47,7 @@
   To generate non-uniform random points, use \code{\link{rpoint}}.
 }
 \seealso{
-\code{\link{disc}},
+\code{\link[spatstat.geom]{disc}},
 \code{\link{runifpoint}},
 \code{\link{rpoint}}
 }
@@ -59,11 +59,9 @@
  Y <- affine(X, mat=diag(c(3,1)))
  plot(Y)
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \keyword{spatial}
 \keyword{datagen}

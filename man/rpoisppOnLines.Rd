@@ -75,8 +75,8 @@ rpoisppOnLines(lambda, L, lmax = NULL, \dots, nsim=1, drop=TRUE)
   as \code{L}. If \code{nsim > 1}, a list of such point patterns.
 }
 \seealso{
-  \code{\link{psp}},
-  \code{\link{ppp}},
+  \code{\link[spatstat.geom]{psp}},
+  \code{\link[spatstat.geom]{ppp}},
   \code{\link{runifpointOnLines}},
   \code{\link{rpoispp}}
 }

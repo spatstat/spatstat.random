@@ -36,17 +36,15 @@ runifpoint3(n, domain = box3(), nsim=1, drop=TRUE)
 }
 \seealso{
   \code{\link{rpoispp3}}, 
-  \code{\link{pp3}}, 
-  \code{\link{box3}}
+  \code{\link[spatstat.geom]{pp3}}, 
+  \code{\link[spatstat.geom]{box3}}
 }
 \examples{
    X <- runifpoint3(50)
 }
-\author{\adrian
-  
-  
-  and \rolf
-  
+\author{
+  \adrian
+  and \rolf.
 }
 \keyword{spatial}
 \keyword{datagen}

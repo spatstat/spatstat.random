@@ -81,7 +81,7 @@
     }
     \item{a pixel image:}{
       if \code{f} is a pixel image
-      (object of class \code{"im"}, see \code{\link{im.object}})
+      (object of class \code{"im"}, see \code{\link[spatstat.geom]{im.object}})
       then random points will be generated
       with probability density
       proportional to the pixel values of \code{f}.
@@ -119,13 +119,14 @@
   functions.
 
   If \code{warn=TRUE} (the default), a warning will be issued if \code{n} is very large.
-  The threshold is \code{\link{spatstat.options}("huge.npoints")}.
+  The threshold is \code{\link[spatstat.geom]{spatstat.options}("huge.npoints")}.
   This warning has no consequences,
   but it helps to trap a number of common errors.
 }
 \seealso{
-\code{\link{ppp.object}},
-\code{\link{owin.object}},
+\code{\link[spatstat.geom]{ppp.object}},
+\code{\link[spatstat.geom]{owin.object}},
+\code{\link[spatstat.geom]{im.object}},
 \code{\link{runifpoint}}
 }
 \examples{

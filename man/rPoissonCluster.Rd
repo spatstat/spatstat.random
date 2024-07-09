@@ -24,7 +24,7 @@
   \item{win}{
     Window in which to simulate the pattern.
     An object of class \code{"owin"}
-    or something acceptable to \code{\link{as.owin}}.
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
   }
   \item{\dots}{
     Arguments passed to \code{rcluster}
@@ -61,7 +61,7 @@
   with intensity \code{kappa} in an expanded
   window as explained below.. Here \code{kappa} may be a single
   positive number, a function \code{kappa(x, y)}, or a pixel image
-  object of class \code{"im"} (see \code{\link{im.object}}).
+  object of class \code{"im"} (see \code{\link[spatstat.geom]{im.object}}).
   See \code{\link{rpoispp}} for details.
   
   Second, each parent point is replaced by a random cluster of points,
@@ -70,7 +70,7 @@
   of this pattern to the window \code{win} is then returned as the
   result of \code{rPoissonCluster}.
 
-  The expanded window consists of \code{\link{as.rectangle}(win)}
+  The expanded window consists of \code{\link[spatstat.geom]{as.rectangle}(win)}
   extended by the amount \code{expand} in each direction. The size of
   the expansion is saved in the attribute \code{"expand"} and may be
   extracted by \code{attr(X, "expand")} where \code{X} is the generated
