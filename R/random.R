@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.119 $   $Date: 2024/06/08 23:48:41 $
+##    $Revision: 4.121 $   $Date: 2024/08/11 02:36:43 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -577,7 +577,7 @@ rMaternInhibition <- function(type,
 rSSI <- function(r, n=Inf, win = square(1), 
                  giveup = 1000, x.init=NULL, ...,
                  f=NULL, fmax=NULL,
-                 nsim=1, drop=TRUE)
+                 nsim=1, drop=TRUE, verbose=TRUE)
 {
   win.given <- !missing(win) && !is.null(win)
   stopifnot(is.numeric(r) && length(r) == 1 && r >= 0)
@@ -587,6 +587,8 @@ rSSI <- function(r, n=Inf, win = square(1),
     check.1.integer(nsim)
     stopifnot(nsim >= 1)
   }
+  ## 'verbose' applies only when nsim > 1
+  verbose <- verbose && (nsim > 1)
   ##
   if(!is.null(f)) {
     stopifnot(is.numeric(f) || is.im(f) || is.function(f))
@@ -656,8 +658,9 @@ rSSI <- function(r, n=Inf, win = square(1),
 
   #' start simulation 		    
   pstate <- list()
+  if(verbose) splat("Generating", nsim, "realisations...")
   for(isim in seq_len(nsim)) {
-    if(nsim > 1) pstate <- progressreport(isim, nsim, state=pstate)
+    if(verbose) pstate <- progressreport(isim, nsim, state=pstate)
     ## Simple Sequential Inhibition process
     ## fixed number of points
     xx <- coords(x.init)$x

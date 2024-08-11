@@ -7,7 +7,7 @@
 }
 \usage{
  rSSI(r, n=Inf, win = square(1), giveup = 1000, x.init=NULL, ...,
-      f=NULL, fmax=NULL, nsim=1, drop=TRUE)
+      f=NULL, fmax=NULL, nsim=1, drop=TRUE, verbose=TRUE)
 }
 \arguments{
   \item{r}{
@@ -48,6 +48,10 @@
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
     result will be a point pattern, rather than a list 
     containing a point pattern.
+  }
+  \item{verbose}{
+    Logical value specifying whether to print progress reports
+    when \code{nsim > 1}.
   }
 }
 \value{

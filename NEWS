@@ -1,10 +1,18 @@
 
-        CHANGES IN spatstat.random VERSION 3.3-1.001
+        CHANGES IN spatstat.random VERSION 3.3-1.002
 
 OVERVIEW
 
     o Tweaks to documentation.
+
+    o Minor improvements.
     
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rSSI
+    New argument 'verbose' specifies whether to
+    print progress reports when nsim > 1.
+
 
         CHANGES IN spatstat.random VERSION 3.3-1
 
