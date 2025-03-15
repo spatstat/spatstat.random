@@ -109,22 +109,39 @@
   where \code{a} is the area of the window \code{win}. 
 }
 \section{Reproducibility}{
-  The simulation algorithm, for the case where
-  \code{lambda} is a pixel image, was changed in \pkg{spatstat}
-  version \code{1.42-3}. Set \code{spatstat.options(fastpois=FALSE)}
-  to use the previous, slower algorithm, if it is desired to reproduce
-  results obtained with earlier versions.
-
-  The previous slower algorithm uses ``thinning'': it first generates a uniform
+  The simulation algorithm has changed in the following cases.
+  \itemize{
+    \item
+    \code{lambda} is a function which is constant on each tile of
+    a tessellation (a function of class \code{"tessfun"} created by
+    \code{\link[spatstat.geom]{as.tess}}) and the tiles are rectangles or polygons.
+    The algorithm was changed in \code{spatstat.random} version \code{3.3-3}.
+    The new algorithm generates uniform Poisson
+    realisations in each tile of the tessellation.
+    This algorithm is exact (i.e. does not involve spatial
+    discretisation), and is usually faster than the old algorithm.
+    Set the argument \code{tilewise=FALSE} to use the previous
+    rejection algorithm.
+    \item
+    \code{lambda} is a pixel image.
+    The algorithm was changed in \pkg{spatstat}
+    version \code{1.42-3}.
+    The new faster algorithm randomly selects pixels with
+    probability proportional to intensity, and generates point locations
+    inside the selected pixels.
+    Set \code{spatstat.options(fastpois=FALSE)}
+    to use the previous, slower algorithm, if it is desired to reproduce
+    results obtained with earlier versions.
+  }
+  In both cases the previous algorithm
+  uses ``thinning'': it first generates a uniform
   Poisson process of intensity \code{lmax},
   then randomly deletes or retains each point, independently of other points,
   with retention probability
   \eqn{p(x,y) = \lambda(x,y)/\mbox{lmax}}{p(x,y) = lambda(x,y)/lmax}.
-  The new faster algorithm randomly selects pixels with
-  probability proportional to intensity, and generates point locations
-  inside the selected pixels.
 
-  Thinning is still used when \code{lambda} is a \code{function(x,y,\dots)}.
+  Thinning is still used when \code{lambda} is a
+  \code{function(x,y,\dots)} in all other cases.
 }
 \seealso{
   \code{\link{rmpoispp}} for Poisson \emph{marked} point patterns,

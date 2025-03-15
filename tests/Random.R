@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.18 $ $Date: 2024/02/26 05:43:36 $
+#'  $Revision: 1.19 $ $Date: 2025/03/15 03:52:19 $
 
 
 local({
@@ -60,6 +60,15 @@ local({
     Z <- rlabel(finpines)
   }
 
+  if(FULLTEST) {
+    ## intensity constant on each tile of a tessellation
+    X <- cells[c(2, 22, 32, 37)]
+    V <- dirichlet(X)
+    lam <- as.function(V, values=rep(5, nobjects(V)))
+    Y <- rpoispp(lam, tilewise=TRUE) # tilewise algorithm
+    Y <- rpoispp(lam) # code for default value of 'tilewise'
+  }
+  
   f1 <- function(x,y){(x^2 + y^3)/10}
   f2 <- function(x,y){(x^3 + y^2)/10}
   ZZ <- solist(A=as.im(f1, letterR),

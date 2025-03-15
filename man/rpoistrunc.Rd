@@ -70,6 +70,11 @@ rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R
 \author{
   \adrian, after ideas of Ted Harding and Peter Dalgaard.
 }
+\references{
+  E.F. Harding (2005) Email to R-help email group, 01 May 2005.
+
+  P. Dalgaard (2005) Email to R-help email group, 01 May 2005.
+}
 \seealso{
   \code{\link[stats]{rpois}} for Poisson random variables.
 

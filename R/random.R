@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.121 $   $Date: 2024/08/11 02:36:43 $
+##    $Revision: 4.124 $   $Date: 2025/03/15 03:40:12 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -388,8 +388,17 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
   }
+
+  if(!missing(lambda) && inherits(lambda, "tessfun")) {
+    ## intensity is constant on each tile of a tessellation
+    ## use special algorithm
+    if(missing(win)) win <- NULL
+    result <- rpoisTessfun(lambda, win=win, nsim=nsim, drop=drop, ...)
+    return(result)
+  }
   
   if(missing(lambda) && is.null(lmax) && missing(win) && !is.null(ex)) {
+    ## use example pattern 'ex'
     lambda <- intensity(unmark(ex))
     win <- Window(ex)
   } else {
@@ -494,6 +503,58 @@ rpoispp <- function(lambda, lmax=NULL, win = owin(), ...,
   stop(paste(sQuote("lambda"), "must be a constant, a function or an image"))
 }
     
+rpoisTessfun <- function(lambda, win=NULL, ..., nsim=1, drop=TRUE,
+                         tilewise=NULL, verbose=TRUE) {
+  ## special case of rpoispp: constant intensity on each tile of tessellation
+  stopifnot(inherits(lambda, "tessfun"))
+  tes <- as.tess(lambda)
+  lam <- as.numeric(tessfunvalues(lambda))
+  lmax <- max(lam)
+  Wfull <- Window(as.tess(lambda))
+  if(is.null(win)) win <- Wfull else stopifnot(is.owin(win))
+  if(length(tilewise) == 0) {
+    ## decide which algorithm to use
+    switch(tes$type,
+           rect = ,
+           tiled = {
+             En <- integral(lambda)
+             Em <- lmax * area(Wfull)
+             tilewise <- (Em > .Machine$integer.max) || (En < Em/1e3)
+             if(verbose)
+               message("Using ", if(tilewise) "tilewise" else "rejection",
+                       " algorithm")
+           },
+           image = {
+             ## No benefit in splitting by tiles
+             tilewise <- FALSE
+           })
+  }
+  if(isFALSE(tilewise)) {
+    ## use rejection algorithm 
+    class(lambda) <- setdiff(class(lambda), "tessfun")
+    result <- rpoispp(lambda, lmax=lmax, win=win, ..., nsim=nsim, drop=drop)
+    return(result)
+  }
+  B <- Frame(win)
+  til <- tiles(tes)
+  nt <- length(til)
+  for(j in seq_len(nt)) {
+    ## generate 'nsim' patterns in tile 'j'
+    Uj <- runifpoispp(lam[j], til[[j]], nsim=nsim, drop=FALSE)
+    ## extract coordinates as list(list(x,y), list(x,y), ...)
+    if(j == 1) {
+      xylist <- lapply(Uj, concatxy)
+    } else {
+      xylist <- mapply(concatxy, xylist, Uj, SIMPLIFY=FALSE)
+    }
+  }
+  ## create point pattern objects
+  result <- lapply(xylist, as.ppp, W=B, check=FALSE)
+  ## clip to 'win'
+  result <- lapply(result, "[", i=win)
+  return(simulationresult(result, nsim, drop))
+}
+
 rMaternI <- function(kappa, r, win = owin(c(0,1),c(0,1)), stationary=TRUE,
                      ..., nsim=1, drop=TRUE)
 {

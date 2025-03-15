@@ -1,4 +1,17 @@
 
+        CHANGES IN spatstat.random VERSION 3.3-2.001
+
+OVERVIEW
+
+    o Improved algorithm for rpoispp when intensity is defined by tessellation
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rpoispp
+    Improved algorithm in the case where the intensity 'lambda' is
+    a function of class 'tessfun' representing a function which is
+    constant on each tile of a tessellation.
+
         CHANGES IN spatstat.random VERSION 3.3-2
 
 OVERVIEW
