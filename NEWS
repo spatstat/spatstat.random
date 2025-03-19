@@ -1,9 +1,9 @@
 
-        CHANGES IN spatstat.random VERSION 3.3-2.001
+        CHANGES IN spatstat.random VERSION 3.3-3
 
 OVERVIEW
 
-    o Improved algorithm for rpoispp when intensity is defined by tessellation
+    o Improved algorithm for rpoispp when intensity is defined by tessellation.
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
