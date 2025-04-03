@@ -1,4 +1,16 @@
 
+        CHANGES IN spatstat.random VERSION 3.3-3.001
+
+OVERVIEW
+
+    o Conditional simulation in rLGCP.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o rLGCP
+    New argument 'n.cond' specifies conditional simulation.
+    Every realisation will have exactly 'n = n.cond' points.
+
         CHANGES IN spatstat.random VERSION 3.3-3
 
 OVERVIEW

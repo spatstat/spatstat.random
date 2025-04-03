@@ -9,7 +9,8 @@
  rLGCP(model=c("exponential", "gauss", "stable", "gencauchy", "matern"),
        mu = 0, param = NULL,
        \dots,
-       win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE)
+       win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE,
+       n.cond=NULL)
 }
 \arguments{
   \item{model}{
@@ -44,6 +45,10 @@
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
     result will be a point pattern, rather than a list 
     containing a point pattern.
+  }
+  \item{n.cond}{
+    Optional. Integer specifying a fixed number of points.
+    See the section on \emph{Conditional Simulation}.
   }
 }
 \value{
@@ -144,6 +149,17 @@
   and it defaults to the unit square otherwise.
   
   The LGCP model can be fitted to data using \code{\link[spatstat.model]{kppm}}.
+}
+\section{Conditional Simulation}{
+  If \code{n.cond} is specified, it should be a single integer.
+  Simulation will be conditional on the event 
+  that the pattern contains exactly \code{n.cond} points.
+
+  Conditional simulation uses the rejection algorithm described
+  in Section 6.2 of Moller, Syversveen and Waagepetersen (1998).
+  There is a maximum number of proposals which will be attempted.
+  Consequently the return value may contain fewer
+  than \code{nsim} point patterns.
 }
 \section{Warning: new implementation}{
   The simulation algorithm for \code{rLGCP} has been completely re-written

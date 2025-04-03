@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.31 $    $Date: 2024/02/26 05:33:48 $
+#'  $Revision: 1.34 $    $Date: 2025/04/03 02:02:55 $
 #'
 
 rLGCP <- local({
@@ -15,7 +15,8 @@ rLGCP <- local({
   rLGCP <- function(model=c("exponential", "gauss", "stable",
                             "gencauchy", "matern"),
                     mu = 0, param = NULL, ...,
-                    win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE) {
+                    win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE,
+                    n.cond=NULL) {
     ## validate
     model <- match.arg(model)
     if (is.numeric(mu)) {
@@ -28,22 +29,28 @@ rLGCP <- local({
     if(!all(nzchar(names(param))))
       stop("Outdated syntax of argument 'param' to rLGCP", call.=FALSE)
     ##
-    do.call(do.rLGCP,
+    do.call(dispatch.rLGCP,
             append(list(model=model,
                         mu=mu,
                         win=win,
                         saveLambda=saveLambda,
                         nsim=nsim,
-                        drop=drop),
+                        drop=drop,
+                        n.cond=n.cond),
                    resolve.defaults(list(...), param)))
   }
 
+  dispatch.rLGCP <- function(..., n.cond=NULL) {
+    if(is.null(n.cond)) do.rLGCP(...) else do.cond.rLGCP(..., n.cond=n.cond)
+  }
+  
   do.rLGCP <- function(model=c("exponential", "gauss", "stable",
                             "gencauchy", "matern"),
                        mu = 0, ...,
                        win=NULL, saveLambda=TRUE,
                        Lambdaonly=FALSE,
-                       nsim=1, drop=TRUE) {
+                       nsim=1, drop=TRUE,
+                       n.cond=NULL) {
 
     ## empty list
     if(nsim == 0) return(simulationresult(list()))
@@ -127,5 +134,107 @@ rLGCP <- local({
     return(simulationresult(result, nsim, drop))
   }
 
+  do.cond.rLGCP <- function(model=c("exponential", "gauss", "stable",
+                            "gencauchy", "matern"),
+                            mu = 0, ...,
+                            n.cond=NULL, w.cond=NULL, 
+                            giveup=1000, maxchunk=100,
+                            win=NULL, saveLambda=TRUE,
+                            Lambdaonly=FALSE,
+                            nsim=1,
+                            verbose=FALSE, drop=FALSE) {
+    ## simulation window
+    win.given <- !is.null(win)
+    mu.image <- is.im(mu)
+    win <- if(win.given) as.owin(win) else if(mu.image) as.owin(mu) else owin()
+
+    ## type of simulation
+    w.sim <- as.owin(win)
+    fullwindow <- is.null(w.cond)
+    if(fullwindow) {
+      w.cond <- w.sim
+      w.free <- NULL
+    } else {
+      #' not yet public
+      stopifnot(is.owin(w.cond))
+      w.free <- setminus.owin(w.sim, w.cond)
+    }
+  
+    nremaining <- nsim
+    ntried <- 0
+    accept <- FALSE
+    nchunk <- 1
+    phistory <- Lamhistory <- numeric(0)
+    results <- list()
+    while(nremaining > 0) {
+      ## increase chunk length
+      nchunk <- min(maxchunk, giveup - ntried, 2 * nchunk)
+      ## bite off next chunk of unconditional simulations
+      lamlist <- do.rLGCP(model=model, mu=mu, ..., 
+                          nsim=nchunk,
+                          Lambdaonly=TRUE,
+                          drop=FALSE)
+      ## compute acceptance probabilities
+      lamlist <- lapply(lamlist, "[", i=w.sim, drop=FALSE, tight=TRUE)
+      if(fullwindow) {
+        Lam <- sapply(lamlist, integral)
+      } else {
+        Lam <- sapply(lamlist, integral, domain=w.cond)
+      }
+      p <- exp(n.cond * log(Lam/n.cond) + n.cond - Lam)
+      phistory <- c(phistory, p)
+      Lamhistory <- c(Lamhistory, Lam)
+      ## accept/reject
+      accept <- (runif(length(p)) < p)
+      if(any(accept)) {
+        jaccept <- which(accept)
+        if(length(jaccept) > nremaining)
+          jaccept <- jaccept[seq_len(nremaining)]
+        naccepted <- length(jaccept)
+        if(verbose)
+          splat("Accepted the",
+                commasep(ordinal(ntried + jaccept)),
+                ngettext(naccepted, "proposal", "proposals"))
+        nremaining <- nremaining - naccepted
+        for(j in jaccept) {
+          lamj <- lamlist[[j]]
+          if(min(lamj) < 0)
+            lamj <- eval.im(pmax(lamj, 0))
+          if(Lambdaonly) {
+            #' undocumented: return the driving intensities only
+            results <- append(results, list(lamj))
+          } else {
+            #' normal: return the simulated patterns
+            if(fullwindow) {
+              Y <- rpoint(n.cond, lamj, win=w.sim, forcewin=TRUE)
+            } else {
+              lamj.cond <- lamj[w.cond, drop=FALSE, tight=TRUE]
+              lamj.free <- lamj[w.free, drop=FALSE, tight=TRUE]
+              Ycond <- rpoint(n.cond, lamj.cond, win=w.cond)
+              Yfree <- rpoispp(lamj.free)
+              Y <- superimpose(Ycond, Yfree, W=w.sim)
+            }
+            if(saveLambda) attr(Y, "Lambda") <- lamj
+            results <- append(results, list(Y))
+          }
+        }
+      }
+      ntried <- ntried + nchunk
+      if(ntried >= giveup && nremaining > 0) {
+        message(paste("Gave up after", ntried,
+                      "proposals with", nsim - nremaining, "accepted"))
+        message(paste("Mean acceptance probability =",
+                      signif(mean(phistory), 3)))
+        break
+      }
+    }
+    nresults <- length(results)
+    results <- simulationresult(results, nresults, drop)
+    attr(results, "history") <- data.frame(Lam=Lamhistory, p=phistory)
+    if(verbose && nresults == nsim)
+      splat("Mean acceptance probability", signif(mean(phistory), 3))
+    return(results)
+  }
+  
   rLGCP
 })
