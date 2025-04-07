@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.34 $    $Date: 2025/04/03 02:02:55 $
+#'  $Revision: 1.35 $    $Date: 2025/04/07 02:31:10 $
 #'
 
 rLGCP <- local({
@@ -170,7 +170,7 @@ rLGCP <- local({
       ## increase chunk length
       nchunk <- min(maxchunk, giveup - ntried, 2 * nchunk)
       ## bite off next chunk of unconditional simulations
-      lamlist <- do.rLGCP(model=model, mu=mu, ..., 
+      lamlist <- do.rLGCP(model=model, mu=mu, win=win, ..., 
                           nsim=nchunk,
                           Lambdaonly=TRUE,
                           drop=FALSE)
