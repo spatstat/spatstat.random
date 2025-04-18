@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.64 $ $Date: 2024/06/09 00:05:33 $
+#'   $Revision: 1.66 $ $Date: 2025/04/18 04:18:17 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -260,6 +260,8 @@ detect.par.format <- function(par, native, generic) {
       return(rep.int(Inf, length(rvals)))
     pi*rvals^2+(1-exp(-rvals^2/(4*par[2L])))/par[1L]
   },
+  ## standardised term in K function
+  B1 = function(r, ...) { 1 - exp(-(r^2)/4) },
   ## pair correlation function
   pcf= function(par,rvals, ..., strict=TRUE){
     ## 'par' is in native format
@@ -267,6 +269,10 @@ detect.par.format <- function(par, native, generic) {
       return(rep.int(Inf, length(rvals)))
     1 + exp(-rvals^2/(4 * par[2L]))/(4 * pi * par[1L] * par[2L])
   },
+  ## standardised term in pcf
+  A1 = function(r, ...) { exp(-r^2/4)/(4*pi) },
+  a1 = function(r, ...) { exp(-r^2/4) },
+  a1prime = function(r, ...) { -(r/2) * exp(-r^2/4) },
   ## gradient of pcf (contributed by Chiara Fend)
   Dpcf= function(par,rvals, ..., strict=TRUE){
     ## 'par' is in native format
@@ -428,6 +434,7 @@ detect.par.format <- function(par, native, generic) {
     y <- pi * rvals^2 + (1/kappa) * .MatClustHfun(rvals/(2 * R))
     return(y)
   },
+  B1 = function(r, ...) { .MatClustHfun(r/2) },
   pcf= function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0))
@@ -437,6 +444,9 @@ detect.par.format <- function(par, native, generic) {
     y <- 1 + (1/(pi * kappa * R^2)) * .MatClustgfun(rvals/(2 * R))
     return(y)
   },
+  A1 = function(r, ...) { .MatClustgfun(r/2)/pi },
+  a1 = function(r, ...) { .MatClustgfun(r/2) },
+  a1prime = function(r, ...) { ifelse(r < 2, -(2/pi) * sqrt(1 - r^2/4), 0) },
   Dpcf= function(par,rvals, ...){
     ## 'par' is in native format
     kappa <- par[1L]
@@ -567,12 +577,16 @@ detect.par.format <- function(par, native, generic) {
       return(rep.int(Inf, length(rvals)))
     pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
   },
+  B1 = function(r, ...) { 1 - 1/sqrt(1 + r^2/4) },
   pcf= function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0))
       return(rep.int(Inf, length(rvals)))
     1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
   },
+  A1 = function(r, ...) {  ((1 + r^2/4)^(-1.5))/(8 * pi) },
+  a1 = function(r, ...) {  (1 + r^2/4)^(-1.5) },
+  a1prime = function(r, ...) {  (-3*r/4) * (1 + r^2/4)^(-2.5) },
   Dpcf= function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0)){
@@ -794,6 +808,7 @@ resolve.vargamma.shape <- function(...,
                                    par=par, nu.pcf=nu.pcf)$value
     return(out)
   },
+  B1 = NULL,
   pcf= function(par,rvals, ..., margs){
     ## 'par' is in native format
     ## margs = list(..nu.pcf..)
@@ -809,6 +824,9 @@ resolve.vargamma.shape <- function(...,
                   1)
     return(as.numeric(1 + sig2 * fr))
   },
+  A1 = NULL,
+  a1 = NULL,
+  a1prime = NULL,
   Dpcf = NULL,
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ..., margs) {

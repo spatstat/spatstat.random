@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.19 $ $Date: 2025/03/15 03:52:19 $
+#'  $Revision: 1.20 $ $Date: 2025/04/07 03:54:43 $
 
 
 local({
@@ -148,6 +148,18 @@ local({
     lg.s.c <- rLGCP('matern', mu=MU,
                     var = sigma2x, scale = range / sqrt(8), 
                     nu = 1, win = win)
+  }
+  if(ALWAYS) {
+    #' rLGCP in window other than the unit square
+    ow <- owin(c(-3.75, 25.75), c(-3.75, 25.75))
+    X <- rLGCP(model = "exp", mu = -1.75, var = 1, scale = 2,
+               win = ow, saveLambda=TRUE, eps=0.5, rule.eps="shrink.frame")
+    if(FULLTEST) {
+      #' conditional simulation, same parameters
+      Y <- rLGCP(model = "exp", mu = -1.75, var = 1, scale = 2,
+                 win = ow, saveLambda=TRUE, eps=0.5, rule.eps="shrink.frame",
+                 n.cond=256)
+    }
   }
 })
 

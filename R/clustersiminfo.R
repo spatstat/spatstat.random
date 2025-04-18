@@ -9,6 +9,12 @@
 #'  Table of additional information for cluster models
 #'  for use in Brix-Kendall and Baddeley-Chang simulation algorithms
 #'
+#'  The simulation algorithm rclusterBKBC uses this information
+#'  provided there is an entry in this table for the desired model,
+#'  and provided use.special=TRUE. Otherwise it uses a generic algorithm.
+#'
+#' -------------------------------------------------------------------
+#'
 #'  D = bounding disc
 #'  rD = radius of D (numeric > 0)
 #'  r = distance from parent point to centre of disc (numeric vector)
@@ -24,7 +30,7 @@
 #'     roffspring = function(n, mod)
 #'          generate x, y coordinates of n offspring of parent at origin
 #'
-#' (A) Brix-Kendall dominating process
+#' (B) Brix-Kendall dominating process
 #'
 #'     hdom = function(r, mod, rD)
 #'          Value inside D of the dominating offspring density, for a parent at distance r from centre of D
@@ -48,7 +54,7 @@
 #'     invMplus = function(v, mod, rD, Minfty)
 #'          Inverse function of Mplus (IF KNOWN)
 #'
-#' (B) Baddeley-Chang super-dominating process
+#' (C) Baddeley-Chang super-dominating process
 #' 
 #'     rhoplusplus = function(r, mod, rD)
 #'          Intensity of superdominating process
