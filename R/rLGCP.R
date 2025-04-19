@@ -7,7 +7,7 @@
 #'
 #'  modifications by Adrian Baddeley, Ege Rubak and Tilman Davies
 #' 
-#'  $Revision: 1.35 $    $Date: 2025/04/07 02:31:10 $
+#'  $Revision: 1.37 $    $Date: 2025/04/19 03:41:26 $
 #'
 
 rLGCP <- local({
@@ -16,7 +16,7 @@ rLGCP <- local({
                             "gencauchy", "matern"),
                     mu = 0, param = NULL, ...,
                     win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE,
-                    n.cond=NULL) {
+                    n.cond=NULL, w.cond=NULL) {
     ## validate
     model <- match.arg(model)
     if (is.numeric(mu)) {
@@ -40,15 +40,19 @@ rLGCP <- local({
                    resolve.defaults(list(...), param)))
   }
 
-  dispatch.rLGCP <- function(..., n.cond=NULL) {
-    if(is.null(n.cond)) do.rLGCP(...) else do.cond.rLGCP(..., n.cond=n.cond)
+  dispatch.rLGCP <- function(..., n.cond=NULL, w.cond=NULL) {
+    if(is.null(n.cond)) {
+      do.rLGCP(...)
+    } else {
+      do.cond.rLGCP(..., n.cond=n.cond, w.cond=w.cond)
+    }
   }
   
   do.rLGCP <- function(model=c("exponential", "gauss", "stable",
                             "gencauchy", "matern"),
                        mu = 0, ...,
                        win=NULL, saveLambda=TRUE,
-                       Lambdaonly=FALSE,
+                       LambdaOnly=FALSE, Lambdaonly=FALSE,
                        nsim=1, drop=TRUE,
                        n.cond=NULL) {
 
@@ -56,6 +60,8 @@ rLGCP <- local({
     if(nsim == 0) return(simulationresult(list()))
     
     model <- match.arg(model)
+
+    LambdaOnly <- LambdaOnly || Lambdaonly  # old spelling
 
     ## simulation window
     win.given <- !is.null(win)
@@ -115,7 +121,7 @@ rLGCP <- local({
     ## exponentiate
     Lambdalist <- solapply(Zlist, exp)
 
-    if(Lambdaonly) {
+    if(LambdaOnly) {
       ## undocumented exit - return Lambda only
       return(simulationresult(Lambdalist, nsim, drop))
     }
@@ -140,7 +146,7 @@ rLGCP <- local({
                             n.cond=NULL, w.cond=NULL, 
                             giveup=1000, maxchunk=100,
                             win=NULL, saveLambda=TRUE,
-                            Lambdaonly=FALSE,
+                            LambdaOnly=FALSE, Lambdaonly=FALSE,
                             nsim=1,
                             verbose=FALSE, drop=FALSE) {
     ## simulation window
@@ -148,6 +154,8 @@ rLGCP <- local({
     mu.image <- is.im(mu)
     win <- if(win.given) as.owin(win) else if(mu.image) as.owin(mu) else owin()
 
+    LambdaOnly <- LambdaOnly || Lambdaonly  # old spelling
+    
     ## type of simulation
     w.sim <- as.owin(win)
     fullwindow <- is.null(w.cond)
@@ -172,7 +180,7 @@ rLGCP <- local({
       ## bite off next chunk of unconditional simulations
       lamlist <- do.rLGCP(model=model, mu=mu, win=win, ..., 
                           nsim=nchunk,
-                          Lambdaonly=TRUE,
+                          LambdaOnly=TRUE,
                           drop=FALSE)
       ## compute acceptance probabilities
       lamlist <- lapply(lamlist, "[", i=w.sim, drop=FALSE, tight=TRUE)
@@ -200,7 +208,7 @@ rLGCP <- local({
           lamj <- lamlist[[j]]
           if(min(lamj) < 0)
             lamj <- eval.im(pmax(lamj, 0))
-          if(Lambdaonly) {
+          if(LambdaOnly) {
             #' undocumented: return the driving intensities only
             results <- append(results, list(lamj))
           } else {

@@ -10,7 +10,7 @@
        mu = 0, param = NULL,
        \dots,
        win=NULL, saveLambda=TRUE, nsim=1, drop=TRUE,
-       n.cond=NULL)
+       n.cond=NULL, w.cond=NULL)
 }
 \arguments{
   \item{model}{
@@ -48,6 +48,11 @@
   }
   \item{n.cond}{
     Optional. Integer specifying a fixed number of points.
+    See the section on \emph{Conditional Simulation}.
+  }
+  \item{w.cond}{
+    Optional. Conditioning region. A window (object of class \code{"owin"})
+    specifying the region which must contain exactly \code{n.cond} points.
     See the section on \emph{Conditional Simulation}.
   }
 }
@@ -153,8 +158,10 @@
 \section{Conditional Simulation}{
   If \code{n.cond} is specified, it should be a single integer.
   Simulation will be conditional on the event 
-  that the pattern contains exactly \code{n.cond} points.
-
+  that the pattern contains exactly \code{n.cond} points
+  (or contains exactly \code{n.cond} points inside
+  the region \code{w.cond} if it is given).
+ 
   Conditional simulation uses the rejection algorithm described
   in Section 6.2 of Moller, Syversveen and Waagepetersen (1998).
   There is a maximum number of proposals which will be attempted.

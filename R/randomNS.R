@@ -4,7 +4,7 @@
 ##   Simulating from Neyman-Scott process
 ##   'Naive' algorithm
 ##
-##   $Revision: 1.39 $  $Date: 2024/06/09 00:11:29 $
+##   $Revision: 1.41 $  $Date: 2025/04/19 03:44:08 $
 ##
 ##    Original code for naive simulation of Neyman-Scott by Adrian Baddeley
 ##    Original code for rCauchy and rVarGamma offspring by Abdollah Jalilian
@@ -160,19 +160,23 @@ rNeymanScott <-
   return(result)
 }  
 
-fakeNeyScot <- function(Y, lambda, win, saveLambda, saveparents) {
+fakeNeyScot <- function(Y, lambda, win,
+                        saveLambda=FALSE,
+                        saveparents=FALSE,
+                        LambdaOnly=FALSE, ...) {
   ## Y is a ppp or ppplist obtained from rpoispp
   ## which will be returned as the realisation of a Neyman-Scott process
   ## when the process is degenerately close to Poisson.
-  if(saveLambda || saveparents) {
-    if(saveLambda && !is.im(lambda)) lambda <- as.im(lambda, W=win)
-    if(saveparents) emptyparents <- ppp(window=win) # empty pattern
+  doLambda <- saveLambda || LambdaOnly
+  if(doLambda || saveparents) {
+    if(doLambda && !is.im(lambda)) lambda <- as.im(lambda, W=win, ...)
     if(isSingle <- is.ppp(Y)) Y <- solist(Y)
+    if(LambdaOnly) return(rep(list(lambda), length(Y)))
     for(i in seq_along(Y)) {
       Yi <- Y[[i]]
       if(saveLambda) attr(Yi, "Lambda") <- lambda
       if(saveparents) {
-        attr(Yi, "parents") <- emptyparents
+        attr(Yi, "parents") <- list(x=numeric(0), y=numeric(0))
         attr(Yi, "parentid") <- integer(0)
         attr(Yi, "cost") <- npoints(Yi)
       }
@@ -181,6 +185,18 @@ fakeNeyScot <- function(Y, lambda, win, saveLambda, saveparents) {
     if(isSingle) Y <- Y[[1L]]
   }
   return(Y)
+}
+
+emptyNeyScot <- function(win, nsim=1, 
+                         saveLambda=FALSE,  saveparents=FALSE,
+                         LambdaOnly=FALSE, ...) {
+  ## generate results of Neyman-Scott when the process is always empty
+  empty <- ppp(window=win)
+  empties <- as.solist(rep(list(empty), nsim))
+  fakeNeyScot(empties, lambda=0, win=win,
+              saveLambda=saveLambda,
+              saveparents=saveparents,
+              LambdaOnly=LambdaOnly, ...)
 }
 
 thinParents <- function(X, P, Pmax=1) {

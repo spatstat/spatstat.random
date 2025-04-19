@@ -12,7 +12,7 @@
            algorithm=c("BKBC", "naive"),
            nonempty=TRUE, 
            poisthresh=1e-6, saveparents=FALSE, saveLambda=FALSE,
-           kappamax=NULL, mumax=NULL)
+           kappamax=NULL, mumax=NULL, LambdaOnly=FALSE)
 }
 \arguments{
   \item{kappa}{
@@ -87,16 +87,23 @@
     values of \code{mu}, when \code{mu} is a pixel image or a
     function.
   }
+  \item{LambdaOnly}{
+    Logical value specifying whether to return only the random intensity,
+    rather than the point pattern.
+  }
 }
 \value{
-  A point pattern (an object of class \code{"ppp"}) if \code{nsim=1},
-  or a list of point patterns if \code{nsim > 1}.
+  A point pattern (object of class \code{"ppp"})
+  or a list of point patterns.
 
   Additionally, some intermediate results of the simulation are returned
   as attributes of this point pattern (see \code{\link[spatstat.random]{rNeymanScott}}).
   Furthermore, the simulated intensity
   function is returned as an attribute \code{"Lambda"}, if
   \code{saveLambda=TRUE}.
+
+  If \code{LambdaOnly=TRUE} the result is a pixel image
+  (object of class \code{"im"}) or a list of pixel images.
 }
 \details{
   This algorithm generates a realisation of

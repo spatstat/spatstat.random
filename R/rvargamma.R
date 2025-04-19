@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.6 $ $Date: 2023/01/08 02:26:28 $
+#'   $Revision: 1.9 $ $Date: 2025/04/19 05:21:25 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -40,17 +40,18 @@ rVarGamma <- local({
 
   ## main function
   rVarGamma <- function(kappa, scale, mu,
-                           nu,
-                           win = square(1),
-                           nsim=1, drop=TRUE, 
-                           ...,
-                          algorithm=c("BKBC", "naive"),
-                          nonempty=TRUE, 
-                          thresh = 0.001,
-                          poisthresh=1e-6,
-                          expand = NULL,
-                          saveparents=FALSE, saveLambda=FALSE,
-                          kappamax=NULL, mumax=NULL) {
+                        nu,
+                        win = square(1),
+                        nsim=1, drop=TRUE, 
+                        ...,
+                        n.cond=NULL, w.cond=NULL,
+                        algorithm=c("BKBC", "naive"),
+                        nonempty=TRUE, 
+                        thresh = 0.001,
+                        poisthresh=1e-6,
+                        expand = NULL,
+                        saveparents=FALSE, saveLambda=FALSE,
+                        kappamax=NULL, mumax=NULL, LambdaOnly=FALSE) {
     ## Variance-Gamma cluster process
     
     ## nu / nu.ker: smoothness parameter of Variance Gamma kernel function
@@ -73,6 +74,19 @@ rVarGamma <- local({
     nu.ker <- nu
     ## Catch old scale syntax (omega)
     if(missing(scale)) scale <- dots$omega
+
+    if(!is.null(n.cond)) {
+      ## conditional simulation
+      mod <- clusterprocess("VarGamma", mu=mu, kappa=kappa, scale=scale, nu=nu)
+      result <- condSimCox(mod, nsim=nsim, ...,
+                           win=win, n.cond=n.cond, w.cond=w.cond,
+                           saveLambda=saveLambda, LambdaOnly=LambdaOnly,
+                           drop=drop)
+      return(result)
+    }
+
+    ## ------- Unconditional simulation ------------------
+    doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
     
     ## Catch old name 'eps' for 'thresh':
     if(missthresh <- missing(thresh))
@@ -97,21 +111,14 @@ rVarGamma <- local({
       
     ## detect trivial case where patterns are empty
     if(kappamax == 0 || mumax == 0) {
-      empt <- ppp(window=win)
-      if(saveparents) {
-        attr(empt, "parents") <- list(x=numeric(0), y=numeric(0))
-        attr(empt, "parentid") <- integer(0)
-        attr(empt, "cost") <- 0
-      }
-      if(saveLambda) 
-        attr(empt, "Lambda") <- as.im(0, W=win)
-      result <- rep(list(empt), nsim)
+      result <- emptyNeyScot(win, nsim,
+                             saveLambda, saveparents, LambdaOnly, ...)
       return(simulationresult(result, nsim=nsim, drop=drop))
     }
 
     #' determine algorithm
     algorithm <- match.arg(algorithm)
-    do.parents <- saveparents || saveLambda || !is.numeric(kappa)
+    do.parents <- saveparents || doLambda || !is.numeric(kappa)
     do.hybrid <- (algorithm == "BKBC") && nonempty 
 
 
@@ -150,7 +157,8 @@ rVarGamma <- local({
         if(is.function(mu)) mu <- as.im(mu, W=win, ...)
         kapmu <- kappa * mu
         result <- rpoispp(kapmu, win=win, nsim=nsim, drop=drop, warnwin=FALSE)
-        result <- fakeNeyScot(result, kapmu, win, saveLambda, saveparents)
+        result <- fakeNeyScot(result, kapmu, win,
+                              saveLambda, saveparents, LambdaOnly)
         return(result)
       }
     
@@ -171,7 +179,7 @@ rVarGamma <- local({
                              kappamax=kappamax, mumax=mumax)
 
     }
-    if(saveLambda){
+    if(doLambda){
       BW <- Frame(win)
       for(i in 1:nsim) {
         parents <- attr(result[[i]], "parents")
@@ -179,7 +187,12 @@ rVarGamma <- local({
         parents <- as.ppp(parents, W=BX, check=FALSE)
         Lambda <- clusterfield("VarGamma", parents, scale=scale,
                                nu=nu.ker, mu=mu, ...)
-        attr(result[[i]], "Lambda") <- Lambda[win, drop=FALSE]
+        Lambda <- Lambda[win, drop=FALSE]
+        if(LambdaOnly) {
+          result[[i]] <- Lambda
+        } else {
+          attr(result[[i]], "Lambda") <- Lambda
+        }
       }
     }
     return(simulationresult(result, nsim, drop))
@@ -187,6 +200,7 @@ rVarGamma <- local({
 
   inflateVarGamma <- function(mod, rD) {
     optimalinflation("VarGamma", mod, rD) 
-    }
+  }
+  
   rVarGamma
 })

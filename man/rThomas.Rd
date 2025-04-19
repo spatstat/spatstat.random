@@ -9,12 +9,13 @@
   rThomas(kappa, scale, mu, win = square(1),
              nsim=1, drop=TRUE,
              \dots,
+             n.cond=NULL, w.cond=NULL, 
              algorithm=c("BKBC", "naive"),
              nonempty=TRUE, 
              poisthresh=1e-6,
              expand = 4*scale,
              saveparents=FALSE, saveLambda=FALSE,
-             kappamax=NULL, mumax=NULL, sigma) 
+             kappamax=NULL, mumax=NULL, LambdaOnly=FALSE, sigma) 
 }
 \arguments{
   \item{kappa}{
@@ -46,6 +47,15 @@
     Passed to \code{\link[spatstat.random]{clusterfield}} to control the image
     resolution when \code{saveLambda=TRUE}.
   }
+  \item{n.cond}{
+    Optional. Integer specifying a fixed number of points.
+    See the section on \emph{Conditional Simulation}.
+  }
+  \item{w.cond}{
+    Optional. Conditioning region. A window (object of class \code{"owin"})
+    specifying the region which must contain exactly \code{n.cond} points.
+    See the section on \emph{Conditional Simulation}.
+  }
   \item{algorithm}{
     String (partially matched) specifying the simulation algorithm.
     See Details.
@@ -76,7 +86,7 @@
   \item{saveLambda}{
     Logical. If \code{TRUE} then the random intensity corresponding to
     the simulated parent points will also be calculated and saved,
-    and returns as an attribute of the point pattern.
+    and returned as an attribute of the point pattern.
   }
   \item{kappamax}{
     Optional. Numerical value which is an upper bound for the
@@ -88,19 +98,26 @@
     values of \code{mu}, when \code{mu} is a pixel image or a
     function.
   }
+  \item{LambdaOnly}{
+    Logical value specifying whether to return only the random intensity,
+    rather than the point pattern.
+  }
   \item{sigma}{
     Deprecated. Equivalent to \code{scale}.
   }
 }
 \value{
-  A point pattern (an object of class \code{"ppp"}) if \code{nsim=1},
-  or a list of point patterns if \code{nsim > 1}.
+  A point pattern (object of class \code{"ppp"})
+  or a list of point patterns.
 
   Additionally, some intermediate results of the simulation are returned
   as attributes of this point pattern (see \code{\link[spatstat.random]{rNeymanScott}}).
   Furthermore, the simulated intensity
   function is returned as an attribute \code{"Lambda"}, if
   \code{saveLambda=TRUE}.
+
+  If \code{LambdaOnly=TRUE} the result is a pixel image
+  (object of class \code{"im"}) or a list of pixel images.
 }
 \details{
   This algorithm generates a realisation of the (`modified')
@@ -225,6 +242,19 @@
   \code{kappa * mu}, using \code{\link[spatstat.random]{rpoispp}}. 
   This avoids computations that would otherwise require huge amounts
   of memory.
+}
+\section{Conditional Simulation}{
+  If \code{n.cond} is specified, it should be a single integer.
+  Simulation will be conditional on the event 
+  that the pattern contains exactly \code{n.cond} points
+  (or contains exactly \code{n.cond} points inside
+  the region \code{w.cond} if it is given).
+
+  Conditional simulation uses the rejection algorithm described
+  in Section 6.2 of Moller, Syversveen and Waagepetersen (1998).
+  There is a maximum number of proposals which will be attempted.
+  Consequently the return value may contain fewer
+  than \code{nsim} point patterns.
 }
 \section{Fitting cluster models to data}{
   The Thomas model with homogeneous parents
