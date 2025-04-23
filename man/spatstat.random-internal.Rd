@@ -25,6 +25,7 @@
 \alias{kraeverRandomFields}
 \alias{MultiPair.checkmatrix}
 \alias{optimalinflation}
+\alias{predict.clusterprocess}
 \alias{print.clusterprocess}
 \alias{print.rmhcontrol}
 \alias{print.rmhexpand}
@@ -113,6 +114,7 @@ kraever(package, fatal)
 kraeverRandomFields()
 MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
 optimalinflation(clusters, mod, rD)
+\method{predict}{clusterprocess}(object, \dots, locations, type, ngrid)
 \method{print}{clusterprocess}(x, \dots)
 \method{print}{rmhcontrol}(x, \dots)
 \method{print}{rmhexpand}(x, \dots, prefix=TRUE)
@@ -159,7 +161,7 @@ rpoint.multi(n, f, fmax, marks, win, giveup, verbose, warn, nsim, drop)
 rthinEngine(X, P, \dots, nsim, drop, Pmax, na.zero, what, fatal, warn)
 runifpoispp(lambda, win, \dots, nsim, drop)
 runifpoisppOnLines(lambda, L, nsim, drop)
-\method{simulate}{clusterprocess}(object, nsim, \dots, win)
+\method{simulate}{clusterprocess}(object, nsim, \dots, win, window)
 spatstatClusterModelInfo(name, onlyPCP)
 spatstatClusterSimInfo(name)
 spatstatClusterSimModelMatch(name, verbose)

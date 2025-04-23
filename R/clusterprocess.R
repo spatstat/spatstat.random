@@ -75,14 +75,19 @@ predict.clusterprocess <- function(object, ...,
     stop("Sorry, only type='intensity' is implemented")
   lambda <- object$par.std[["kappa"]] * object$mu
   if(is.numeric(lambda)) {
+    ## stationary
     if(is.ppp(locations))
       return(rep(lambda, npoints(locations)))
     W <- as.owin(locations)
     if(!is.mask(W))
       W <- as.mask(W, dimyx=ngrid, ...)
     return(as.im(lambda, W=W))
+  } else {
+    ## nonstationary; lambda is an image
+    if(missing(locations) || is.null(locations)) 
+      return(lambda)
+    return(lambda[locations, drop=FALSE])
   }
-  return(lambda[locations])
 }
 
 clusterradius.clusterprocess <- function(model, ...,
@@ -101,14 +106,15 @@ reach.clusterprocess <- function(x, ..., epsilon) {
   2 * clusterradius(x, ..., thresh=thresh)
 }
 
-simulate.clusterprocess <- function(object, nsim=1, ..., win=unit.square()) {
+simulate.clusterprocess <- function(object, nsim=1, ...,
+                                    win=unit.square(), window=win) {
   with(object, {
     switch(name,
          Thomas = {
            rThomas(kappa=par.std[["kappa"]],
                    scale=par.std[["scale"]],
                    mu=mu,
-                   win=win,
+                   win=window,
                    nsim=nsim,
                    ...)
          },
@@ -116,7 +122,7 @@ simulate.clusterprocess <- function(object, nsim=1, ..., win=unit.square()) {
            rMatClust(kappa=par.std[["kappa"]],
                      scale=par.std[["scale"]],
                      mu=mu,
-                     win=win,
+                     win=window,
                      nsim=nsim,
                      ...)
          },
@@ -124,7 +130,7 @@ simulate.clusterprocess <- function(object, nsim=1, ..., win=unit.square()) {
            rCauchy(kappa=par.std[["kappa"]],
                    scale=par.std[["scale"]],
                    mu=mu,
-                   win=win,
+                   win=window,
                    nsim=nsim,
                    ...)
          },
@@ -134,7 +140,7 @@ simulate.clusterprocess <- function(object, nsim=1, ..., win=unit.square()) {
                      list(kappa=par.std[["kappa"]],
                           scale=par.std[["scale"]],
                           mu=mu,
-                          win=win,
+                          win=window,
                           nsim=nsim,
                           ...),
                      clustargs))

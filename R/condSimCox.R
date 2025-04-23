@@ -1,7 +1,7 @@
 #'
 #'    condSimCox.R
 #'
-#'    $Revision: 1.2 $ $Date: 2025/04/19 05:30:14 $
+#'    $Revision: 1.4 $ $Date: 2025/04/23 07:10:57 $
 #'
 #'    Conditional simulation for Cox models
 
@@ -13,6 +13,12 @@ condSimCox <- function(object, nsim=1,
                        verbose=TRUE, drop=FALSE) {
   stopifnot(inherits(object, c("kppm", "clusterprocess", "zclustermodel")))
 
+  if(is.null(window)) {
+    if(!inherits(object, "kppm"))
+      stop("Argument 'window' or 'win' is required", call.=FALSE)
+    ## default to window of original data
+    window <- Window(object)
+  }
   w.sim <- as.owin(window)
   fullwindow <- is.null(w.cond)
   if(fullwindow) {
@@ -22,6 +28,13 @@ condSimCox <- function(object, nsim=1,
     stopifnot(is.owin(w.cond))
     w.free <- setminus.owin(w.sim, w.cond)
   }
+
+#  if(verbose) {
+#    ## calculate order-of-magnitude approximate mean acceptance probability
+#    EN <- integral(predict(object, locations=w.sim), domain=w.cond)
+#    phat <- exp(n.cond * log(EN/n.cond) + n.cond - EN)
+#    message("Rough estimate of mean acceptance probability:", signif(phat, 2))
+#  }
   
   nremaining <- nsim
   ntried <- 0
@@ -33,7 +46,7 @@ condSimCox <- function(object, nsim=1,
     ## increase chunk length
     nchunk <- min(maxchunk, giveup - ntried, 2 * nchunk)
     ## bite off next chunk of simulations
-    lamlist <- simulate(object, nsim=nchunk,
+    lamlist <- simulate(object, window=w.sim, nsim=nchunk,
                         LambdaOnly=TRUE,
                         ..., drop=FALSE, verbose=FALSE)
     ## validate/recover
@@ -90,18 +103,25 @@ condSimCox <- function(object, nsim=1,
       }
     }
     ntried <- ntried + nchunk
+    naccepted <- nsim - nremaining
     if(ntried >= giveup && nremaining > 0) {
       message(paste("Gave up after", ntried,
-                    "proposals with", nsim - nremaining, "accepted"))
-      message(paste("Mean acceptance probability =",
+                    "proposals with", naccepted, "accepted"))
+      message(paste("Average acceptance probability =",
                     signif(mean(phistory), 3)))
       break
     }
+    
+    if(verbose && ((ntried >= 30 && naccepted == 0) || ((pbar <- mean(phistory)) < 1e-3)))
+      message(paste("Accepted", naccepted,
+                    "of the first", ntried, "proposals;",
+                    "average acceptance probability =",
+                    signif(mean(phistory), 3)))
   }
   nresults <- length(results)
   results <- simulationresult(results, nresults, drop)
   attr(results, "history") <- data.frame(mu=mhistory, p=phistory)
   if(verbose && nresults == nsim)
-    splat("Mean acceptance probability", signif(mean(phistory), 3))
+    splat("Average acceptance probability", signif(mean(phistory), 3))
   return(results)
 }
