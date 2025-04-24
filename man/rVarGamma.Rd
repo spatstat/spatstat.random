@@ -311,6 +311,10 @@ For fitting the model, see
   Decomposition of variance for spatial Cox processes.
   \emph{Scandinavian Journal of Statistics} \bold{40}, 119-137.
   
+  \Moller, J., Syversveen, A. and Waagepetersen, R. (1998)
+  Log Gaussian Cox Processes.
+  \emph{Scandinavian Journal of Statistics} \bold{25}, 451--482.
+
   Waagepetersen, R. (2007)
   An estimating function approach to inference for
   inhomogeneous Neyman-Scott processes.

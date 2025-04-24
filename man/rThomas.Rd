@@ -298,6 +298,10 @@ For fitting the model, see
   Statistical analysis of spatial point patterns by
   means of distance methods. \emph{Biometrics} \bold{32} 659--667.
 
+  \Moller, J., Syversveen, A. and Waagepetersen, R. (1998)
+  Log Gaussian Cox Processes.
+  \emph{Scandinavian Journal of Statistics} \bold{25}, 451--482.
+
   Thomas, M. (1949) A generalisation of Poisson's binomial limit for use
   in ecology. \emph{Biometrika} \bold{36}, 18--25.
 

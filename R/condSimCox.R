@@ -1,7 +1,7 @@
 #'
 #'    condSimCox.R
 #'
-#'    $Revision: 1.4 $ $Date: 2025/04/23 07:10:57 $
+#'    $Revision: 1.5 $ $Date: 2025/04/24 07:38:15 $
 #'
 #'    Conditional simulation for Cox models
 
@@ -122,6 +122,6 @@ condSimCox <- function(object, nsim=1,
   results <- simulationresult(results, nresults, drop)
   attr(results, "history") <- data.frame(mu=mhistory, p=phistory)
   if(verbose && nresults == nsim)
-    splat("Average acceptance probability", signif(mean(phistory), 3))
+    message(paste("Average acceptance probability", signif(mean(phistory), 3)))
   return(results)
 }
