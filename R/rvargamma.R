@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.9 $ $Date: 2025/04/19 05:21:25 $
+#'   $Revision: 1.10 $ $Date: 2025/04/25 07:01:50 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -75,10 +75,15 @@ rVarGamma <- local({
     ## Catch old scale syntax (omega)
     if(missing(scale)) scale <- dots$omega
 
+    ## algorithm choices
+    algorithm <- match.arg(algorithm)
+    doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
+    
     if(!is.null(n.cond)) {
       ## conditional simulation
       mod <- clusterprocess("VarGamma", mu=mu, kappa=kappa, scale=scale, nu=nu)
       result <- condSimCox(mod, nsim=nsim, ...,
+                           nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
@@ -86,7 +91,6 @@ rVarGamma <- local({
     }
 
     ## ------- Unconditional simulation ------------------
-    doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
     
     ## Catch old name 'eps' for 'thresh':
     if(missthresh <- missing(thresh))
@@ -117,7 +121,6 @@ rVarGamma <- local({
     }
 
     #' determine algorithm
-    algorithm <- match.arg(algorithm)
     do.parents <- saveparents || doLambda || !is.numeric(kappa)
     do.hybrid <- (algorithm == "BKBC") && nonempty 
 

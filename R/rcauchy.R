@@ -1,7 +1,7 @@
 #'
 #'    rcauchy.R
 #'
-#'   $Revision: 1.12 $ $Date: 2025/04/19 05:21:11 $
+#'   $Revision: 1.13 $ $Date: 2025/04/25 07:01:41 $
 #'
 #'   Simulation of Cauchy cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -167,10 +167,15 @@ rCauchy <- local({
     check.1.real(scale)
     stopifnot(scale > 0)
 
+    ## algorithm choices
+    doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
+    algorithm <- match.arg(algorithm)
+
     if(!is.null(n.cond)) {
       ## conditional simulation
       mod <- clusterprocess("Cauchy", mu=mu, kappa=kappa, scale=scale)
       result <- condSimCox(mod, nsim=nsim, ...,
+                           nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
@@ -178,7 +183,6 @@ rCauchy <- local({
     }
 
     ## ------- Unconditional simulation ------------------
-    doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
     
     ## Catch old name 'eps' for 'thresh':
     if(missing(thresh))
@@ -209,7 +213,6 @@ rCauchy <- local({
     }
 
     #' determine algorithm
-    algorithm <- match.arg(algorithm)
     do.parents <- saveparents || doLambda || !is.numeric(kappa)
     do.hybrid <- (algorithm == "BKBC") && nonempty 
 

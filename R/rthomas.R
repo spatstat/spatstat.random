@@ -1,7 +1,7 @@
 #'
 #'    rthomas.R
 #'
-#'   $Revision: 1.11 $ $Date: 2025/04/19 05:20:23 $
+#'   $Revision: 1.12 $ $Date: 2025/04/25 07:02:04 $
 #' 
 #'   Simulation of modified Thomas cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -153,10 +153,15 @@ rThomas <- local({
       check.1.real(scale)
       stopifnot(scale > 0)
 
+      ## algorithm choices
+      algorithm <- match.arg(algorithm)
+      doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
+      
       if(!is.null(n.cond)) {
         ## conditional simulation
         mod <- clusterprocess("Thomas", mu=mu, kappa=kappa, scale=scale)
         result <- condSimCox(mod, nsim=nsim, ...,
+                             nonempty=nonempty, algorithm=algorithm,
                              win=win, n.cond=n.cond, w.cond=w.cond,
                              saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                              drop=drop)
@@ -164,7 +169,6 @@ rThomas <- local({
       }
 
       ## ------- Unconditional simulation ------------------
-      doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
 
       ## determine the effective maximum radius of clusters
       ## (for the naive algorithm, or when kappa is not constant)
@@ -186,7 +190,6 @@ rThomas <- local({
       }
 
       #' determine algorithm
-      algorithm <- match.arg(algorithm)
       do.parents <- saveparents || doLambda || !is.numeric(kappa)
       do.hybrid <- (algorithm == "BKBC") && nonempty 
 

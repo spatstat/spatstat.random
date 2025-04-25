@@ -1,7 +1,7 @@
 #'
 #'    rmatclust.R
 #'
-#'   $Revision: 1.9 $ $Date: 2025/04/19 05:20:47 $
+#'   $Revision: 1.10 $ $Date: 2025/04/25 07:02:13 $
 #'
 #'   Simulation of Matern cluster process
 #'   naive algorithm or BKBC algorithm
@@ -142,8 +142,10 @@ rMatClust <- local({
     check.1.real(scale)
     stopifnot(scale > 0)
 
+    ## algorithm choices
+    algorithm <- match.arg(algorithm)
     doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
-
+    
     #' validate 'kappa' and 'mu'
     km <- validate.kappa.mu(kappa, mu, kappamax, mumax,
                             win, scale, ..., 
@@ -155,6 +157,7 @@ rMatClust <- local({
       ## conditional simulation
       mod <- clusterprocess("MatClust", mu=mu, kappa=kappa, scale=scale)
       result <- condSimCox(mod, nsim=nsim, ...,
+                           nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
@@ -172,7 +175,6 @@ rMatClust <- local({
 
     
     #' determine algorithm
-    algorithm <- match.arg(algorithm)
     do.parents <- saveparents || doLambda || !is.numeric(kappa)
     do.hybrid <- (algorithm == "BKBC") && nonempty 
 
