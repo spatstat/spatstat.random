@@ -1,7 +1,9 @@
 
-        CHANGES IN spatstat.random VERSION 3.3-3.008
+        CHANGES IN spatstat.random VERSION 3.3-3.009
 
 OVERVIEW
+
+    o We thank Murray Efford for contributions.
 
     o Conditional simulation in rLGCP, rThomas, rMatClust, rCauchy, rVarGamma.
 

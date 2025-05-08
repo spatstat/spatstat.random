@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.10 $ $Date: 2025/04/25 07:01:50 $
+#'   $Revision: 1.11 $ $Date: 2025/05/08 04:56:34 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -76,11 +76,25 @@ rVarGamma <- local({
     if(missing(scale)) scale <- dots$omega
 
     ## algorithm choices
-    algorithm <- match.arg(algorithm)
     doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
-    
-    if(!is.null(n.cond)) {
-      ## conditional simulation
+    conditioning <- !is.null(n.cond)
+    if((conditioning || doLambda) && !isTRUE(spatstat.options("developer"))) {
+      ## The naive algorithm must be used
+      ## Change defaults 
+      algorithm <- if(missing(algorithm)) "naive" else match.arg(algorithm)
+      nonempty  <- if(missing(nonempty)) FALSE else isTRUE(nonempty)
+      ## Override given arguments with a warning
+      reason <- if(conditioning) "for conditional simulation" else "for intensity calculation"
+      algorithm <- warn.reset.arg(algorithm, "naive", reason)
+      nonempty  <- warn.reset.arg(nonempty,  FALSE,   reason)
+    } else {
+      ## Any choice of algorithm is permitted
+      algorithm <- match.arg(algorithm)
+      nonempty <- isTRUE(nonempty)
+    }
+
+    ## conditional simulation
+    if(conditioning) {
       mod <- clusterprocess("VarGamma", mu=mu, kappa=kappa, scale=scale, nu=nu)
       result <- condSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,

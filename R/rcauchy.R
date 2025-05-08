@@ -1,7 +1,7 @@
 #'
 #'    rcauchy.R
 #'
-#'   $Revision: 1.13 $ $Date: 2025/04/25 07:01:41 $
+#'   $Revision: 1.14 $ $Date: 2025/05/08 04:56:51 $
 #'
 #'   Simulation of Cauchy cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -169,10 +169,24 @@ rCauchy <- local({
 
     ## algorithm choices
     doLambda <- isTRUE(saveLambda) || isTRUE(LambdaOnly)
-    algorithm <- match.arg(algorithm)
+    conditioning <- !is.null(n.cond)
+    if((conditioning || doLambda) && !isTRUE(spatstat.options("developer"))) {
+      ## The naive algorithm must be used
+      ## Change defaults      
+      algorithm <- if(missing(algorithm)) "naive" else match.arg(algorithm)
+      nonempty  <- if(missing(nonempty)) FALSE else isTRUE(nonempty)
+      ## Override given arguments with a warning
+      reason <- if(conditioning) "for conditional simulation" else "for intensity calculation"
+      algorithm <- warn.reset.arg(algorithm, "naive", reason)
+      nonempty  <- warn.reset.arg(nonempty,  FALSE,   reason)
+    } else {
+      ## Any choice of algorithm is permitted
+      algorithm <- match.arg(algorithm)
+      nonempty <- isTRUE(nonempty)
+    }
 
-    if(!is.null(n.cond)) {
-      ## conditional simulation
+    ## conditional simulation
+    if(conditioning) {
       mod <- clusterprocess("Cauchy", mu=mu, kappa=kappa, scale=scale)
       result <- condSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
