@@ -248,6 +248,9 @@
   There is a maximum number of proposals which will be attempted.
   Consequently the return value may contain fewer
   than \code{nsim} point patterns.
+
+  The current algorithm for conditional simulation ignores the
+  argument \code{saveparents} and does not save the parent points.
 }
 \section{Fitting cluster models to data}{
   The Variance-Gamma cluster model with homogeneous parents
