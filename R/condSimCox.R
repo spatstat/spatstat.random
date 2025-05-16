@@ -1,7 +1,7 @@
 #'
 #'    condSimCox.R
 #'
-#'    $Revision: 1.5 $ $Date: 2025/04/24 07:38:15 $
+#'    $Revision: 1.6 $ $Date: 2025/05/16 06:39:31 $
 #'
 #'    Conditional simulation for Cox models
 
@@ -13,6 +13,9 @@ condSimCox <- function(object, nsim=1,
                        verbose=TRUE, drop=FALSE) {
   stopifnot(inherits(object, c("kppm", "clusterprocess", "zclustermodel")))
 
+  #' argument used only for cluster processes
+  saveparents <- isTRUE(list(...)$saveparents)
+  
   if(is.null(window)) {
     if(!inherits(object, "kppm"))
       stop("Argument 'window' or 'win' is required", call.=FALSE)
@@ -57,6 +60,16 @@ condSimCox <- function(object, nsim=1,
           stop("Internal error: intensity images were not saved", call.=FALSE)
       } else stop("Internal error: corrupted result from simulate method")
     }
+    ## extract cluster parents if required
+    if(saveparents) {
+      parentlist <- lapply(lamlist, attr, which="parents")
+      if(any(sapply(parentlist, is.null))) {
+        warning("Internal error: cluster parents were not returned", call.=FALSE)
+        saveparents <- FALSE
+      } else {
+        clusker <- clusterkernel(object)
+      }
+    }
     ## compute acceptance probabilities
     lamlist <- lapply(lamlist, "[", i=w.sim, drop=FALSE, tight=TRUE)
     if(fullwindow) {
@@ -98,6 +111,12 @@ condSimCox <- function(object, nsim=1,
             Y <- superimpose(Ycond, Yfree, W=w.sim)
           }
           if(saveLambda) attr(Y, "Lambda") <- lamj
+          if(saveparents) {
+            genitori <- parentlist[[j]]
+            attr(Y, "parents") <- genitori
+            attr(Y, "parentid") <- assignParents(Y, genitori, clusker)
+            attr(Y, "cost") <- npoints(genitori) + npoints(Y)
+          }
         }
         results <- append(results, list(Y))
       }
@@ -124,4 +143,18 @@ condSimCox <- function(object, nsim=1,
   if(verbose && nresults == nsim)
     message(paste("Average acceptance probability", signif(mean(phistory), 3)))
   return(results)
+}
+
+assignParents <- function(offspring, parents, kernfun) {
+  #' assign parents to offspring 
+  dx <- outer(offspring$x, parents$x, "-")
+  dy <- outer(offspring$y, parents$y, "-")
+  #' offspring pdf value for each (offspring, parent) pair
+  kerval <- matrix(0, nrow=nrow(dx), ncol=ncol(dx))
+  kerval[] <- kernfun(as.numeric(dx), as.numeric(dy))
+  #' probabilities of offspring are proportional to pdf values
+  probs <- kerval/rowSums(kerval)
+  #' select
+  parentmap <- apply(probs, 1, function(p) { sample.int(length(p), 1, prob=p) })
+  return(parentmap)
 }

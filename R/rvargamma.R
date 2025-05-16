@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.11 $ $Date: 2025/05/08 04:56:34 $
+#'   $Revision: 1.12 $ $Date: 2025/05/16 06:39:05 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -99,6 +99,7 @@ rVarGamma <- local({
       result <- condSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
+                           saveparents=saveparents,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
       return(result)
@@ -206,8 +207,11 @@ rVarGamma <- local({
                                nu=nu.ker, mu=mu, ...)
         Lambda <- Lambda[win, drop=FALSE]
         if(LambdaOnly) {
+          #' save only the intensity
           result[[i]] <- Lambda
+          if(saveparents) attr(result[[i]], "parents") <- parents
         } else {
+          #' usual case - save intensity as attribute
           attr(result[[i]], "Lambda") <- Lambda
         }
       }

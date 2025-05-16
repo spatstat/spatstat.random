@@ -1,7 +1,7 @@
 #'
 #'    rcauchy.R
 #'
-#'   $Revision: 1.14 $ $Date: 2025/05/08 04:56:51 $
+#'   $Revision: 1.15 $ $Date: 2025/05/16 06:38:30 $
 #'
 #'   Simulation of Cauchy cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -191,6 +191,7 @@ rCauchy <- local({
       result <- condSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
+                           saveparents=saveparents,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
       return(result)
@@ -280,8 +281,11 @@ rCauchy <- local({
         Lambda <- clusterfield("Cauchy", parents, scale=scale, mu=mu, ...)
         Lambda <- Lambda[win, drop=FALSE]
         if(LambdaOnly) {
+          #' save only the intensity
           result[[i]] <- Lambda
+          if(saveparents) attr(result[[i]], "parents") <- parents
         } else {
+          #' usual case - save intensity as attribute
           attr(result[[i]], "Lambda") <- Lambda
         }
       }

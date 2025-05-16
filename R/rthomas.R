@@ -1,7 +1,7 @@
 #'
 #'    rthomas.R
 #'
-#'   $Revision: 1.13 $ $Date: 2025/05/08 04:57:50 $
+#'   $Revision: 1.14 $ $Date: 2025/05/16 06:38:41 $
 #' 
 #'   Simulation of modified Thomas cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -177,6 +177,7 @@ rThomas <- local({
         result <- condSimCox(mod, nsim=nsim, ...,
                              nonempty=nonempty, algorithm=algorithm,
                              win=win, n.cond=n.cond, w.cond=w.cond,
+                             saveparents=saveparents,
                              saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                              drop=drop)
         return(result)
@@ -255,8 +256,11 @@ rThomas <- local({
           Lambda <- clusterfield("Thomas", parents, scale=scale, mu=mu, ...)
           Lambda <- Lambda[win, drop=FALSE]
           if(LambdaOnly) {
+            #' save only the intensity
             result[[i]] <- Lambda
+            if(saveparents) attr(result[[i]], "parents") <- parents
           } else {
+            #' usual case - save intensity as attribute
             attr(result[[i]], "Lambda") <- Lambda
           }
         }

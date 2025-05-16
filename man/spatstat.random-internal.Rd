@@ -2,9 +2,11 @@
 \title{Internal spatstat.random functions}
 \alias{spatstat.random-internal} %DoNotExport
 
+\alias{assignParents}
 \alias{change.default.expand}
 \alias{clusterprocess}
 \alias{clusterradius.clusterprocess}
+\alias{clusterkernel.clusterprocess}
 \alias{condSimCox}
 \alias{datagen.runifpointOnLines}
 \alias{datagen.runifpoisppOnLines}
@@ -88,9 +90,11 @@
 
 
 
+assignParents(offspring, parents, kernfun)
 change.default.expand(x, newdefault)
 clusterprocess(name, \dots, mu, kappa, scale)
 \method{clusterradius}{clusterprocess}(model, \dots, thresh, precision)
+\method{clusterkernel}{clusterprocess}(model, \dots)
 condSimCox(object, nsim, \dots, win, window, n.cond, w.cond,
            giveup, maxchunk, saveLambda, LambdaOnly, verbose, drop)
 datagen.runifpointOnLines(n, L)

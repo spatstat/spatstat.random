@@ -1,7 +1,7 @@
 #'
 #'    rmatclust.R
 #'
-#'   $Revision: 1.11 $ $Date: 2025/05/08 04:58:13 $
+#'   $Revision: 1.12 $ $Date: 2025/05/16 06:39:14 $
 #'
 #'   Simulation of Matern cluster process
 #'   naive algorithm or BKBC algorithm
@@ -173,6 +173,7 @@ rMatClust <- local({
       result <- condSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
+                           saveparents=saveparents,
                            saveLambda=saveLambda, LambdaOnly=LambdaOnly,
                            drop=drop)
       return(result)
@@ -239,8 +240,11 @@ rMatClust <- local({
         Lambda <- clusterfield("MatClust", parents, scale=scale, mu=mu, ...)
         Lambda <- Lambda[win, drop=FALSE]
         if(LambdaOnly) {
+          #' save only the intensity
           result[[i]] <- Lambda
+          if(saveparents) attr(result[[i]], "parents") <- parents
         } else {
+          #' usual case - save intensity as attribute
           attr(result[[i]], "Lambda") <- Lambda
         }
       }

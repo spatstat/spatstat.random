@@ -1,7 +1,7 @@
 #'
 #'   clusterprocess.R
 #'
-#'   $Revision: 1.1 $ $Date: 2025/04/19 05:17:27 $
+#'   $Revision: 1.2 $ $Date: 2025/05/16 07:14:33 $
 #'
 
 
@@ -149,6 +149,15 @@ simulate.clusterprocess <- function(object, nsim=1, ...,
                     sQuote(object$name)),
               call.=FALSE)
          )})
+}
+
+clusterkernel.clusterprocess <- function(model, ...) {
+  info <- spatstatClusterModelInfo(model$name)
+  k <- info$kernel
+  par <- model$par.std
+  clustargs <- model$clustargs
+  f <- function(x, y=0, ...) { k(par, sqrt(x^2+y^2), margs=clustargs) }
+  return(f)
 }
 
 
