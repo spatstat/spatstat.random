@@ -1,7 +1,7 @@
 #'
 #'    condSimCox.R
 #'
-#'    $Revision: 1.6 $ $Date: 2025/05/16 06:39:31 $
+#'    $Revision: 1.7 $ $Date: 2025/05/17 09:07:58 $
 #'
 #'    Conditional simulation for Cox models
 
@@ -146,15 +146,27 @@ condSimCox <- function(object, nsim=1,
 }
 
 assignParents <- function(offspring, parents, kernfun) {
-  #' assign parents to offspring 
+  #' assign parents to offspring in Neyman-Scott Cox model
   dx <- outer(offspring$x, parents$x, "-")
   dy <- outer(offspring$y, parents$y, "-")
   #' offspring pdf value for each (offspring, parent) pair
   kerval <- matrix(0, nrow=nrow(dx), ncol=ncol(dx))
   kerval[] <- kernfun(as.numeric(dx), as.numeric(dy))
   #' probabilities of offspring are proportional to pdf values
-  probs <- kerval/rowSums(kerval)
-  #' select
-  parentmap <- apply(probs, 1, function(p) { sample.int(length(p), 1, prob=p) })
+  kersum <- rowSums(kerval)
+  probs <- kerval/kersum
+  if(all(ok <- is.finite(probs) & probs >= 0 & probs <= 1)) {
+    #' select at random 
+    parentmap <- apply(probs, 1, function(p) { sample.int(length(p), 1, prob=p) })
+  } else {
+    #' handle 0/0 etc, using l'Hopital's rule
+    badrow <- matrowany(!ok)
+    d2 <- dx^2 + dy^2
+    parentmap <- integer(nrow(probs))
+    parentmap[badrow] <- apply(d2[badrow, , drop=FALSE], 1, which.min)
+    if(!all(badrow))
+      parentmap[!badrow] <- apply(probs[!badrow, , drop=FALSE], 1,
+                                  function(p) { sample.int(length(p), 1, prob=p) })
+  }
   return(parentmap)
 }
