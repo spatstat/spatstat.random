@@ -1,7 +1,7 @@
 #'
 #'    rthomas.R
 #'
-#'   $Revision: 1.14 $ $Date: 2025/05/16 06:38:41 $
+#'   $Revision: 1.15 $ $Date: 2025/05/20 08:21:20 $
 #' 
 #'   Simulation of modified Thomas cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -174,7 +174,7 @@ rThomas <- local({
       ## conditional simulation
       if(conditioning) {
         mod <- clusterprocess("Thomas", mu=mu, kappa=kappa, scale=scale)
-        result <- condSimCox(mod, nsim=nsim, ...,
+        result <- CondSimCox(mod, nsim=nsim, ...,
                              nonempty=nonempty, algorithm=algorithm,
                              win=win, n.cond=n.cond, w.cond=w.cond,
                              saveparents=saveparents,

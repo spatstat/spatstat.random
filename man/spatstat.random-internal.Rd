@@ -7,7 +7,7 @@
 \alias{clusterprocess}
 \alias{clusterradius.clusterprocess}
 \alias{clusterkernel.clusterprocess}
-\alias{condSimCox}
+\alias{CondSimCox}
 \alias{datagen.runifpointOnLines}
 \alias{datagen.runifpoisppOnLines}
 \alias{datagen.rpoisppOnLines}
@@ -95,7 +95,7 @@ change.default.expand(x, newdefault)
 clusterprocess(name, \dots, mu, kappa, scale)
 \method{clusterradius}{clusterprocess}(model, \dots, thresh, precision)
 \method{clusterkernel}{clusterprocess}(model, \dots)
-condSimCox(object, nsim, \dots, win, window, n.cond, w.cond,
+CondSimCox(object, nsim, \dots, win, window, n.cond, w.cond,
            giveup, maxchunk, saveLambda, LambdaOnly, verbose, drop)
 datagen.runifpointOnLines(n, L)
 datagen.runifpoisppOnLines(lambda, L)

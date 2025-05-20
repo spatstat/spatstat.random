@@ -1,7 +1,7 @@
 #'
 #'    rmatclust.R
 #'
-#'   $Revision: 1.12 $ $Date: 2025/05/16 06:39:14 $
+#'   $Revision: 1.13 $ $Date: 2025/05/20 08:21:15 $
 #'
 #'   Simulation of Matern cluster process
 #'   naive algorithm or BKBC algorithm
@@ -170,7 +170,7 @@ rMatClust <- local({
     ## conditional simulation
     if(conditioning) {
       mod <- clusterprocess("MatClust", mu=mu, kappa=kappa, scale=scale)
-      result <- condSimCox(mod, nsim=nsim, ...,
+      result <- CondSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
                            saveparents=saveparents,

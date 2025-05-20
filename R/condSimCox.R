@@ -1,11 +1,11 @@
 #'
 #'    condSimCox.R
 #'
-#'    $Revision: 1.7 $ $Date: 2025/05/17 09:07:58 $
+#'    $Revision: 1.8 $ $Date: 2025/05/20 08:21:36 $
 #'
 #'    Conditional simulation for Cox models
 
-condSimCox <- function(object, nsim=1,
+CondSimCox <- function(object, nsim=1,
                        ..., win=NULL, window=win,
                        n.cond=NULL, w.cond=NULL,
                        giveup=1000, maxchunk=100,

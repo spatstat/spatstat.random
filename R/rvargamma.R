@@ -1,7 +1,7 @@
 #'
 #'    rvargamma.R
 #'
-#'   $Revision: 1.12 $ $Date: 2025/05/16 06:39:05 $
+#'   $Revision: 1.13 $ $Date: 2025/05/20 08:21:09 $
 #'
 #'   Simulation of Variance-Gamma cluster process
 #'   using either naive algorithm or BKBC algorithm
@@ -96,7 +96,7 @@ rVarGamma <- local({
     ## conditional simulation
     if(conditioning) {
       mod <- clusterprocess("VarGamma", mu=mu, kappa=kappa, scale=scale, nu=nu)
-      result <- condSimCox(mod, nsim=nsim, ...,
+      result <- CondSimCox(mod, nsim=nsim, ...,
                            nonempty=nonempty, algorithm=algorithm,
                            win=win, n.cond=n.cond, w.cond=w.cond,
                            saveparents=saveparents,
