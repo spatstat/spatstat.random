@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.124 $   $Date: 2025/03/15 03:40:12 $
+##    $Revision: 4.128 $   $Date: 2025/07/26 04:16:32 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -36,7 +36,8 @@
 ##          plot(rMaternII(100, 0.05))
 ##
 
-runifdisc <- function(n, radius=1, centre=c(0,0), ..., nsim=1, drop=TRUE)
+runifdisc <- function(n, radius=1, centre=c(0,0), ..., nsim=1, drop=TRUE,
+                      boxed=FALSE)
 {
   ## i.i.d. uniform points in the disc of radius r and centre (x,y)
   check.1.real(radius)
@@ -45,21 +46,38 @@ runifdisc <- function(n, radius=1, centre=c(0,0), ..., nsim=1, drop=TRUE)
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
   }
-  disque <- disc(centre=centre, radius=radius, ...)
+  ensure2vector(centre)
+  if(boxed) {
+    ## replace disc by square
+    disque <- owin(centre[1] + radius * c(-1,1),
+                   centre[2] + radius * c(-1,1))
+  } else {
+    ## usual case: create disc window
+    disque <- do.call(disc,
+                      resolve.defaults(list(centre=centre,
+                                            radius=radius),
+                                       list(...),
+                                       list(npoly=32)))
+  }
+  ## constants
   twopi <- 2 * pi
   rad2 <- radius^2
+  nn <- nsim * n
+  ## generate all coordinates
+  theta <- matrix(runif(nn, min=0, max=twopi), n, nsim)
+  s     <- matrix(sqrt(runif(nn, min=0, max=rad2)), n, nsim)
+  xx <- centre[1] + s * cos(theta)
+  yy <- centre[2] + s * sin(theta)
+  ## pack up
   result <- vector(mode="list", length=nsim)
-  for(isim in seq_len(nsim)) {
-    theta <- runif(n, min=0, max=twopi)
-    s <- sqrt(runif(n, min=0, max=rad2))
-    result[[isim]] <- ppp(centre[1] + s * cos(theta),
-                          centre[2] + s * sin(theta),
+  for(jsim in seq_len(nsim)) {
+    result[[jsim]] <- ppp(xx[, jsim],
+                          yy[, jsim], 
                           window=disque, check=FALSE)
   }
   result <- simulationresult(result, nsim, drop)
   return(result)
 }
-
 
 runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
                        giveup=1000, warn=TRUE, ...,

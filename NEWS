@@ -1,4 +1,15 @@
 
+        CHANGES IN spatstat.random VERSION 3.4-1.001
+
+OVERVIEW
+
+    o Efficiency improvements to runifdisc
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o runifdisc
+    Accelerated. New argument 'boxed'.
+
         CHANGES IN spatstat.random VERSION 3.4-1
 
 OVERVIEW
