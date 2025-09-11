@@ -351,6 +351,8 @@ is.poisson.rmhmodel <- function(x) {
   identical(x$cif, 'poisson')
 }
 
+is.poisson.NAobject <- function(x) { NA_integer_ }
+
 is.stationary <- function(x) {
   UseMethod("is.stationary")
 }
@@ -360,6 +362,8 @@ is.stationary.rmhmodel <- function(x) {
   tren <- x$trend
   return(is.null(tren) || is.numeric(tren))
 }
+
+is.stationary.NAobject <- function(x) { NA_integer_ }
 
 as.owin.rmhmodel <- function(W, ..., fatal=FALSE) {
   # W is the rmhmodel object. It contains a window w

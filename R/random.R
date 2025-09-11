@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.128 $   $Date: 2025/07/26 04:16:32 $
+##    $Revision: 4.129 $   $Date: 2025/09/11 22:42:45 $
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -81,12 +81,15 @@ runifdisc <- function(n, radius=1, centre=c(0,0), ..., nsim=1, drop=TRUE,
 
 runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
                        giveup=1000, warn=TRUE, ...,
+                       fail.action=c("error", "pass", "missing"),
                        nsim=1, drop=TRUE, ex=NULL)
 {
   if(!missing(nsim)) {
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
   }
+
+  fail.action <- match.arg(fail.action)
   
   if(missing(n) && missing(win) && !is.null(ex)) {
     stopifnot(is.ppp(ex))
@@ -183,8 +186,13 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
                  break
                } else if(ntries >= giveup) {
                  ## otherwise get bored eventually
-                 stop(paste("Gave up after", giveup * n, "trials,",
-                            X$n, "points accepted"))
+                 switch(fail.action,
+                        pass    = { result[[isim]] <- X },
+                        missing = { result[[isim]] <- NAobject("ppp") },
+                        error   = {
+                           stop(paste("Gave up after", giveup * n, "trials,",
+                                     X$n, "points accepted"))
+                        })
                }
              }
            }
@@ -238,12 +246,17 @@ runifpoispp <- function(lambda, win = owin(c(0,1),c(0,1)), ...,
 }
 
 rpoint <- function(n, f, fmax=NULL,
-                   win=unit.square(), ..., giveup=1000, warn=TRUE, verbose=FALSE,
+                   win=unit.square(), ..., giveup=1000,
+                   fail.action=c("error", "pass", "missing"),
+                   warn=TRUE, verbose=FALSE,
                    nsim=1, drop=TRUE, forcewin=FALSE) {
+
+  fail.action <- match.arg(fail.action)
   
   if(missing(f) || (is.numeric(f) && length(f) == 1))
     ## uniform distribution
-    return(runifpoint(n, win, giveup=giveup, warn=warn, nsim=nsim, drop=drop))
+    return(runifpoint(n, win, giveup=giveup, fail.action=fail.action,
+                      warn=warn, nsim=nsim, drop=drop))
   
   ## non-uniform distribution....
   if(!is.function(f) && !is.im(f))
@@ -310,8 +323,20 @@ rpoint <- function(n, f, fmax=NULL,
           edgy <- edgy[!inside.owin(xe, ye, win.out)]
           if(ntries > giveup) break;
         }
+        accepted <- (length(edgy) == 0)
+      } else {
+        accepted <- TRUE
       }
-      result[[isim]] <- ppp(x, y, window=win.out, check=FALSE)
+      X <- ppp(x, y, window=win.out, check=FALSE)
+      if(!accepted)
+        switch(fail.action,
+               pass    = { },
+               missing = { X <- NAobject("ppp") },
+               error   = {
+                 stop(paste("Gave up after", giveup, "trials,",
+                            X$n, "points accepted"))
+               })
+      result[[isim]] <- X
     }
     result <- simulationresult(result, nsim, drop)
     return(result)
@@ -383,9 +408,15 @@ rpoint <- function(n, f, fmax=NULL,
           }
         }
       }
-      if(ntries > giveup)
-        stop(paste("Gave up after",giveup * n,"trials with",
-                   X$n, "points accepted"))
+      if(ntries > giveup) {
+        switch(fail.action,
+               pass    = { result[[isim]] <- X },
+               missing = { result[[isim]] <- NAobject("ppp") },
+               error   = {
+                 stop(paste("Gave up after",giveup * n,"trials with",
+                            X$n, "points accepted"))
+               })
+      }
     }
   }
   result <- simulationresult(result, nsim, drop)

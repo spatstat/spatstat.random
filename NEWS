@@ -1,14 +1,20 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-1.001
+        CHANGES IN spatstat.random VERSION 3.4-1.002
 
 OVERVIEW
 
-    o Efficiency improvements to runifdisc
+    o Efficiency improvements to runifdisc.
+
+    o More options when simulating a fixed number of random points.
 
 SIGNIFICANT USER-VISIBLE CHANGES
 
     o runifdisc
     Accelerated. New argument 'boxed'.
+
+    o runifpoint, rpoint, rmpoint
+    New argument 'fail.action' specifies what to do if the required number of
+    random points cannot be generated. 
 
         CHANGES IN spatstat.random VERSION 3.4-1
 

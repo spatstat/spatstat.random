@@ -7,6 +7,7 @@
 }
 \usage{
  runifpoint(n, win=owin(c(0,1),c(0,1)), giveup=1000, warn=TRUE, \dots,
+            fail.action=c("error", "pass", "missing"),
             nsim=1, drop=TRUE, ex=NULL)
 }
 \arguments{
@@ -29,6 +30,16 @@
     See Details.
   }
   \item{\dots}{Ignored.}
+  \item{fail.action}{
+    Character string (partially matched) specifying what to do
+    if the number of attempts exceeds \code{giveup}.
+    If \code{fail.action="error"} (the default), a fatal error will be
+    generated. If \code{fail.action="pass"}, the pattern of accepted
+    points (containing fewer than \code{n} points) will be returned.
+    If \code{fail.action="missing"}, the result will be a
+    \sQuote{missing point pattern}, an object belonging to
+    the classes \code{"NAobject"} and \code{"ppp"}.
+  }
   \item{nsim}{Number of simulated realisations to be generated.}
   \item{drop}{
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the

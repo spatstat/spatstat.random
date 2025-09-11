@@ -171,7 +171,9 @@ rmpoint <- local({
   rmpoint <- function(n, f=1, fmax=NULL, 
                       win = unit.square(), 
                       types, ptypes, ...,
-                      giveup = 1000, verbose = FALSE,
+                      giveup = 1000,
+                      fail.action=c("error", "pass", "missing"),
+                      verbose = FALSE,
                       nsim = 1, drop=TRUE) {
     if(!is.numeric(n))
       stop("n must be a scalar or vector")
@@ -185,6 +187,8 @@ rmpoint <- local({
     check.1.integer(nsim)
     stopifnot(nsim >= 0)
 
+    fail.action <- match.arg(fail.action)
+    
     ######  Trivial cases
 
     if(nsim == 0) return(simulationresult(list()))
@@ -342,7 +346,7 @@ rmpoint <- local({
         ## All types have the same conditional density of location;
         ## generate the locations using rpoint
         X <- rpoint(ntot, flist[[1]], maxes[[1]], win=win, ...,
-                    giveup=giveup, verbose=verbose)
+                    giveup=giveup, fail.action=fail.action, verbose=verbose)
         resultlist[[isim]] <- X %mark% marques
       } else {
         ## Invoke rpoint() for each type separately
@@ -354,14 +358,19 @@ rmpoint <- local({
           if(single.arg && is.function(f)) {
             ## want to call f(x,y,m, ...)
             Y <- rpoint(nn[i], funwithfixedmark, fmax=maxes[i], win=win,
-                        ..., m=factortype[i], fun=f, giveup=giveup, verbose=verbose)
+                        ..., m=factortype[i], fun=f,
+                        giveup=giveup, fail.action=fail.action, verbose=verbose)
           } else {
             ## call f(x,y, ...) or use other formats
             Y <- rpoint(nn[i], flist[[i]], fmax=maxes[i], win=win,
-                        ..., giveup=giveup, verbose=verbose)
+                        ..., giveup=giveup, fail.action=fail.action, verbose=verbose)
           }
-          Y <- Y %mark% factortype[i]
-          X[marques == factortype[i]] <- Y
+          if(is.NAobject(Y)) {
+            X <- NAobject("ppp")
+          } else {
+            Y <- Y %mark% factortype[i]
+            X[marques == factortype[i]] <- Y
+          }
         }
         resultlist[[isim]] <- X
       }
@@ -429,7 +438,8 @@ rmpoint.I.allim <- local({
 ##
 rpoint.multi <- function (n, f, fmax=NULL, marks = NULL,
                           win = unit.square(),
-                          giveup = 1000, verbose = FALSE,
+                          giveup = 1000, fail.action=c("error", "pass", "missing"),
+                          verbose = FALSE,
                           warn=TRUE, nsim=1, drop=TRUE) {
   check.1.integer(nsim)
   stopifnot(nsim >= 0)
@@ -437,9 +447,11 @@ rpoint.multi <- function (n, f, fmax=NULL, marks = NULL,
   if(is.null(marks) || (is.factor(marks) && length(levels(marks)) == 1)) {
     ## Unmarked
     if(is.function(f)) {
-      return(rpoint(n, f, fmax, win, nsim=nsim, warn=warn, giveup=giveup, verbose=verbose))
+      return(rpoint(n, f, fmax, win, nsim=nsim,
+                    warn=warn, giveup=giveup, fail.action=fail.action, verbose=verbose))
     } else {
-      return(rpoint(n, f, fmax,      nsim=nsim, warn=warn, giveup=giveup, verbose=verbose))
+      return(rpoint(n, f, fmax,      nsim=nsim,
+                    warn=warn, giveup=giveup, fail.action=fail.action, verbose=verbose))
     }
   }
 
@@ -466,23 +478,25 @@ rpoint.multi <- function (n, f, fmax=NULL, marks = NULL,
   ## generate required number of points of each type
   Xlist <- rmpoint(nums, f, fmax, win=win, types=types,
                    nsim=nsim, drop=FALSE,
-                   giveup=giveup, verbose=verbose)
+                   giveup=giveup, fail.action=fail.action, verbose=verbose)
   ## Reorder them to correspond to the desired 'marks' vector
   for(isim in seq_len(nsim)) {
     X <- Xlist[[isim]]
-    if(any(table(marks(X)) != nums))
-      stop("Internal error: output of rmpoint illegal")
     Y <- X
-    Xmarks <- marks(X)
-    for(ty in types) {
-      to   <- (marks == ty)
-      from <- (Xmarks == ty)
-      if(sum(to) != sum(from))
-        stop(paste("Internal error: mismatch for mark =", ty))
-      if(any(to)) {
-        Y$x[to] <- X$x[from]
-        Y$y[to] <- X$y[from]
-        Y$marks[to] <- ty
+    if(!is.NAobject(X)) {
+      Xmarks <- marks(X)
+      if(any(table(Xmarks) != nums))
+        stop("Internal error: output of rmpoint illegal")
+      for(ty in types) {
+        to   <- (marks == ty)
+        from <- (Xmarks == ty)
+        if(sum(to) != sum(from))
+          stop(paste("Internal error: mismatch for mark =", ty))
+        if(any(to)) {
+          Y$x[to] <- X$x[from]
+          Y$y[to] <- X$y[from]
+          Y$marks[to] <- ty
+        }
       }
     }
     resultlist[[isim]] <- Y

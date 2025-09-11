@@ -8,7 +8,9 @@
 \usage{
  rmpoint(n, f=1, fmax=NULL, win=unit.square(),
          types, ptypes,
-         \dots, giveup=1000, verbose=FALSE,
+         \dots, giveup=1000,
+         fail.action=c("error", "pass", "missing"),
+         verbose=FALSE,
          nsim=1, drop=TRUE)
 }
 \arguments{
@@ -45,6 +47,16 @@
   \item{giveup}{
     Number of attempts in the rejection method after which
     the algorithm should stop trying to generate new points.
+  }
+  \item{fail.action}{
+    Character string (partially matched) specifying what to do
+    if the number of attempts exceeds \code{giveup}.
+    If \code{fail.action="error"} (the default), a fatal error will be
+    generated. If \code{fail.action="pass"}, the pattern of accepted
+    points (containing fewer than \code{n} points) will be returned.
+    If \code{fail.action="missing"}, the result will be a
+    \sQuote{missing point pattern}, an object belonging to
+    the classes \code{"NAobject"} and \code{"ppp"}.
   }
   \item{verbose}{
     Flag indicating whether to report details of performance

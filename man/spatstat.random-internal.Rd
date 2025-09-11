@@ -23,6 +23,8 @@
 \alias{is.cadlag}
 \alias{is.expandable}
 \alias{is.expandable.rmhmodel}
+\alias{is.poisson.NAobject}
+\alias{is.stationary.NAobject}
 \alias{kraever}
 \alias{kraeverRandomFields}
 \alias{MultiPair.checkmatrix}
@@ -114,6 +116,8 @@ HermiteCoefs(order)
 is.cadlag(s)
 is.expandable(x)
 \method{is.expandable}{rmhmodel}(x) 
+\method{is.poisson}{NAobject}(x) 
+\method{is.stationary}{NAobject}(x) 
 kraever(package, fatal)
 kraeverRandomFields()
 MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
@@ -161,7 +165,8 @@ rmhSnoopEnv(Xinit, Wclip, R)
 \method{rmhstart}{rmhstart}(start, \dots) 
 \method{rmhstart}{list}(start, \dots) 
 rmpoint.I.allim(n, f, types, nsim)
-rpoint.multi(n, f, fmax, marks, win, giveup, verbose, warn, nsim, drop)
+rpoint.multi(n, f, fmax, marks, win, giveup, fail.action,
+             verbose, warn, nsim, drop)
 rthinEngine(X, P, \dots, nsim, drop, Pmax, na.zero, what, fatal, warn)
 runifpoispp(lambda, win, \dots, nsim, drop)
 runifpoisppOnLines(lambda, L, nsim, drop)
