@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.66 $ $Date: 2025/04/18 04:18:17 $
+#'   $Revision: 1.67 $ $Date: 2025/10/05 13:12:55 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -824,9 +824,33 @@ resolve.vargamma.shape <- function(...,
                   1)
     return(as.numeric(1 + sig2 * fr))
   },
-  A1 = NULL,
-  a1 = NULL,
-  a1prime = NULL,
+  A1 = function(r, ..., margs) {
+    nu.pcf <- margs$nu.pcf
+    phi <- 1/(4 * pi * nu.pcf)
+    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    ## Matern correlation function
+    fr <- ifelseXB(r > 0,
+                  (r^nu.pcf) * besselK(r, nu.pcf) / denom,
+                  1)
+    return(as.numeric(phi * fr))
+  },
+  a1 = function(r, ..., margs) {
+    nu.pcf <- margs$nu.pcf
+    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    ## Matern correlation function
+    fr <- ifelseXB(r > 0,
+                  (r^nu.pcf) * besselK(r, nu.pcf) / denom,
+                  1)
+    return(as.numeric(fr))
+  },
+  a1prime = function(r, ..., margs) {
+    nu.pcf <- margs$nu.pcf
+    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    fr <- ifelseXB(r > 0,
+                  (r^nu.pcf) * besselK(r, nu.pcf - 1) / denom,
+                  0)
+    return(as.numeric(-fr))
+  },
   Dpcf = NULL,
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ..., margs) {
