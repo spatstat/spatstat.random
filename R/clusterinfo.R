@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.67 $ $Date: 2025/10/05 13:12:55 $
+#'   $Revision: 1.68 $ $Date: 2025/10/08 14:39:43 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -273,6 +273,7 @@ detect.par.format <- function(par, native, generic) {
   A1 = function(r, ...) { exp(-r^2/4)/(4*pi) },
   a1 = function(r, ...) { exp(-r^2/4) },
   a1prime = function(r, ...) { -(r/2) * exp(-r^2/4) },
+  a1primeprime = function(r, ...) { (r^2/4 - 1/2) * exp(-r^2/4) },
   ## gradient of pcf (contributed by Chiara Fend)
   Dpcf= function(par,rvals, ..., strict=TRUE){
     ## 'par' is in native format
@@ -447,6 +448,9 @@ detect.par.format <- function(par, native, generic) {
   A1 = function(r, ...) { .MatClustgfun(r/2)/pi },
   a1 = function(r, ...) { .MatClustgfun(r/2) },
   a1prime = function(r, ...) { ifelse(r < 2, -(2/pi) * sqrt(1 - r^2/4), 0) },
+  a1primeprime = function(r, ...) {
+    ifelse(r < 2, -r/(2*pi * sqrt(1 - r^2/4)), 0)
+  },
   Dpcf= function(par,rvals, ...){
     ## 'par' is in native format
     kappa <- par[1L]
@@ -587,6 +591,9 @@ detect.par.format <- function(par, native, generic) {
   A1 = function(r, ...) {  ((1 + r^2/4)^(-1.5))/(8 * pi) },
   a1 = function(r, ...) {  (1 + r^2/4)^(-1.5) },
   a1prime = function(r, ...) {  (-3*r/4) * (1 + r^2/4)^(-2.5) },
+  a1prime = function(r, ...) {
+    (-3/4) * (1 + r^2/4)^(-5/2) + (15/16) * (1 + r^2/4)^(-7/2) 
+  },
   Dpcf= function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0)){
@@ -835,21 +842,30 @@ resolve.vargamma.shape <- function(...,
     return(as.numeric(phi * fr))
   },
   a1 = function(r, ..., margs) {
-    nu.pcf <- margs$nu.pcf
-    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    nu <- margs$nu.pcf
+    denom <- 2^(nu - 1) * gamma(nu)
     ## Matern correlation function
     fr <- ifelseXB(r > 0,
-                  (r^nu.pcf) * besselK(r, nu.pcf) / denom,
+                  (r^nu) * besselK(r, nu) / denom,
                   1)
     return(as.numeric(fr))
   },
   a1prime = function(r, ..., margs) {
-    nu.pcf <- margs$nu.pcf
-    denom <- 2^(nu.pcf - 1) * gamma(nu.pcf)
+    nu <- margs$nu.pcf
+    denom <- 2^(nu - 1) * gamma(nu)
     fr <- ifelseXB(r > 0,
-                  (r^nu.pcf) * besselK(r, nu.pcf - 1) / denom,
+                  (r^nu) * besselK(r, nu - 1) / denom,
                   0)
     return(as.numeric(-fr))
+  },
+  a1primeprime = function(r, ..., margs) {
+    nu <- margs$nu.pcf
+    denom <- 2^(nu - 1) * gamma(nu)
+    fr <- ifelseXB(r > 0,
+                   (nu * (r^(nu-1)) * besselK(r, nu - 1)
+                     - (1/2) * (r^nu) * (besselK(r, nu-2) + besselK(r, nu))),
+                   0)
+    return(as.numeric(fr/denom))
   },
   Dpcf = NULL,
   ## Convert to/from canonical cluster parameters
