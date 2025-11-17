@@ -97,7 +97,7 @@
 }
 \examples{
 if(require(spatstat.model)) {
-  fit <- ppm(cells ~1, Strauss(0.07))
+  fit <- ppm(cells ~1, Strauss(0.07), nd=20)
   default.expand(fit)
 }
   mod <- rmhmodel(cif="strauss", par=list(beta=100, gamma=0.5, r=0.07))

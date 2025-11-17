@@ -187,6 +187,8 @@
 
 For fitting the model, see \code{\link[spatstat.model]{kppm}},
 \code{\link[spatstat.model]{lgcp.estK}}.
+
+For generating Gaussian Random Fields, see \code{\link[spatstat.random]{rGRFgauss}}.
 }
 \references{
   \Moller, J., Syversveen, A. and Waagepetersen, R. (1998)

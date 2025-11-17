@@ -42,16 +42,11 @@
 \alias{reheat}
 \alias{resolve.vargamma.shape}
 \alias{retrieve.param}
+\alias{rGRFcircembed}
 \alias{rMaternInhibition}
 \alias{rMatClustHom}
 \alias{rThomasHom}
 \alias{rCauchyHom}
-\alias{rGRFcircembed}
-\alias{rGRFgauss}
-\alias{rGRFexpo}
-\alias{rGRFstable}
-\alias{rGRFgencauchy}
-\alias{rGRFmatern}
 \alias{rPoissonClusterEngine}
 \alias{RmhExpandRule}
 \alias{rmhsnoop}
@@ -135,18 +130,13 @@ RandomFieldsSafe()
 reheat(model, invtemp)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, nu, allow.nu, allow.default)
 retrieve.param(desired, aliases, \dots, par)
+rGRFcircembed(W, mu, var, corrfun, \dots, nsim, drop)
 rMaternInhibition(type, kappa, r, win, stationary, \dots, nsim, drop)
 rMatClustHom(kappa, mu, R, W, \dots, nsim, drop, inflate, saveparents)
 rThomasHom(kappa, mu, sigma, W, \dots,
            nsim, drop, inflate, saveparents, maxinflate)
 rCauchyHom(kappa, mu, scale, W, \dots,
            nsim, drop, inflate, saveparents, maxinflate)
-rGRFcircembed(W, mu, var, corrfun, \dots, nsim, drop)
-rGRFgauss(W, mu, var, scale, \dots, nsim, drop)
-rGRFexpo(W, mu, var, scale, \dots, nsim, drop)
-rGRFstable(W, mu, var, scale, alpha, \dots, nsim, drop)
-rGRFgencauchy(W, mu, var, scale, alpha, beta, \dots, nsim, drop)
-rGRFmatern(W, mu, var, scale, nu, \dots, nsim, drop)
 rPoissonClusterEngine(kappa, expand, rcluster, win, \dots,
                       nsim, drop, saveparents, kappamax, lmax, rmax) 
 RmhExpandRule(nama)

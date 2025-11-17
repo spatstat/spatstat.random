@@ -1,10 +1,17 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-2.004
+        CHANGES IN spatstat.random VERSION 3.4-2.005
 
 OVERVIEW
 
+    o Generate Gaussian Random Fields.
+    
     o Internal improvements.
 
+NEW FUNCTIONS
+
+    o rGRFexpo, rGRFgauss, rGRFmatern, rGRFstable, rGRFgencauchy
+    Generate a Gaussian Random Field.
+    
         CHANGES IN spatstat.random VERSION 3.4-2
 
 OVERVIEW
