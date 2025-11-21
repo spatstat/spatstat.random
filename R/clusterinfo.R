@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.70 $ $Date: 2025/10/09 14:51:59 $
+#'   $Revision: 1.76 $ $Date: 2025/11/21 02:05:24 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -13,6 +13,8 @@
 #' 
 #'   Each list entry contains information about a particular cluster mechanism.
 #'   It is a list with the following entries:
+#'
+#'   ................... Names .............................................
 #'
 #'       modelname       (String) The name of the process as it would be stated in an article
 #'                       e.g. "Neyman-Scott process with Cauchy kernel"
@@ -45,10 +47,10 @@
 #'                       The names of any shape parameters of the kernel
 #'                       that could/should be provided by the user
 #'                       e.g.   'nu'
+#'                       Or "*" if shape parameters are present but their names are not fixed
 #'
-#'       clustargsnames  (Character vector)
-#'                       DEPRECATED
-#'                       Identical to shapenames
+#' 
+#'   ................... Argument processing  ..............................
 #'       
 #'       checkpar        function(par, native=TRUE, ...)
 #'                       Validates the parameters 'par' (in either format)
@@ -63,22 +65,22 @@
 #'       outputshape     function(margs, ..)
 #'                       Convert 'margs' to the format required for printed output.
 #' 
-#'       checkclustargs  function(margs, old=TRUE, ...)
-#'                       DEPRECATED: equivalent to outputshape(...)
-#'                       If old=TRUE, return 'margs' (NEVER USED)
-#'                       If old=FALSE, convert 'margs' to the format required for output.
-#'
 #'       resolveshape    function(...) 
 #'                       Extracts any shape parameters that may be present in '...'
 #'                       under different aliases or formats (e.g. 'nu.pcf' versus 'nu.ker').
 #'                       Returns list(margs, covmodel) where covmodel=list(type, model, margs)
 #'                       where 'margs' is in the format required for internal use.
 #' 
-#'       resolvedots     function(...)
-#'                       DEPRECATED - equivalent to resolveshape(...)
+#'       tocanonical     function(par, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Convert 'par' from native format to experimental 'canonical' format
 #'
-#'       parhandler      function(...)
-#'                       DEPRECATED - equivalent to function(...) { resolveshape(...)$covmodel }
+#'       tohuman         function(can, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Convert from experimental 'canonical' format to 'native' par format
+#'
+#'   ................... Properties of the cluster mechanism . ..............
+#'   ................... [defined only for cluster processes] ...............
 #'
 #'       ddist           function(r, scale, ...)
 #'                       One-dimensional probability density of distance from parent to offspring
@@ -90,11 +92,15 @@
 #'                       (thresh = probability that parent-to-offspring distance exceeds this radius)
 #'
 #'       kernel          function(par, rvals, ..., margs)
-#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
 #'                       compute kernel (two-dimensional probability density of offspring)
 #'                       as a function of distance from parent to offspring.
 #'                       'par' is in native format
 #'                       'margs' is a list of shape arguments, if required
+#'
+#'       kerinverse       function(par, level, ..., margs)
+#'                       [OPTIONAL]
+#'                       compute the minimum distance at which kernel <= level
+#'                       'par' is in native format
 #'
 #'       isPCP           logical.
 #'                       TRUE iff the model is a Poisson cluster process
@@ -102,29 +108,49 @@
 #'       iscompact       logical.
 #'                       TRUE if the kernel has compact support.
 #'
-#'       roffspring      function(n, par, ..., margs)
-#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'       roffspring      function(n, par, ..., model, margs)
 #'                       Random generator of cluster.
 #'                       Generates n offspring of a parent at the origin.
 #'
+#'   ................... Properties of the point process ..............
+#' 
 #'       K               function(par, rvals, ..., model, margs)
 #'                       Compute K-function
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
+#'
+#'       B1              function(par, rvals, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Standardised term in K function: equals K function when kappa = 1, scale=1.
 #'                        
 #'       pcf             function(par, rvals, ..., model, margs)
 #'                       Compute pair correlation function
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
 #'                       
+#'       A1              function(par, rvals, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Standardised term in pcf: equals pcf when kappa = 1, scale=1.
+#'                        
+#'       a1              function(par, rvals, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Standardised term in pcf: a1(r) = A1(r)/A1(0).
+#' 
+#'       a1prime         function(par, rvals, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Derivative of a1(r) with respect to r
+#' 
+#'       a1primeprime    function(par, rvals, ..., model, margs)
+#'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
+#'                       Second derivative of a1(r) with respect to r
+#'                        
 #'       Dpcf            function(par, rvals, ..., model, margs)
-#'                       Compute vector of partial derivatives of pair correlation function with respect to 'par'
+#'                       Compute vector of partial derivatives of pair correlation function
+#'                       with respect to 'par' 
 #'                       'par' is in native format
 #'                       Arguments 'model', 'margs' are required if there are shape parameters
 #'
-#'       funaux          DEPRECATED
-#'                       List of additional functions used in computation
-#'                       (These should now be defined as stand-alone objects)
+#' ...................... Utilities .........................................................
 #'
 #'       selfstart       function(X)
 #'                       Calculates reasonable default estimates of 'par' from point pattern X
@@ -133,8 +159,6 @@
 #'       interpret       function(par, lambda)
 #'                       Return a full set of model parameters in a meaningful format for printing
 #'
-#'       roffspring      function(n, par, ..., model, margs)
-#'                       Generates random offspring of a parent at the origin
 #'
 
 #' ..................................................................................................
@@ -194,7 +218,7 @@ detect.par.format <- function(par, native, generic) {
   printmodelname = function(...) "Thomas process", # Used by print.kppm
   parnames       = c("kappa", "sigma2"),
   shapenames     = NULL,
-  clustargsnames = NULL,
+  ## ............... Argument processing ................................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
     ## 'par' is in either format
     if(is.null(par))
@@ -219,11 +243,25 @@ detect.par.format <- function(par, native, generic) {
     return(par)
   },
   outputshape = function(margs, ...) list(),
-  checkclustargs = function(margs, old = TRUE, ...) list(),
   resolveshape = function(...){ return(list(...)) },
-  resolvedots = function(...){ return(list(...)) },
-  parhandler = NULL,
-  ## density function for the distance to offspring
+  ## Convert to/from canonical cluster parameters
+  tocanonical = function(par, ...) {
+    ## 'par' is in native format
+    ## convert to experimental 'canonical' format
+    kappa <- par[[1L]]
+    sigma2 <- par[[2L]]
+    c(strength=1/(4 * pi * kappa * sigma2), scale=sqrt(sigma2))
+  },
+  tohuman = function(can, ...) {
+    ## 'can' is in 'canonical' format
+    ## convert to native format
+    strength <- can[[1L]]
+    scale <- can[[2L]]
+    sigma2 <- scale^2
+    c(kappa=1/(4 * pi * strength * sigma2), sigma2=sigma2)
+  },
+  ## .......... Properties of the cluster mechanism ............
+  ## Density function for the distance to offspring
   ddist = function(r, scale, ...) {
     ## 'scale' is generic format
     2 * pi * r * dnorm(r, 0, scale)/sqrt(2*pi*scale^2)
@@ -241,10 +279,19 @@ detect.par.format <- function(par, native, generic) {
     }
     return(rmax)
   },
+  ## Cluster kernel (2D probability density, expressed as function of distance from origin)
   kernel = function(par, rvals, ...) {
     ## 'par' is in native format
     scale <- sqrt(par[2L])
     dnorm(rvals, 0, scale)/sqrt(2*pi*scale^2)
+  },
+  ## Distance at which 2D kernel falls below 'level'
+  kerinverse = function(par, level, ...) {
+    ## 'par' is in native format
+    sigma2 <- par[2L]
+    v <- - 2 * sigma2 * log(2 * pi * sigma2 * level)
+    r <- if(v <= 0) 0 else sqrt(v)
+    return(r)
   },
   isPCP=TRUE,
   iscompact=FALSE,
@@ -253,6 +300,7 @@ detect.par.format <- function(par, native, generic) {
     sigma <- sqrt(par[2L])
     list(x=rnorm(n, sd=sigma), y=rnorm(n, sd=sigma))
   },
+  ## .............. Properties of the point process ...................
   ## K-function
   K = function(par,rvals, ..., strict=TRUE){
     ## 'par' is in native format
@@ -274,7 +322,7 @@ detect.par.format <- function(par, native, generic) {
   a1 = function(r, ...) { exp(-r^2/4) },
   a1prime = function(r, ...) { -(r/2) * exp(-r^2/4) },
   a1primeprime = function(r, ...) { (r^2/4 - 1/2) * exp(-r^2/4) },
-  ## gradient of pcf (contributed by Chiara Fend)
+  ## gradient of pcf with respect to 'par' (contributed by Chiara Fend)
   Dpcf= function(par,rvals, ..., strict=TRUE){
     ## 'par' is in native format
     if(strict && any(par <= 0)){
@@ -287,22 +335,6 @@ detect.par.format <- function(par, native, generic) {
     out <- rbind(dkappa, dsigma2)
     rownames(out) <- c("kappa","sigma2")
     return(out)
-  },
-  ## Convert to/from canonical cluster parameters
-  tocanonical = function(par, ...) {
-    ## 'par' is in native format
-    ## convert to experimental 'canonical' format
-    kappa <- par[[1L]]
-    sigma2 <- par[[2L]]
-    c(strength=1/(4 * pi * kappa * sigma2), scale=sqrt(sigma2))
-  },
-  tohuman = function(can, ...) {
-    ## 'can' is in 'canonical' format
-    ## convert to native format
-    strength <- can[[1L]]
-    scale <- can[[2L]]
-    sigma2 <- scale^2
-    c(kappa=1/(4 * pi * strength * sigma2), sigma2=sigma2)
   },
   ## sensible starting parameters
   selfstart = function(X) {
@@ -318,10 +350,6 @@ detect.par.format <- function(par, native, generic) {
     mu <- if(is.numeric(lambda) && length(lambda) == 1)
             lambda/kappa else NA
     c(kappa=kappa, sigma=sigma, mu=mu)
-  },
-  roffspring = function(n, par, ...) {
-    sd <- sqrt(par[["sigma2"]])
-    list(x=rnorm(n, sd=sd), y=rnorm(n, sd=sd))
   }
 )
 
@@ -381,7 +409,7 @@ detect.par.format <- function(par, native, generic) {
   printmodelname = function(...) "Matern cluster process", # Used by print.kppm
   parnames       = c("kappa", "R"),
   shapenames     = NULL,
-  clustargsnames = NULL,
+  ## ............ Argument processing ...........................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
     ## 'par' is in either format
     if(is.null(par))
@@ -396,7 +424,25 @@ detect.par.format <- function(par, native, generic) {
     names(par) <- c("kappa", "scale")
     return(par)
   },
-  ## density function for the distance to offspring
+  outputshape = function(margs,  ...) list(),
+  resolveshape = function(...){ return(list(...)) },
+  ## Convert to/from canonical cluster parameters
+  tocanonical = function(par, ...) {
+    ## 'par' is in native format
+    ## convert to experimental 'canonical' format
+    kappa <- par[[1L]]
+    R <- par[[2L]]
+    c(strength=1/(pi * kappa * R^2), scale=R)
+  },
+  tohuman = function(can, ...) {
+    ## 'can' is in 'canonical' format
+    ## convert to native format
+    strength <- can[[1L]]
+    scale <- can[[2L]]
+    c(kappa=1/(pi * strength * scale^2), R=scale)
+  },
+  ## ............. Properties of cluster mechanism ........................
+  ## Density function for the distance to offspring
   ddist = function(r, scale, ...) {
     ## 'scale' is generic format
     ifelse(r>scale, 0, 2 * r / scale^2)
@@ -407,15 +453,19 @@ detect.par.format <- function(par, native, generic) {
     scale <- retrieve.param("scale", "R", ..., par=par)
     return(scale)
   },
-  outputshape = function(margs,  ...) list(),
-  checkclustargs = function(margs, old = TRUE, ...) list(),
-  resolveshape = function(...){ return(list(...)) },
-  resolvedots = function(...){ return(list(...)) },
-  parhandler = NULL,
+  ## cluster kernel (2D probability density, expressed as function of distance from origin)
   kernel = function(par, rvals, ...) {
     ## 'par' is in native format
     scale <- par[2L]
     ifelse(rvals>scale, 0, 1/(pi*scale^2))
+  },
+  ## Distance at which 2D kernel falls below 'level'
+  kerinverse = function(par, level, ...) {
+    ## 'par' is in native format
+    R <- par[2L]
+    f <- 1/(pi * R^2)
+    r <- if(f <= level) 0 else R
+    return(r)
   },
   isPCP=TRUE,
   iscompact=TRUE,
@@ -426,6 +476,7 @@ detect.par.format <- function(par, native, generic) {
     theta <- runif(n, max=2*pi)
     list(x = rad * cos(theta), y = rad * sin(theta))
   },
+  ## ................. Properties of the point process ..................
   K = function(par,rvals, ...){
     ## 'par' is in native format
     if(any(par <= 0))
@@ -466,21 +517,7 @@ detect.par.format <- function(par, native, generic) {
     rownames(out) <- c("kappa","R")
     return(out)
   },         
-  ## Convert to/from canonical cluster parameters
-  tocanonical = function(par, ...) {
-    ## 'par' is in native format
-    ## convert to experimental 'canonical' format
-    kappa <- par[[1L]]
-    R <- par[[2L]]
-    c(strength=1/(pi * kappa * R^2), scale=R)
-  },
-  tohuman = function(can, ...) {
-    ## 'can' is in 'canonical' format
-    ## convert to native format
-    strength <- can[[1L]]
-    scale <- can[[2L]]
-    c(kappa=1/(pi * strength * scale^2), R=scale)
-  },
+  ## ................ Utilities ...................................
   ## sensible starting paramters
   selfstart = function(X) {
     ## return 'par' in native format
@@ -495,12 +532,6 @@ detect.par.format <- function(par, native, generic) {
     mu    <- if(is.numeric(lambda) && length(lambda) == 1)
                lambda/kappa else NA           
     c(kappa=kappa, R=R, mu=mu)
-  },
-  roffspring = function(n, par, ...) {
-    R <- par[["R"]]
-    rad <- R * sqrt(runif(n))
-    theta <- runif(n, max=2*pi)
-    list(x = rad * cos(theta), y = rad * sin(theta))
   }
 )
 
@@ -516,7 +547,7 @@ detect.par.format <- function(par, native, generic) {
   printmodelname = function(...) "Cauchy process", # Used by print.kppm
   parnames       = c("kappa", "eta2"),
   shapenames     = NULL,
-  clustargsnames = NULL,
+  ## .................. Argument processing ...................................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
     ## 'par' is in either format
     if(is.null(par))
@@ -543,70 +574,7 @@ detect.par.format <- function(par, native, generic) {
     return(par)
   },
   outputshape = function(margs, ...) list(),
-  checkclustargs = function(margs, old = TRUE, ...) list(),
   resolveshape = function(...){ return(list(...)) },
-  resolvedots = function(...){ return(list(...)) },
-  parhandler = NULL,
-  ## density function for the distance to offspring
-  ddist = function(r, scale, ...) {
-    ## 'scale' is generic format
-    r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
-  },
-  ## Practical range of clusters
-  range = function(..., par=NULL, thresh=0.01){
-    ## 'par' is in generic format
-    thresh <- as.numeric(thresh %orifnull% 0.01)
-    scale <- retrieve.param("scale", character(0), ..., par=par)
-    ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
-    ## solve for integral = 1-thresh:
-    rmax <- scale * sqrt(1/thresh^2 - 1)
-    return(rmax)
-  },
-  kernel = function(par, rvals, ...) {
-    ## 'par' is in native format
-    scale <- sqrt(par[2L])/2
-    1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
-  },
-  isPCP=TRUE,
-  iscompact=FALSE,
-  roffspring=function(n, par, ...) {
-    ## 'par' is in native format
-    rate <- par[["eta2"]]/8 
-    b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
-    list(x = b * rnorm(n), y = b * rnorm(n))
-  },
-  K = function(par,rvals, ...){
-    ## 'par' is in native format
-    if(any(par <= 0))
-      return(rep.int(Inf, length(rvals)))
-    pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
-  },
-  B1 = function(r, ...) { 1 - 1/sqrt(1 + r^2/4) },
-  pcf= function(par,rvals, ...){
-    ## 'par' is in native format
-    if(any(par <= 0))
-      return(rep.int(Inf, length(rvals)))
-    1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
-  },
-  A1 = function(r, ...) {  ((1 + r^2/4)^(-1.5))/(8 * pi) },
-  a1 = function(r, ...) {  (1 + r^2/4)^(-1.5) },
-  a1prime = function(r, ...) {  (-3*r/4) * (1 + r^2/4)^(-2.5) },
-  a1prime = function(r, ...) {
-    (-3/4) * (1 + r^2/4)^(-5/2) + (15/16) * (1 + r^2/4)^(-7/2) 
-  },
-  Dpcf= function(par,rvals, ...){
-    ## 'par' is in native format
-    if(any(par <= 0)){
-      dkappa <- rep.int(Inf, length(rvals))
-      deta2 <- rep.int(Inf, length(rvals))
-    } else {
-      dkappa <- -(1 + rvals^2/par[2L])^(-1.5)/(2 * pi * par[2L] * par[1L]^2)
-      deta2 <- 1.5 * rvals^2 * (1 + rvals^2/par[2L])^(-2.5)/(2 * par[2L]^3 * par[1L] * pi) - (1 + rvals^2/par[2L])^(-1.5)/(2*pi*par[1L]*par[2L]^2)
-    }
-    out <- rbind(dkappa, deta2)
-    rownames(out) <- c("kappa","eta2")
-    return(out)
-  },
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ...) {
     ## 'par' is in native format
@@ -623,6 +591,77 @@ detect.par.format <- function(par, native, generic) {
     eta2 <- 4 * scale^2
     c(kappa=1/(2 * pi * strength * eta2), eta2=eta2)
   },
+  ## ...................... Properties of the cluster mechanism ....................
+  ## density function for the distance to offspring
+  ddist = function(r, scale, ...) {
+    ## 'scale' is generic format
+    r/(scale^2) *  (1 + (r / scale)^2)^(-3/2)
+  },
+  ## Practical range of clusters
+  range = function(..., par=NULL, thresh=0.01){
+    ## 'par' is in generic format
+    thresh <- as.numeric(thresh %orifnull% 0.01)
+    scale <- retrieve.param("scale", character(0), ..., par=par)
+    ## integral of ddist(r) dr is 1 - (1+(r/scale)^2)^(-1/2)
+    ## solve for integral = 1-thresh:
+    rmax <- scale * sqrt(1/thresh^2 - 1)
+    return(rmax)
+  },
+  ## Offspring kernel (2D probability density, expressed as function of distance from origin)
+  kernel = function(par, rvals, ...) {
+    ## 'par' is in native format
+    scale <- sqrt(par[2L])/2
+    1/(2*pi*scale^2)*((1 + (rvals/scale)^2)^(-3/2))
+  },
+  ## Distance at which 2D kernel falls below 'level'
+  kerinverse = function(par, level, ...) {
+    ## 'par' is in native format
+    scale2 <- par[2L]/4
+    r <- max(0, scale2 * ((2 * pi * scale2 * level)^(-2/3) - 1))
+    return(r)
+  },
+  isPCP=TRUE,
+  iscompact=FALSE,
+  roffspring=function(n, par, ...) {
+    ## 'par' is in native format
+    rate <- par[["eta2"]]/8 
+    b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
+    list(x = b * rnorm(n), y = b * rnorm(n))
+  },
+  ## .................... Properties of the point process ..................
+  K = function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    pi*rvals^2 + (1 - 1/sqrt(1 + rvals^2/par[2L]))/par[1L]
+  },
+  B1 = function(r, ...) { 1 - 1/sqrt(1 + r^2/4) },
+  pcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0))
+      return(rep.int(Inf, length(rvals)))
+    1 + ((1 + rvals^2/par[2L])^(-1.5))/(2 * pi * par[2L] * par[1L])
+  },
+  A1 = function(r, ...) {  ((1 + r^2/4)^(-1.5))/(8 * pi) },
+  a1 = function(r, ...) {  (1 + r^2/4)^(-1.5) },
+  a1prime = function(r, ...) {  (-3*r/4) * (1 + r^2/4)^(-2.5) },
+  a1primeprime = function(r, ...) {
+    (-3/4) * (1 + r^2/4)^(-5/2) + (15/16) * (1 + r^2/4)^(-7/2) 
+  },
+  Dpcf= function(par,rvals, ...){
+    ## 'par' is in native format
+    if(any(par <= 0)){
+      dkappa <- rep.int(Inf, length(rvals))
+      deta2 <- rep.int(Inf, length(rvals))
+    } else {
+      dkappa <- -(1 + rvals^2/par[2L])^(-1.5)/(2 * pi * par[2L] * par[1L]^2)
+      deta2 <- 1.5 * rvals^2 * (1 + rvals^2/par[2L])^(-2.5)/(2 * par[2L]^3 * par[1L] * pi) - (1 + rvals^2/par[2L])^(-1.5)/(2*pi*par[1L]*par[2L]^2)
+    }
+    out <- rbind(dkappa, deta2)
+    rownames(out) <- c("kappa","eta2")
+    return(out)
+  },
+  ## ............ Utilities ................................
   selfstart = function(X) {
     ## return 'par' in native format
     kappa <- intensity(X)
@@ -637,12 +676,6 @@ detect.par.format <- function(par, native, generic) {
     mu <- if(is.numeric(lambda) && length(lambda) == 1)
             lambda/kappa else NA
     c(kappa=kappa, omega=omega, mu=mu)
-  },
-  roffspring = function(n, par, ...) {
-    #' par is in native format
-    rate <- par[["eta2"]]/8 
-    b <- 1/sqrt(rgamma(n, shape=1/2, rate=rate))
-    list(x = b * rnorm(n), y = b * rnorm(n))
   }
 )
 
@@ -738,7 +771,7 @@ resolve.vargamma.shape <- function(...,
   },
   parnames = c("kappa", "eta"),
   shapenames     = "nu",
-  clustargsnames = "nu",
+  ## ...................... Argument processing ...........................
   checkpar = function(par, native = old, ..., old = TRUE, strict=TRUE){
     ## 'par' is in either format
     if(is.null(par))
@@ -754,14 +787,26 @@ resolve.vargamma.shape <- function(...,
     return(par)
   },
   outputshape = .VarGammaOutputShape,
-  checkclustargs = function(margs, old = TRUE, ...){
-    if(!old)
-      margs <- list(nu=margs$nu.ker)
-    return(margs)
-  },
   resolveshape = .VarGammaResolveShape,
-  resolvedots  = .VarGammaResolveShape,
-  parhandler = function(...){ .VarGammaResolveShape(...)$covmodel },
+  ## Convert to/from canonical cluster parameters
+  tocanonical = function(par, ..., margs) {
+    ## 'par' is in native format
+    ## convert to experimental 'canonical' format
+    kappa <- par[[1L]]
+    eta <- par[[2L]]
+    nu.pcf <- margs$nu.pcf
+    c(strength=1/(4 * pi * nu.pcf * kappa * eta^2), scale=eta)
+  },
+  tohuman = function(can, ..., margs) {
+    ## 'can' is in 'canonical' format
+    ## convert to native format
+    strength <- can[[1L]]
+    eta <- scale <- can[[2L]]
+    nu.pcf <- margs$nu.pcf
+    c(kappa=1/(4 * pi * nu.pcf * strength * eta^2), eta=scale)
+  },
+  ## .............. Properties of the cluster mechanism .................
+  ## Probability density of distance from parent to offspring
   ddist = .VarGammaDdist,
   ## Practical range of clusters
   range = function(..., par=NULL, thresh=0.001){
@@ -778,7 +823,7 @@ resolve.vargamma.shape <- function(...,
                     scale=scale, nu=nu, p=1-thresh)$root
     return(rmax)
   },
-  ## kernel function in polar coordinates (no angular argument).
+  ## 2D kernel probability density function in polar coordinates (no angular argument).
   kernel = function(par, rvals, ..., margs) {
     ## 'par' is in native format
     scale <- as.numeric(par[2L])
@@ -789,6 +834,8 @@ resolve.vargamma.shape <- function(...,
     denom <- pi * (2^(nu.ker+1)) * scale^2 * gamma(nu.ker + 1)
     numer/denom
   },
+  ## Distance at which 2D kernel falls below 'level'
+  kerinverse = NULL, # fall back on root-finding algorithm
   isPCP=TRUE,
   iscompact=FALSE,
   roffspring=function(n, par, ..., margs) {
@@ -869,23 +916,6 @@ resolve.vargamma.shape <- function(...,
     return(as.numeric(fr/denom))
   },
   Dpcf = NULL,
-  ## Convert to/from canonical cluster parameters
-  tocanonical = function(par, ..., margs) {
-    ## 'par' is in native format
-    ## convert to experimental 'canonical' format
-    kappa <- par[[1L]]
-    eta <- par[[2L]]
-    nu.pcf <- margs$nu.pcf
-    c(strength=1/(4 * pi * nu.pcf * kappa * eta^2), scale=eta)
-  },
-  tohuman = function(can, ..., margs) {
-    ## 'can' is in 'canonical' format
-    ## convert to native format
-    strength <- can[[1L]]
-    eta <- scale <- can[[2L]]
-    nu.pcf <- margs$nu.pcf
-    c(kappa=1/(4 * pi * nu.pcf * strength * eta^2), eta=scale)
-  },
   ## sensible starting values
   selfstart = function(X) {
     ## return 'par' in native format
@@ -901,14 +931,6 @@ resolve.vargamma.shape <- function(...,
     mu <- if(is.numeric(lambda) && length(lambda) == 1)
             lambda/kappa else NA
     c(kappa=kappa, omega=omega, mu=mu)
-  },
-  roffspring = function(n, par, ..., margs) {
-    #' par is in native format
-    shape <- margs$nu.ker + 1
-    scale <- par[[2L]]
-    rate <- 1/(2 * scale^2)
-    b <- sqrt(rgamma(n, shape=shape, rate=rate))
-    list(x= b * rnorm(n), y = b * rnorm(n))
   }
 )
 
@@ -993,6 +1015,8 @@ resolve.vargamma.shape <- function(...,
   modelabbrev    = "log-Gaussian Cox process", # In fitted obj.
   printmodelname = function(...) "log-Gaussian Cox process", # Used by print.kppm
   parnames       = c("sigma2", "alpha"),
+  shapenames     = "*",  # shape parameters are present but depend on the model
+  ## ................. Argument handling ...........................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
     ## 'par' is in either format
     if(is.null(par))
@@ -1008,13 +1032,19 @@ resolve.vargamma.shape <- function(...,
     return(par)
   },
   outputshape = function(margs, ...) return(margs),
-  checkclustargs = function(margs, old = TRUE, ...) return(margs),
   resolveshape = .LGCPResolveShape,
-  resolvedots  = .LGCPResolveShape,
-  parhandler   = function(...) { .LGCPResolveShape(...)$covmodel },
+  ## canonical parameters are not defined for LGCP 
+  tocanonical = NULL,
+  tohuman = NULL,
+  ## ..... Empty entries for cluster mechanism ....
+  ddist = NULL,
+  range = NULL,
+  kernel = NULL,
+  kerinverse = NULL,
   isPCP=FALSE,
   iscompact=FALSE,
   roffspring=NULL,
+  ## ...... Properties of the point process ...............
   K = function(par, rvals, ..., model, margs) {
     ## 'par' is in native format
     if(any(par <= 0))
@@ -1057,6 +1087,7 @@ resolve.vargamma.shape <- function(...,
     th <- indefinteg(integrand, rvals, lower=0, method=imethod)
     return(th)
   },
+  B1 = NULL, # not a cluster process
   pcf= function(par, rvals, ..., model, margs) {
     ## 'par' is in native format
     if(any(par <= 0))
@@ -1096,6 +1127,10 @@ resolve.vargamma.shape <- function(...,
     gtheo <- exp(par[1L] * Cfun(rvals/par[2L]))
     return(gtheo)
   },
+  A1 = NULL, # not a cluster process
+  a1 = NULL, # not a cluster process
+  a1prime = NULL, # not a cluster process
+  a1primeprime = NULL, # not a cluster process
   Dpcf= function(par,rvals, ..., model){
     ## 'par' is in native format
     if(!(model %in% c("exponential", "stable")))

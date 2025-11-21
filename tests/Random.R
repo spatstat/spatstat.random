@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.20 $ $Date: 2025/04/07 03:54:43 $
+#'  $Revision: 1.23 $ $Date: 2025/11/21 01:38:26 $
 
 
 local({
@@ -118,6 +118,33 @@ local({
     B4 <- boxx(0:1, 0:1, 0:1, 0:1)
     Z0 <- runifpointx(0, domain=B4, nsim=2)
     Z1 <- runifpointx(1, domain=B4, nsim=2)
+  }
+
+  if(FULLTEST) {
+    ## check sanity of cluster info table
+    cnames <- c("Thomas", "MatClust", "Cauchy", "VarGamma", "LGCP")
+    required <- names(spatstatClusterModelInfo('Thomas'))
+    for(cn in cnames) {
+      en <- spatstatClusterModelInfo(cn)
+      na <- names(en)
+      if(anyDuplicated(na)) {
+        wh <- unique(na[duplicated(na)])
+        stop(paste("Duplicated",
+                   ngettext(length(wh), "entry", "entries"),
+                   paste(sQuote(wh), collapse=", "),
+                   "in cluster info table for", cn , "model"),
+             call.=FALSE)
+      }
+      mus <- setdiff(required, na)
+      if(length(mus))
+        stop(paste(ngettext(length(mus), "Entry", "Entries"),
+                   paste(sQuote(mus), collapse=", "),
+                   "missing from cluster info table for", cn, "model"),
+             call.=FALSE)
+      if(!identical(na, required))
+        stop("Mismatch in cluster info table for", cn, "and Thomas models",
+             call.=FALSE)
+    }
   }
 
 })

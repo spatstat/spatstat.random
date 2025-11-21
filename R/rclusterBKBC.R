@@ -1,6 +1,6 @@
 #'   rclusterBKBC.R
 #'
-#'   $Revision: 1.6 $ $Date: 2023/03/04 02:47:17 $
+#'   $Revision: 1.9 $ $Date: 2025/11/21 01:24:47 $
 #' 
 #'   Simulation of stationary cluster process
 #'   using Brix-Kendall algorithm and Baddeley-Chang modification
@@ -40,10 +40,10 @@ rclusterBKBC <- function(clusters="Thomas",
   ## Validate parameters and convert to native parametrisation
   par.generic <- c(kappa=kappa, scale=scale)
   par <- cinfo$checkpar(par.generic, old=TRUE)
-  if(length(cinfo$clustargsnames)) { ## shape of kernel
-    shapestuff <- cinfo$resolvedots(...)$covmodel
+  if(length(cinfo$shapenames)) { ## there are parameters controlling shape of kernel
+    shapestuff <- cinfo$resolveshape(...)$covmodel ## resolve the parameter values
     shapemodel <- shapestuff$model ## optional: name of covariance model e.g. 'exponential'
-    shapeargs <- shapestuff$margs ## shape parameter values
+    shapeargs <- shapestuff$margs ## values of the shape parameters
   } else shapemodel <- shapeargs <- NULL
   ## Assemble model information in format required by cluster simulation functions in bkinfo.R
   mod <- list(par=par, mu=mu, shapemodel=shapemodel, shapeargs=shapeargs)
@@ -746,18 +746,27 @@ optimalinflation <- function(clusters, mod, rD) {
   margs <- mod$shapeargs
   a <- if(mu == 0) 1 else (1 + (1-exp(-mu))/mu)
   b <- a/(pi * rD^2)
-  h0 <- cinfo$kernel(par.native, 0, margs=margs)
-  if(h0 <= b) {
-    rE <- rD
-  } else {
-    kernel <- cinfo$kernel
-    f <- function(x) { b - kernel(par.native, x, margs=margs) }
-    u <- try(uniroot(f, c(0, 100 * scale)), silent=TRUE)
-    if(inherits(u, "try-error")) {
-      rE <- 2 * rD
+  ## solve the equation h(r) = b where h is the 2D kernel
+  if(is.function(kerinv <- cinfo$kerinverse)) {
+    ## use specialised code to solve h(r) = b
+    delta <- kerinv(par.native, level=b, margs=margs)
+    rE <- rD + delta
+  } else if(is.function(kernel <- cinfo$kernel)) {
+    ## apply root-finding to solve h(r) = b
+    h0 <- kernel(par.native, 0, margs=margs)
+    if(h0 <= b) {
+      rE <- rD
     } else {
-      rE <- rD + u$root
+      f <- function(x) { b - kernel(par.native, x, margs=margs) }
+      u <- try(uniroot(f, c(0, 100 * scale)), silent=TRUE)
+      if(inherits(u, "try-error")) {
+        rE <- 2 * rD
+      } else {
+        rE <- rD + u$root
+      }
     }
+  } else {
+    rE <- 2 * rD
   }
   return(rE)
 }
