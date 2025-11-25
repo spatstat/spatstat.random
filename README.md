@@ -6,10 +6,20 @@
 [![GitHub R package version](https://img.shields.io/github/r-package/v/spatstat/spatstat.random)](https://github.com/spatstat/spatstat.random)
 
 The original `spatstat` package has been split into
-several sub-packages.
+several sub-packages
+(see [spatstat/spatstat](https://github.com/spatstat/spatstat))
 
-This package `spatstat.random` is one of these packages.
-It contains the functions for
+This package `spatstat.random` is one of the sub-packages.
+It contains the functions for **random generation** of data
+and **simulation** of models.
+
+You are viewing the GitHub repository which holds
+the latest **development version** of `spatstat.random`.
+For the latest public release on CRAN, click the green badge above.
+
+### Overview
+
+`spatstat.random` supports
 
 - generating random spatial patterns of points according to many simple rules
 (complete spatial randomness, binomial process, random grid,
@@ -41,6 +51,22 @@ Exceptions:
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
 
-The reorganisation of `spatstat` into a family of packages is described
-on the GitHub repository
-[spatstat/spatstat](https://github.com/spatstat/spatstat).
+
+### Installing the package
+
+This repository contains the _development version_ of
+`spatstat.random`. The easiest way to install the development version
+is to start R and type
+
+```R
+repo <- c('https://spatstat.r-universe.dev', 'https://cloud.r-project.org')
+install.packages("spatstat.random", dependencies=TRUE, repos=repo)
+```
+
+To install the latest _public release_ of `spatstat.random`,
+type
+
+```R
+install.packages("spatstat.random")
+```
+
