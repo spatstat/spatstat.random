@@ -16,7 +16,6 @@
 \alias{expandwinPerfect}
 \alias{emptyNeyScot}
 \alias{fakeNeyScot}
-\alias{getRandomFieldsModelGen}
 \alias{handle.rshift.args}
 \alias{HermiteCoefs}
 \alias{intensity.clusterprocess}
@@ -26,7 +25,6 @@
 \alias{is.poisson.NAobject}
 \alias{is.stationary.NAobject}
 \alias{kraever}
-\alias{kraeverRandomFields}
 \alias{MultiPair.checkmatrix}
 \alias{optimalinflation}
 \alias{predict.clusterprocess}
@@ -37,7 +35,6 @@
 \alias{print.rmhstart}
 \alias{print.rmhInfoList}
 \alias{print.summary.rmhexpand}
-\alias{RandomFieldsSafe}
 \alias{reach.clusterprocess}
 \alias{reheat}
 \alias{resolve.vargamma.shape}
@@ -103,7 +100,6 @@ detect.par.format(par, native, generic)
 emptyNeyScot(win, nsim, saveLambda, saveparents, LambdaOnly, \dots)
 fakeNeyScot(Y, lambda, win, saveLambda, saveparents,
             LambdaOnly, \dots)
-getRandomFieldsModelGen(model)
 handle.rshift.args(W, \dots, radius, width, height,
                    edge, clip, edgedefault)
 HermiteCoefs(order)
@@ -113,8 +109,7 @@ is.expandable(x)
 \method{is.expandable}{rmhmodel}(x) 
 \method{is.poisson}{NAobject}(x) 
 \method{is.stationary}{NAobject}(x) 
-kraever(package, fatal)
-kraeverRandomFields()
+kraever(package, fatal, loaded)
 MultiPair.checkmatrix(mat, n, matname, naok, zerook, asymmok)
 optimalinflation(clusters, mod, rD)
 \method{predict}{clusterprocess}(object, \dots, locations, type, ngrid)
@@ -125,7 +120,6 @@ optimalinflation(clusters, mod, rD)
 \method{print}{rmhstart}(x, \dots)
 \method{print}{rmhInfoList}(x, \dots)
 \method{print}{summary.rmhexpand}(x, \dots)
-RandomFieldsSafe()
 \method{reach}{clusterprocess}(x, \dots, epsilon)
 reheat(model, invtemp)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, nu, allow.nu, allow.default)

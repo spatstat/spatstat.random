@@ -62,8 +62,12 @@
   The retained points constitute \Matern's Model I.
 }
 \seealso{
-\code{\link{rpoispp}},
-\code{\link{rMatClust}}
+  \code{\link{rMaternII}} for \Matern's Model II.
+
+  \code{\link{rSSI}}.
+  
+  \code{\link{rpoispp}},
+  \code{\link{rMatClust}}
 }
 \examples{
  X <- rMaternI(20, 0.05)

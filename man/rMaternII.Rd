@@ -69,9 +69,12 @@
   for the same parameter values.
 }
 \seealso{
-\code{\link{rpoispp}},
-\code{\link{rMatClust}},
-\code{\link{rMaternI}}
+  \code{\link{rMaternI}} for \Matern's Model I.
+  
+  \code{\link{rSSI}}.
+  
+  \code{\link{rpoispp}},
+  \code{\link{rMatClust}},
 }
 \examples{
  X <- rMaternII(20, 0.05)
