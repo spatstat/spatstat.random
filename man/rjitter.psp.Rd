@@ -39,7 +39,8 @@
   Each of the endpoints of each segment in \code{X} will be
   subjected to an independent random displacement. The displacement vectors are
   uniformly distributed in a circle of radius \code{radius}.
-
+  Marks attached to the segments will be unchanged.
+  
   If \code{clip=TRUE} (the default), segment endpoints
   are permitted to move to locations slightly outside the window of \code{X},
   and the resulting segments will be clipped to the window.

@@ -1,9 +1,15 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-3.002
+        CHANGES IN spatstat.random VERSION 3.4-3.003
 
 OVERVIEW
 
-    o Internal housekeeping.
+    o Minor improvements and bug fixes.
+
+BUG FIXES
+
+    o rjitter.psp
+    Did not preserve marks attached to the segments.
+    Fixed.
     
         CHANGES IN spatstat.random VERSION 3.4-3
 

@@ -1,7 +1,7 @@
 #
 # randomseg.R
 #
-# $Revision: 1.18 $ $Date: 2024/02/04 08:04:51 $
+# $Revision: 1.19 $ $Date: 2025/12/31 03:18:14 $
 #
 
 
@@ -57,6 +57,7 @@ rjitter.psp <- function(X, radius, ..., clip=TRUE, nsim=1, drop=TRUE) {
     result <- simulationresult(result, nsim, drop)
     return(result)
   }
+  marx <- marks(X)
   Xfrom <- endpoints.psp(X, "first")
   Xto   <- endpoints.psp(X, "second")
   if(clip) 
@@ -66,6 +67,7 @@ rjitter.psp <- function(X, radius, ..., clip=TRUE, nsim=1, drop=TRUE) {
     Xfrom <- rjitter(Xfrom, radius)
     Xto   <- rjitter(Xto, radius)
     Y <- as.psp(from=Xfrom, to=Xto)
+    marks(Y) <- marx
     if(clip)
       Y <- Y[Window(X), clip=TRUE]
     result[[isim]] <- Y
