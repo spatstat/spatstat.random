@@ -36,7 +36,7 @@ simple sequential inhibition, cell process),
 random shift, jittering),
 
 - generating simulated realisations of spatial point processes
-(Poisson processes, \Matern inhibition models, \Matern cluster processes,
+(Poisson processes, Matern inhibition models, Matern cluster processes,
 Neyman-Scott cluster processes, log-Gaussian Cox processes,
 product shot noise cluster processes, Gibbs point processes)
 
@@ -68,7 +68,7 @@ Exceptions:
 #### Point process models defined by simple constructions
 
 - simple sequential inhibition (`rSSI`)
-- \Matern inhibition models (`rMaternI`, `rMaternII`)
+- Matern inhibition models (`rMaternI`, `rMaternII`)
 - cell process (`rcell`)
 
 #### Randomly changing an existing point pattern
