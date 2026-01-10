@@ -30,7 +30,7 @@ simple sequential inhibition, cell process),
 random shift, jittering),
 
 - generating simulated realisations of spatial point processes
-(Poisson processes, Matern inhibition models, Matern cluster processes,
+(Poisson processes, \Matern inhibition models, \Matern cluster processes,
 Neyman-Scott cluster processes, log-Gaussian Cox processes,
 product shot noise cluster processes, Gibbs point processes)
 
@@ -51,6 +51,79 @@ Exceptions:
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
 
+### Detailed contents
+
+#### Generating random patterns
+
+- binomial random patterns (`runifpoint`, `rpoint`, `rmpoint`, `runifdisc`)
+- completely random patterns (`rpoispp`, `rmpoispp`)
+- systematic random patterns (`rstrat`, `rsyst`)
+
+#### Point process models defined by simple constructions
+
+- simple sequential inhibition (`rSSI`)
+- \Matern inhibition models (`rMaternI`, `rMaternII`)
+- cell process (`rcell`)
+
+#### Randomly changing an existing point pattern
+
+- random shift (`rshift`)
+- random thinning (`rthin`)
+- random (re)labelling (`rlabel`)
+- block resampling (`quadratresample`)
+
+#### Clustered point processes
+
+- log-Gaussian Cox process (`rLGCP`)
+- Neyman-Scott cluster processes
+(`rThomas`, `rMatClust`, `rCauchy`, `rVarGamma`)
+- general Neyman-Scott cluster process (`rNeymanScott`)
+- general Poisson cluster process (`rPoissonCluster`)
+- Gauss-Poisson process (`rGaussPoisson`)
+
+#### Gibbs point processes
+
+- perfect simulation algorithms for specific Gibbs models
+(`rHardcore`, `rStrauss`, `rStraussHard`, `rDiggleGratton`, `rDGS`,
+`rPenttinen`, 
+- Metropolis-Hastings simulation algorithm for Gibbs models
+(`rmh`)
+- alternating Gibbs sampler for multitype Gibbs processes (`rags`,
+`ragsMultiHard`)
+- alternating Gibbs sampler for area-interaction process (`ragsAreaInter`)
+
+#### random points along lines
+
+- random points along specified line segments
+(`runifpointOnLines`, `rpoisppOnLines`)
+
+#### random pixel images and random sets
+
+- random pixel noise (`rnoise`)
+- random mosaic (`rMosaicField`, `rMosaicSet`)
+
+#### random line segment patterns
+
+- Poisson line process (`rpoisline`)
+
+#### random tessellations
+
+- tessellation using Poisson line process (`rpoislinetess`)
+
+#### three-dimensional point patterns
+
+- uniform random points in 3D (`runifpoint3`)
+- Poisson point process in 3D (`rpoispp3`)
+
+#### multi-dimensional point patterns
+
+- uniform random points in space or space-time (`runifpointx`)
+- Poisson point process in space or space-time (`rpoisppx`)
+
+#### probability distributions
+
+- theoretical distribution of nearest neighbour distance (`rknn`)
+- mixed Poisson distribution (`dmixpois`)
 
 ### Installing the package
 
