@@ -22,7 +22,9 @@ Contents:
  - [Overview of package](#overview)
  - [Detailed contents of package](#detailed)
  - [Installing the package](#installing)
- 
+
+___
+
 ### <a name="overview"></a> Overview 
 
 `spatstat.random` supports
@@ -56,6 +58,8 @@ Exceptions:
 - generation of determinantal point processes is provided in `spatstat.model`
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
+
+___
 
 ### <a name="detailed"></a> Detailed contents
 
@@ -130,6 +134,8 @@ Exceptions:
 
 - theoretical distribution of nearest neighbour distance (`rknn`)
 - mixed Poisson distribution (`dmixpois`)
+
+___
 
 ### <a name="installing"></a> Installing the package 
 
