@@ -17,7 +17,13 @@ You are viewing the GitHub repository which holds
 the latest **development version** of `spatstat.random`.
 For the latest public release on CRAN, click the green badge above.
 
-### Overview
+Contents:
+
+ - [Overview of package](#overview)
+ - [Detailed contents of package](#detailed)
+ - [Installing the package](#installing)
+ 
+### Overview {#overview}
 
 `spatstat.random` supports
 
@@ -51,7 +57,7 @@ Exceptions:
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
 
-### Detailed contents
+### Detailed contents {#detailed}
 
 #### Generating random patterns
 
@@ -125,7 +131,7 @@ Exceptions:
 - theoretical distribution of nearest neighbour distance (`rknn`)
 - mixed Poisson distribution (`dmixpois`)
 
-### Installing the package
+### Installing the package {#installing}
 
 This repository contains the _development version_ of
 `spatstat.random`. The easiest way to install the development version
