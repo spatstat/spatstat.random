@@ -23,7 +23,7 @@ Contents:
  - [Detailed contents of package](#detailed)
  - [Installing the package](#installing)
  
-### Overview {#overview}
+### <a name="overview"></a> Overview 
 
 `spatstat.random` supports
 
@@ -57,7 +57,7 @@ Exceptions:
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
 
-### Detailed contents {#detailed}
+### <a name="detailed"></a> Detailed contents
 
 #### Generating random patterns
 
@@ -131,7 +131,7 @@ Exceptions:
 - theoretical distribution of nearest neighbour distance (`rknn`)
 - mixed Poisson distribution (`dmixpois`)
 
-### Installing the package {#installing}
+### <a name="installing"></a> Installing the package 
 
 This repository contains the _development version_ of
 `spatstat.random`. The easiest way to install the development version
