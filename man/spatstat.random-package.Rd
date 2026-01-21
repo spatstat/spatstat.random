@@ -174,6 +174,12 @@
 	simulate the Baddeley-Silverman cell process  \cr
 	\code{\link[spatstat.random]{rmh}} \tab
 	simulate Gibbs point process using Metropolis-Hastings \cr
+	\code{\link[spatstat.random]{rags}} \tab
+	alternating Gibbs sampler for multitype processes \cr
+	\code{\link[spatstat.random]{ragsAreaInter}} \tab
+	alternating Gibbs sample for area-interaction process \cr
+	\code{\link[spatstat.random]{ragsMultiHard}} \tab
+	alternating Gibbs sample for multitype hardcore process \cr
 	\code{\link[spatstat.random]{runifpointOnLines}} \tab
 	generate \eqn{n} random points along specified line segments \cr
 	\code{\link[spatstat.random]{rpoisppOnLines}} \tab
@@ -373,7 +379,6 @@
   Robert Aue,
   Marcel Austenfeld,
   Sandro Azaele,
-  Malissa Baddeley,
   Guy Bayegnak,
   Colin Beale,
   Melanie Bell,
@@ -541,6 +546,7 @@
   Torben Tvedebrink,
   Kevin Ummer,
   Medha Uppala,
+  Malissa Usher,
   Andrew van Burgel,
   Tobias Verbeke,
   Mikko Vihtakari,
