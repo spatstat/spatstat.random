@@ -47,12 +47,15 @@
 \newcommand{\baddrubaturnbook}{Baddeley, A., Rubak, E. and Turner, R. (2015) \emph{Spatial Point Patterns: Methodology and Applications with R}. Chapman and Hall/CRC Press. }
 %% Citations of recent articles that will change rapidly
 \newcommand{\baddchangclustersim}{Baddeley, A. and Chang, Y.-M. (2023) Robust algorithms for simulating cluster point processes. \emph{Journal of Statistical Computation and Simulation} \bold{93}, 1950--1975.}
-\newcommand{\smoothpcfpaper}{Baddeley, A., Davies, T.M. and Hazelton, M.L. (2025) An improved estimator of the pair correlation function of a spatial point process. \emph{Biometrika}, to appear.}
+\newcommand{\smoothpcfpaper}{Baddeley, A., Davies, T.M. and Hazelton, M.L. (2025) An improved estimator of the pair correlation function of a spatial point process. \emph{Biometrika} \bold{111}, 2, article asaf021.}
 \newcommand{\smoothpcfpapercite}{Baddeley, Davies and Hazelton (2025)}
 %% ROC paper
 \newcommand{\rocketAuthors}{\adrian, \ege and \suman}
 \newcommand{\rocpapercite}{Baddeley et al (2025)}
 \newcommand{\rocpapercitealp}{Baddeley et al, 2025)}
 \newcommand{\rocpaper}{Baddeley, A., Rubak, E., Rakshit, S. and Nair, G. (2025) ROC curves for spatial point patterns and presence-absence data. \doi{10.48550/arXiv.2506.03414}.}
+%% pointweights
+\newcommand{\pointweightsAny}{A numeric or logical valued vector, matrix, data frame, pixel image, \code{function} or \code{expression}, or one of the strings \code{"x"} or \code{"y"} representing the cartesian coordinates. The \code{expression} may involve the variables \code{x,y,marks} representing the coordinates and marks of the point pattern}
+\newcommand{\pointweightsVector}{A numeric or logical valued vector, pixel image, \code{function} or \code{expression}, or one of the strings \code{"x"} or \code{"y"} representing the cartesian coordinates. The \code{expression} may involve the variables \code{x,y,marks} representing the coordinates and marks of the point pattern}
 
 

@@ -4,7 +4,7 @@
 #
 #   Random generators for MULTITYPE point processes
 #
-#   $Revision: 1.41 $   $Date: 2022/04/08 06:25:53 $
+#   $Revision: 1.42 $   $Date: 2026/01/21 06:26:39 $
 #
 #   rmpoispp()   random marked Poisson pp
 #   rmpoint()    n independent random marked points

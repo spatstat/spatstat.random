@@ -3,7 +3,7 @@
 #'
 #'   Random generators of Gaussian random fields
 #'
-#'   $Revision: 1.7 $ $Date: 2023/10/20 14:50:06 $
+#'   $Revision: 1.8 $ $Date: 2026/01/21 06:26:39 $
 #'
 #'   Copyright (c) 2023 Adrian Baddeley
 #'   GNU Public Licence (>= 2.0)
