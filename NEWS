@@ -1,10 +1,37 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-4.001
+        CHANGES IN spatstat.random VERSION 3.4-4.002
 
 OVERVIEW
 
+    o New class of (theoretical) cluster process models
+    
     o Internal improvements.
 
+NEW CLASSES
+
+    o clusterprocess
+    An object of this class represents a Neyman-Scott-Cox cluster process
+    model with specified values of the parameters.
+    
+NEW FUNCTIONS
+
+    o clusterprocess
+    Create an object of class 'clusterprocess'.
+
+    o clusterradius.clusterprocess
+    Radius of the support of the offspring density of a cluster process model.
+    
+    o predict.clusterprocess
+    Predict intensity of a cluster process model
+    
+    o print.clusterprocess
+    Print a cluster process model
+    
+    o reach.clusterprocess
+    Distance beyond which the pair correlation is effectively 1.
+    
+    o simulate.clusterprocess
+    Generate simulated realisations of a cluster process model.
 
         CHANGES IN spatstat.random VERSION 3.4-4
 
