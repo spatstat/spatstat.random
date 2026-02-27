@@ -10,7 +10,8 @@
   Methods for Cluster Models
 }
 \description{
-  Methods for the experimental class of cluster models.
+  Methods for the class \code{"clusterprocess"} of cluster point process
+  models with specified values of the parameters.
 }
 \usage{
  \method{intensity}{clusterprocess}(X, \dots)
@@ -58,7 +59,7 @@
 }
 \details{
   An object of class \code{"clusterprocess"} represents a Neyman-Scott-Cox
-  cluster process model with the specified parameter values.
+  cluster process model with specified parameter values.
 
   This page documents methods for printing, simulating and predicting
   such models, supplied by the package \pkg{spatstat.random}.
@@ -79,8 +80,10 @@
   m2 <- clusterprocess("VarGamma", kappa=10, mu=10, scale=0.1, nu=0.7)
   m
   m2
+  intensity(m)
+  reach(m)
+  clusterradius(m)
   Z <- predict(m, locations=square(2))
-  Z2 <- predict(m2, locations=square(1))
   X <- simulate(m)
 }
 \keyword{spatial}

@@ -36,11 +36,13 @@ clusterprocess(name = "Thomas", \dots, mu, kappa, scale)
   This function creates an object representing a Neyman-Scott-Cox
   cluster process model with the specified parameter values.
   The object belongs to the class \code{"clusterprocess"}.
-  There are methods for simulating and predicting the model,
-  calculating its \eqn{K}-function, and other purposes.
 
   This is different from the model-fitting function
   \code{\link[spatstat.model]{kppm}} which fits such a model to a point pattern dataset.
+
+  There are methods for simulating a \code{"clusterprocess"},
+  calculating its moments, and other purposes, listed under
+  \emph{See Also}.
 }
 \value{
   Object of class \code{"clusterprocess"}.
@@ -49,11 +51,29 @@ clusterprocess(name = "Thomas", \dots, mu, kappa, scale)
   \adrian
 }
 \seealso{
-  \code{\link{methods.clusterprocess}},
-  \code{\link[spatstat.model]{psib}}
+  Methods for 
+  \code{simulate},
+  \code{predict},
+  \code{intensity},
+  \code{print},
+  \code{clusterradius} and 
+  \code{reach}
+  are supplied in package \pkg{spatstat.random}
+  and documented under \code{\link{methods.clusterprocess}}.
+
+  The functions
+  \code{\link[spatstat.model]{Kmodel}},
+  \code{\link[spatstat.model]{pcfmodel}},
+  \code{\link[spatstat.model]{psib}},
+  \code{\link[spatstat.model]{persist}},
+  \code{\link[spatstat.model]{clusterstrength}} and
+  \code{\link[spatstat.model]{varcount}}
+  in package \pkg{spatstat.model}
+  can also be applied to a \code{"clusterprocess"}.
 }
 \examples{
   m <- clusterprocess("Thomas", kappa=10, mu=5, scale=0.1)
+  simulate(m, win=square(2))
 }
 \keyword{spatial}
 \keyword{models}

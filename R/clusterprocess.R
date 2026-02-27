@@ -1,7 +1,7 @@
 #'
 #'   clusterprocess.R
 #'
-#'   $Revision: 1.3 $ $Date: 2026/02/26 10:00:57 $
+#'   $Revision: 1.4 $ $Date: 2026/02/27 06:37:01 $
 #'
 
 
@@ -10,7 +10,8 @@ clusterprocess <- function(name="Thomas", ..., mu, kappa, scale) {
   if(missing(mu)) stop("The mean cluster size mu must be given")
   if(missing(scale)) stop("The cluster scale must be given")
   rules <- spatstatClusterModelInfo(name)
-  if(!(rules$isPCP)) stop("clusterprocess only supports Neyman-Scott processes")
+  if(!isTRUE(rules$isPCP))
+    stop("clusterprocess only supports Neyman-Scott processes")
   par.std <- c(kappa=kappa, scale=scale)
   par.std <- rules$checkpar(par.std, native=FALSE)
   par.idio <- rules$checkpar(par.std, native=TRUE)

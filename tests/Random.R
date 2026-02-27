@@ -193,3 +193,35 @@ local({
 reset.spatstat.options()
 
 
+#'
+#'   tests/clustaprox.R
+#'
+#'   Support for class 'clusterprocess'
+#'
+#'   $Revision$  $Date$
+#'
+#'   Assumes 'EveryStart.R' was run
+
+
+local({
+  if(FULLTEST) {
+    ## Cases of 'predict.clusterprocess'
+    ## (a) Model with nuisance parameters
+    mVG <- clusterprocess("VarGamma", kappa=10, mu=10, scale=0.1, nu=0.7)
+    lamVG <- intensity(mVG)
+    reVG <- reach(mVG)
+    radVG <- clusterradius(mVG)
+    W12 <- owin(c(0,1),c(0,2), unitname=c("foot", "feet"))
+    ZVG <- predict(mVG, locations=W12)
+    XVG <- simulate(mVG, win=W12)
+    ## check correct handling of domains
+    stopifnot(identical(unitname(ZVG), unitname(W12)))
+    stopifnot(identical(unitname(XVG), unitname(W12)))
+    stopifnot(identical(Frame(ZVG), W12))
+    stopifnot(identical(Frame(XVG), W12))
+  }
+})
+
+reset.spatstat.options()
+
+
