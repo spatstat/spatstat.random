@@ -8,7 +8,7 @@
   independent, uniform random points in three dimensions.
 }
 \usage{
-runifpoint3(n, domain = box3(), nsim=1, drop=TRUE)
+runifpoint3(n, domain = box3(), \dots, nsim=1, drop=TRUE, ex=NULL)
 }
 \arguments{
   \item{n}{
@@ -18,11 +18,17 @@ runifpoint3(n, domain = box3(), nsim=1, drop=TRUE)
     Three-dimensional box in which the process should be generated.
     An object of class \code{"box3"}.
   }
+  \item{\dots}{Ignored.}
   \item{nsim}{Number of simulated realisations to be generated.}
   \item{drop}{
     Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
     result will be a point pattern, rather than a list 
     containing a point pattern.
+  }
+  \item{ex}{
+    An example point pattern (object of class \code{"pp3"})
+    which will be used to determine the number of points
+    \code{n} and the containing box \code{domain}.
   }
 }
 \value{
@@ -41,6 +47,8 @@ runifpoint3(n, domain = box3(), nsim=1, drop=TRUE)
 }
 \examples{
    X <- runifpoint3(50)
+
+   runifpoint3(ex=osteo$pts[[1]])
 }
 \author{
   \adrian

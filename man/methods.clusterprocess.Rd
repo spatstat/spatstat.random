@@ -84,7 +84,7 @@
   reach(m)
   clusterradius(m)
   Z <- predict(m, locations=square(2))
-  X <- simulate(m)
+  X <- simulate(m, win=square(2))
 }
 \keyword{spatial}
 \keyword{models}

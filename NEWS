@@ -1,9 +1,11 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-4.003
+        CHANGES IN spatstat.random VERSION 3.4-4.004
 
 OVERVIEW
 
     o New class of (theoretical) cluster process models
+
+    o Inhomogeneous Poisson process in 3D.
     
     o Internal improvements.
 
@@ -33,6 +35,16 @@ NEW FUNCTIONS
     o simulate.clusterprocess
     Generate simulated realisations of a cluster process model.
 
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o runifpoint3, rpoispp3
+    New argument 'ex' (an example point pattern, to be emulated)
+    
+    o rpoispp3
+    Argument 'lambda' may now be a 'function(x,y,z)' so that an
+    inhomogeneous Poisson process may be simulated.
+    New argument 'lmax'.
+    
         CHANGES IN spatstat.random VERSION 3.4-4
 
 OVERVIEW
