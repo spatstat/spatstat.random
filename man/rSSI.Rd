@@ -3,7 +3,8 @@
 \title{Simulate Simple Sequential Inhibition}
 \description{
   Generate a random point pattern, a realisation of the
-  Simple Sequential Inhibition (SSI) process.
+  Simple Sequential Inhibition (SSI) process,
+  in two- or three-dimensional space.
 }
 \usage{
  rSSI(r, n=Inf, win = square(1), giveup = 1000, x.init=NULL, ...,
@@ -23,9 +24,10 @@
   }
   \item{win}{
     Window in which to simulate the pattern.
-    An object of class \code{"owin"}
-    or something acceptable to \code{\link[spatstat.geom]{as.owin}}.
-    The default window is the unit square, unless 
+    An object of class \code{"owin"} or \code{"box3"}
+    or something acceptable to \code{\link[spatstat.geom]{as.owin}}
+    or \code{\link[spatstat.geom]{as.box3}}.
+    The default window is the unit square in two dimensions, unless 
     \code{x.init} is specified, when the default window 
     is the window of \code{x.init}.
   }
@@ -34,7 +36,9 @@
   }
   \item{x.init}{
     Optional. Initial configuration of points. A point pattern
-    (object of class \code{"ppp"}).  The pattern returned by
+    in two or three dimensions
+    (object of class \code{"ppp"} or \code{"pp3"}).
+    The pattern returned by
     \code{rSSI} consists of this pattern together with the points
     added via simple sequential inhibition.  See \bold{Details}.
   }
@@ -55,12 +59,19 @@
   }
 }
 \value{
-  A point pattern (an object of class \code{"ppp"})
-  if \code{nsim=1}, or a list of point patterns if \code{nsim > 1}.
+  A point pattern in two or three dimensional space
+  (an object of class \code{"ppp"} or \code{"pp3"})
+  if \code{nsim=1} and \code{drop=TRUE},
+  otherwise a list of point patterns.
 }
 \details{
   This algorithm generates one or more realisations of the Simple Sequential
   Inhibition point process inside the window \code{win}.
+
+  The window \code{win} may be a two-dimensional region (object of
+  class \code{"owin"}) or a three-dimensional box (object of class
+  \code{"box3"}). Accordingly the result will be a point pattern
+  in two- or three-dimensional space.
 
   Starting with an empty window (or with the point pattern
   \code{x.init} if specified), the algorithm adds points
@@ -105,7 +116,7 @@
   
   The default window is the unit square, \code{win = square(1)},
   unless \code{x.init} is specified, when the default
-  is \code{win=Window(x.init)}, the window of \code{x.init}.
+  is \code{win=domain(x.init)}, the window of \code{x.init}.
 
   If both \code{win} and \code{x.init} are specified, and if the
   two windows are different, then a warning will be issued.
@@ -125,12 +136,18 @@
  X <- runifpoint(100)
  Y <- rSSI(0.03,142,x.init=X) # Y consists of X together with
                               # 42 added points.
- plot(Y, main="rSSI")
- plot(X,add=TRUE,chars=20,cols="red")
+ if(online <- interactive()) {
+   plot(Y, main="rSSI")
+   plot(X,add=TRUE,chars=20,cols="red")
+ }
 
  ## inhomogeneous
  Z <- rSSI(0.07, 50, f=function(x,y){x})
- plot(Z)
+ if(online) plot(Z)
+
+ ## three dimensions
+ A <- rSSI(0.05, 20, box3())
+ if(online) plot(A)
 }
 \author{
 \spatstatAuthors.

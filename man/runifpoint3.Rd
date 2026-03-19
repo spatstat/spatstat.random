@@ -42,6 +42,7 @@ runifpoint3(n, domain = box3(), \dots, nsim=1, drop=TRUE, ex=NULL)
 }
 \seealso{
   \code{\link{rpoispp3}}, 
+  \code{\link{rpoint3}}, 
   \code{\link[spatstat.geom]{pp3}}, 
   \code{\link[spatstat.geom]{box3}}
 }

@@ -3,7 +3,10 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.129 $   $Date: 2025/09/11 22:42:45 $
+##    $Revision: 4.131 $   $Date: 2026/03/19 04:01:10 $
+##
+##    Copyright (c) Adrian Baddeley, Ege Rubak and Rolf Turner 1994-2026
+##    GNU Public Licence (>= 2.0)
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
@@ -17,8 +20,6 @@
 ##    rMaternI()        Mat'ern model I 
 ##    rMaternII()       Mat'ern model II
 ##    rMaternInhibition Generalisation
-
-##    rSSI()            Simple Sequential Inhibition process
 ##
 ##    rPoissonCluster() generic Poisson cluster process
 ##    rGaussPoisson()   Gauss-Poisson process
@@ -632,12 +633,12 @@ rMaternInhibition <- function(type,
   }
   ## Resolve window class
   if(!inherits(win, c("owin", "box3", "boxx"))) {
-    givenwin <- win
-    win <- try(as.owin(givenwin), silent = TRUE)
-    if(inherits(win, "try-error"))
-      win <- try(as.boxx(givenwin), silent = TRUE)
-    if(inherits(win, "try-error"))
+    winwin <- try(as.owin(win), silent = TRUE)
+    if(inherits(winwin, "try-error"))
+      winwin <- try(as.boxx(win), silent = TRUE)
+    if(inherits(winwin, "try-error"))
       stop("Could not coerce argument win to a window (owin, box3 or boxx).")
+    win <- winwin
   }
   dimen <- spatdim(win)
   if(dimen == 2) {
@@ -681,138 +682,6 @@ rMaternInhibition <- function(type,
   if(nsim == 1 && drop) return(result[[1L]])
   if(is.owin(win))
     result <- as.ppplist(result)
-  return(result)
-}
-
-rSSI <- function(r, n=Inf, win = square(1), 
-                 giveup = 1000, x.init=NULL, ...,
-                 f=NULL, fmax=NULL,
-                 nsim=1, drop=TRUE, verbose=TRUE)
-{
-  win.given <- !missing(win) && !is.null(win)
-  stopifnot(is.numeric(r) && length(r) == 1 && r >= 0)
-  stopifnot(is.numeric(n) && length(n) == 1 && n >= 0)
-  must.reach.n <- is.finite(n)
-  if(!missing(nsim)) {
-    check.1.integer(nsim)
-    stopifnot(nsim >= 1)
-  }
-  ## 'verbose' applies only when nsim > 1
-  verbose <- verbose && (nsim > 1)
-  ##
-  if(!is.null(f)) {
-    stopifnot(is.numeric(f) || is.im(f) || is.function(f))
-    if(is.null(fmax) && !is.numeric(f))
-      fmax <- if(is.im(f)) max(f) else max(as.im(f, win))
-  }
-  ##
-  result <- vector(mode="list", length=nsim)
-  if(!win.given) win <- square(1)
-  ## validate initial state
-  if(is.null(x.init)) {
-    ## start with empty pattern in specified window
-    win <- as.owin(win)
-    x.init <- ppp(numeric(0),numeric(0), window=win)
-  } else {
-    ## start with specified pattern
-    stopifnot(is.ppp(x.init))
-    if(!win.given) {
-      win <- as.owin(x.init)
-    } else {
-      ## check compatibility of windows
-      if(!identical(win, as.owin(x.init)))
-        warning(paste("Argument", sQuote("win"),
-                      "is not the same as the window of", sQuote("x.init")))
-      x.init.new <- x.init[win]
-      if(npoints(x.init.new) == 0)
-        stop(paste("No points of x.init lie inside the specified window",
-                   sQuote("win")))
-      nlost <- npoints(x.init) - npoints(x.init.new)
-      if(nlost > 0) 
-        warning(paste(nlost, "out of",
-                      npoints(x.init), "points of the pattern x.init",
-                      "lay outside the specified window",
-                      sQuote("win")))
-      x.init <- x.init.new
-    }
-    if(n < npoints(x.init))
-      stop(paste("x.init contains", npoints(x.init), "points",
-                 "but a pattern containing only n =", n, "points", 
-                 "is required"))
-    if(n == npoints(x.init)) {
-      warning(paste("Initial state x.init already contains", n, "points;",
-                    "no further points were added"))
-      result <- rep(list(x.init), nsim)
-      result <- simulationresult(result, nsim, drop)
-      return(result)
-    }
-  }
-  #' validate radius and 'n' 
-  r2 <- r^2
-  winArea <- area(win)
-  discarea <- pi * r2/4
-  nmelt <- floor(winArea/discarea)
-  packdensity <- pi * sqrt(3)/6
-  npack <- floor(packdensity * winArea/discarea)
-  if(is.finite(n)) {
-    if(n > nmelt) {
-      warning(paste("Window is too small to fit", n, "points",
-                    "at minimum separation", r,
-                    paren(paste("absolute maximum number is", nmelt))))
-    } else if(n > npack) {
-      warning(paste("Window is probably too small to fit", n, "points",
-                    "at minimum separation", r,
-                    paren(paste("packing limit is", nmelt))))
-    }
-  }
-
-  #' start simulation 		    
-  pstate <- list()
-  if(verbose) splat("Generating", nsim, "realisations...")
-  for(isim in seq_len(nsim)) {
-    if(verbose) pstate <- progressreport(isim, nsim, state=pstate)
-    ## Simple Sequential Inhibition process
-    ## fixed number of points
-    xx <- coords(x.init)$x
-    yy <- coords(x.init)$y
-    nn <- npoints(x.init)
-    ## Naive implementation, proposals are uniform
-    xprop <- yprop <- numeric(0)
-    nblock <- if(is.finite(n)) n else min(1024, nmelt)
-    ntries <- 0
-    while(ntries < giveup) {
-      ntries <- ntries + 1
-      if(length(xprop) == 0) {
-        ## generate some more proposal points
-        prop <- if(is.null(f)) runifpoint(nblock, win) else
-                               rpoint(nblock, f, fmax, win)
-        xprop <- coords(prop)$x
-        yprop <- coords(prop)$y
-      }
-      ## extract next proposal
-      xnew <- xprop[1L]
-      ynew <- yprop[1L]
-      xprop <- xprop[-1L]
-      yprop <- yprop[-1L]
-      ## check hard core constraint
-      dx <- xnew - xx
-      dy <- ynew - yy
-      if(!any(dx^2 + dy^2 <= r2)) {
-        xx <- c(xx, xnew)
-        yy <- c(yy, ynew)
-        nn <- nn + 1L
-        ntries <- 0
-      }
-      if(nn >= n)
-        break
-    }
-    if(must.reach.n && nn < n)
-      warning(paste("Gave up after", giveup,
-                    "attempts with only", nn, "points placed out of", n))
-    X <- ppp(xx, yy, window=win, check=FALSE)
-    result[[isim]] <- X
-  }
-  result <- simulationresult(result, nsim, drop)
   return(result)
 }
 

@@ -53,6 +53,9 @@
 \alias{rmhstart.list}
 \alias{rmpoint.I.allim}
 \alias{rpoint.multi}
+\alias{rSSIengine}
+\alias{rSSIengine.owin}
+\alias{rSSIengine.box3}
 \alias{rthinEngine}
 \alias{runifpoispp}          
 \alias{runifpoisppOnLines}
@@ -138,6 +141,11 @@ rmhSnoopEnv(Xinit, Wclip, R)
 rmpoint.I.allim(n, f, types, nsim)
 rpoint.multi(n, f, fmax, marks, win, giveup, fail.action,
              verbose, warn, nsim, drop)
+rSSIengine(win, \dots)
+\method{rSSIengine}{owin}(win, \dots, r, n, 
+   giveup, x.init, f, fmax, nsim, drop, verbose, warn)
+\method{rSSIengine}{box3}(win, \dots, r, n, 
+   giveup, x.init, f, fmax, nsim, drop, verbose, warn)
 rthinEngine(X, P, \dots, nsim, drop, Pmax, na.zero, what, fatal, warn)
 runifpoispp(lambda, win, \dots, nsim, drop)
 runifpoisppOnLines(lambda, L, nsim, drop)
