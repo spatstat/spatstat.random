@@ -8,7 +8,7 @@
 /*
   mhsnoop.c
 
-  $Revision: 1.12 $  $Date: 2022/11/02 11:02:26 $
+  $Revision: 1.15 $  $Date: 2026/03/20 03:34:40 $
 
   support for visual debugger in RMH
 
@@ -28,6 +28,16 @@
 #define MH_DEBUG NO
 #endif
 
+/* approved idioms for 'get' and 'assign' in the interface between R and C   */
+/*                NAME should be a C string in quotes                        */
+
+#define INSTALL(NAME) Rf_install(NAME)
+
+#define GET_VARIABLE(NAME, ENV) R_getVar(INSTALL(NAME), ENV, FALSE)
+
+#define ASSIGN_VARIABLE(NAME, VALUE, ENV) Rf_defineVar(INSTALL(NAME), VALUE, ENV)
+
+/* ............................................................... */
 
 void initmhsnoop(Snoop *s, SEXP env) {
   s->active = isEnvironment(env);
@@ -35,7 +45,7 @@ void initmhsnoop(Snoop *s, SEXP env) {
   s->nexttype = NO_TYPE;   /* deactivated */
   if(s->active) {
     s->env = env;
-    s->expr = findVar(install("callbackexpr"), env);
+    s->expr = GET_VARIABLE("callbackexpr", env);
   } else {
     s->env = s->expr = R_NilValue;
   }
@@ -97,7 +107,7 @@ void mhsnoop(Snoop *s,
   /* copy iteration number */
   PROTECT(Sirep = NEW_INTEGER(1));
   *(INTEGER_POINTER(Sirep)) = irep;
-  setVar(install("irep"), Sirep, e);
+  ASSIGN_VARIABLE("irep", Sirep, e);
   UNPROTECT(1);
   /* copy (x,y) coordinates */
   npts = state->npts;
@@ -109,8 +119,8 @@ void mhsnoop(Snoop *s,
     Px[j] = state->x[j];
     Py[j] = state->y[j];
   }
-  setVar(install("xcoords"), Sx, e);
-  setVar(install("ycoords"), Sy, e);
+  ASSIGN_VARIABLE("xcoords", Sx, e);
+  ASSIGN_VARIABLE("ycoords", Sy, e);
   UNPROTECT(2);
   /* copy marks */
   if(state->ismarked) {
@@ -119,45 +129,45 @@ void mhsnoop(Snoop *s,
     for(j = 0; j < npts; j++) {
       Pm[j] = state->marks[j];
     }
-    setVar(install("mcodes"), Sm, e);
+    ASSIGN_VARIABLE("mcodes", Sm, e);
     UNPROTECT(1);
   }
   /* proposal type */
   PROTECT(Sproptype = NEW_INTEGER(1));
   *(INTEGER_POINTER(Sproptype)) = proptype = prop->itype;
-  setVar(install("proptype"), Sproptype, e);
+  ASSIGN_VARIABLE("proptype", Sproptype, e);
   UNPROTECT(1);
   /* proposal coordinates */
   PROTECT(Sproplocn = NEW_NUMERIC(2));
   Pproplocn = NUMERIC_POINTER(Sproplocn);
   Pproplocn[0] = prop->u;
   Pproplocn[1] = prop->v;
-  setVar(install("proplocn"), Sproplocn, e);
+  ASSIGN_VARIABLE("proplocn", Sproplocn, e);
   UNPROTECT(1);
   /* proposal mark value */
   if(state->ismarked) {
     PROTECT(Spropmark = NEW_INTEGER(1));
     *(INTEGER_POINTER(Spropmark)) = prop->mrk;
-    setVar(install("propmark"), Spropmark, e);
+    ASSIGN_VARIABLE("propmark", Spropmark, e);
     UNPROTECT(1);
   }
   /* proposal point index */
   PROTECT(Spropindx = NEW_INTEGER(1));
   *(INTEGER_POINTER(Spropindx)) = prop->ix;
-  setVar(install("propindx"), Spropindx, e);
+  ASSIGN_VARIABLE("propindx", Spropindx, e);
   UNPROTECT(1);
   /* Metropolis-Hastings numerator and denominator */
   PROTECT(Snumer = NEW_NUMERIC(1));
   PROTECT(Sdenom = NEW_NUMERIC(1));
   *(NUMERIC_POINTER(Snumer)) = numer;
   *(NUMERIC_POINTER(Sdenom)) = denom;
-  setVar(install("numerator"), Snumer, e);
-  setVar(install("denominator"), Sdenom, e);
+  ASSIGN_VARIABLE("numerator", Snumer, e);
+  ASSIGN_VARIABLE("denominator", Sdenom, e);
   UNPROTECT(2);
   /* tentative outcome of proposal (0 = reject, other=accept) */
   PROTECT(Sitype = NEW_INTEGER(1));
   *(INTEGER_POINTER(Sitype)) = fateMH = *itype;
-  setVar(install("itype"), Sitype, e);
+  ASSIGN_VARIABLE("itype", Sitype, e);
   UNPROTECT(1);
 
   /* ..... call visual debugger */
@@ -173,7 +183,7 @@ void mhsnoop(Snoop *s,
 #endif
 
   /* update outcome of proposal */
-  SitypeUser = findVar(install("itype"), e);
+  SitypeUser = GET_VARIABLE("itype", e);
   fateUser = *(INTEGER_POINTER(SitypeUser));
   if(fateUser != fateMH)
     *itype = fateUser;
@@ -197,9 +207,9 @@ void mhsnoop(Snoop *s,
 #endif
     
   /* update stopping time */
-  Sinxt = findVar(install("inxt"), e);
+  Sinxt = GET_VARIABLE("inxt", e);
   s->nextstop = *(INTEGER_POINTER(Sinxt));
-  Stnxt = findVar(install("tnxt"), e);
+  Stnxt = GET_VARIABLE("tnxt", e);
   s->nexttype = *(INTEGER_POINTER(Stnxt));
 
 #if MH_DEBUG

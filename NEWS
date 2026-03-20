@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-4.005
+        CHANGES IN spatstat.random VERSION 3.4-4.006
 
 OVERVIEW
 
@@ -7,7 +7,11 @@ OVERVIEW
 
     o Inhomogeneous Poisson process in 3D.
 
+    o Non-uniform random points in 3D.
+    
     o Simple Sequential Inhibition in 3D.
+
+    o spatstat.random now requires R version >= 4.5.0
     
     o Internal improvements.
 
