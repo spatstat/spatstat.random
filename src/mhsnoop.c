@@ -1,5 +1,6 @@
 #include <R.h>
 #include <Rdefines.h>
+#include <Rversion.h>
 #include <R_ext/Utils.h>
 #include "methas.h"
 
@@ -8,11 +9,11 @@
 /*
   mhsnoop.c
 
-  $Revision: 1.16 $  $Date: 2026/03/20 08:10:48 $
+  $Revision: 1.18 $  $Date: 2026/03/22 01:35:14 $
 
   support for visual debugger in RMH
 
-  Copyright (C) Adrian Baddeley, Ege Rubak and Rolf Turner 2001-2018
+  Copyright (C) Adrian Baddeley, Ege Rubak and Rolf Turner 2001-2026
   Licence: GNU Public Licence >= 2
 
 */

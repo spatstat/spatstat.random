@@ -1,5 +1,5 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-4.007
+        CHANGES IN spatstat.random VERSION 3.4-5
 
 OVERVIEW
 
@@ -11,8 +11,6 @@ OVERVIEW
     
     o Simple Sequential Inhibition in 3D.
 
-    o spatstat.random now requires R version >= 4.5.0
-    
     o Internal improvements.
 
 NEW CLASSES
