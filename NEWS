@@ -1,4 +1,15 @@
 
+        CHANGES IN spatstat.random VERSION 3.4-5.001
+
+OVERVIEW
+
+    o Random unrounding
+
+NEW FUNCTIONS
+
+    o rUnround, rUnround.ppp
+    Random un-rounding of a discretised point pattern.
+
         CHANGES IN spatstat.random VERSION 3.4-5
 
 OVERVIEW

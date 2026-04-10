@@ -3,13 +3,15 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.131 $   $Date: 2026/03/19 04:01:10 $
+##    $Revision: 4.132 $   $Date: 2026/04/10 04:47:36 $
 ##
 ##    Copyright (c) Adrian Baddeley, Ege Rubak and Rolf Turner 1994-2026
 ##    GNU Public Licence (>= 2.0)
 ##
 ##    runifpoint()      n i.i.d. uniform random points ("binomial process")
 ##    runifdisc()       special case of disc (faster)
+##
+##    rUnround()        random unrounding
 ##
 ##    runifpoispp()     uniform Poisson point process
 ##
@@ -202,6 +204,63 @@ runifpoint <- function(n, win=owin(c(0,1),c(0,1)),
          )
   
   ## list of point patterns produced.
+  result <- simulationresult(result, nsim, drop)
+  return(result)
+}
+
+rUnround <- function(X, ...) {
+  UseMethod("rUnround")
+}
+
+rUnround.ppp <- function(X, ..., xstep=NULL, ystep=xstep,
+                         nsim=1, drop=TRUE, giveup=1000) {
+  verifyclass(X, "ppp")
+  if(!missing(nsim)) {
+    check.1.integer(nsim)
+    stopifnot(nsim >= 0)
+  }
+  nX <- npoints(X)
+  W <- Window(X)
+  if(nX == 0) {
+    result <- rep(list(X), nsim)
+    result <- simulationresult(result, nsim, drop)
+    return(result)
+  }
+  if(is.null(xstep) || is.null(ystep)) {
+    M <- as.mask(Frame(W), ...)
+    xstep <- M$xstep
+    ystep <- M$ystep
+  }
+  dx <- xstep/2
+  dy <- ystep/2
+  result <- vector(mode="list", length=nsim)
+  for(isim in seq_len(nsim)) {
+    Xshift <- X
+    undone <- rep.int(TRUE, nX)
+    triesleft <- giveup
+    while(any(undone)) {
+      triesleft <- triesleft - 1
+      if(triesleft <= 0) 
+        break
+      Y <- Xshift[undone]
+      nY <- npoints(Y)
+      xnew <- Y$x + runif(nY, min=-dx, max=dx)
+      ynew <- Y$y + runif(nY, min=-dy, max=dy)
+      ok <- inside.owin(xnew, ynew, W)
+      if(any(ok)) {
+        changed <- which(undone)[ok]
+        Xshift$x[changed] <- xnew[ok]
+        Xshift$y[changed] <- ynew[ok]
+        undone[changed] <- FALSE
+      }
+    }
+    if(any(undone)) {
+      ## give up on these points and return original locations
+      Xshift$x[undone] <- X$x[undone]
+      Xshift$y[undone] <- X$y[undone]
+    }
+    result[[isim]] <- Xshift
+  }
   result <- simulationresult(result, nsim, drop)
   return(result)
 }

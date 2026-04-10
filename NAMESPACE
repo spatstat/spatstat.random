@@ -4,7 +4,8 @@
 
 import(stats,utils,methods)
 import(spatstat.utils,spatstat.data,spatstat.univar,spatstat.geom)
-## import(spatstat.sparse) currently not needed
+
+# import(spatstat.sparse) not currently needed
 
 importFrom("grDevices", "xy.coords")
 
@@ -188,6 +189,8 @@ export("runifpointOnLines")
 export("runifpointx")
 export("runifpoispp")          
 export("runifpoisppOnLines")
+export("rUnround")
+export("rUnround.ppp")
 export("rVarGamma")
 export("simulate.clusterprocess")
 export("spatstatClusterModelInfo")
@@ -250,6 +253,7 @@ S3method("rmhstart", "rmhstart")
    S3method("rshift", "splitppp")
 S3method("rSSIengine", "box3")
 S3method("rSSIengine", "owin")
+S3method("rUnround", "ppp")
  S3method("simulate", "clusterprocess")
 S3method("summary", "rmhexpand")
   S3method("update", "rmhcontrol")
