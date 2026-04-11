@@ -193,6 +193,50 @@ local({
 reset.spatstat.options()
 
 
+#'  tests/rdiffusion.R
+#'   Test random diffusion and other new simulation code
+#'  $Revision: 1.1 $ $Date: 2026/04/11 04:49:23 $
+
+
+local({
+  if(FULLTEST) {
+    #' cases not covered in examples
+    #' polygonal window
+    X <- runifpoint(25, letterR)
+    Xin <- rdiffuse(X, 0.1, method="i", unround=FALSE)
+    stopifnot(npoints(Xin) == 25)
+    Xiy <- rdiffuse(X, 0.1, method="i", unround=TRUE)
+    stopifnot(npoints(Xiy) == 25)
+    Xcn <- rdiffuse(X, 0.1, method="C", unround=FALSE)
+    stopifnot(npoints(Xcn) == 25)
+    Xcy <- rdiffuse(X, 0.1, method="C", unround=TRUE)
+    stopifnot(npoints(Xcy) == 25)
+    #' mask window
+    Y <- discretise(X)
+    Yin <- rdiffuse(Y, 0.1, method="i", unround=FALSE)
+    stopifnot(npoints(Yin) == 25)
+    Yiy <- rdiffuse(Y, 0.1, method="i", unround=TRUE)
+    stopifnot(npoints(Yiy) == 25)
+    Ycn <- rdiffuse(Y, 0.1, method="C", unround=FALSE)
+    stopifnot(npoints(Ycn) == 25)
+    Ycy <- rdiffuse(Y, 0.1, method="C", unround=TRUE)
+    stopifnot(npoints(Ycy) == 25)
+    #' mask window, discretised points
+    Z <- discretise(X, move.points=TRUE)
+    Zin <- rdiffuse(Z, 0.1, method="i", unround=FALSE)
+    stopifnot(npoints(Zin) == 25)
+    Ziy <- rdiffuse(Z, 0.1, method="i", unround=TRUE)
+    stopifnot(npoints(Ziy) == 25)
+    Zcn <- rdiffuse(Z, 0.1, method="C", unround=FALSE)
+    stopifnot(npoints(Zcn) == 25)
+    Zcy <- rdiffuse(Z, 0.1, method="C", unround=TRUE)
+    stopifnot(npoints(Zcy) == 25)
+  }
+})
+
+reset.spatstat.options()
+
+
 #'
 #'   tests/clustaprox.R
 #'

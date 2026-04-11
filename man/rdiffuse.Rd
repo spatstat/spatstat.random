@@ -68,7 +68,7 @@ rdiffuse(X, sigma, \dots)
   \code{\link[spatstat.explore]{densityHeat.ppp}}
 }
 \examples{
-  plot(solist(redwood, rdiffuse(redwood, 0.05)))
+  plot(solist(original=cells, diffused=rdiffuse(cells, 0.05)))
 }
 \keyword{datagen}
 \concept{Diffusion}
