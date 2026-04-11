@@ -3,7 +3,7 @@
 #'
 #'  Random diffusion by random walk on raster
 #'
-#'  $Revision: 1.4 $ $Date: 2026/04/11 02:40:38 $
+#'  $Revision: 1.5 $ $Date: 2026/04/11 06:50:36 $
 #'
 
 rdiffuse <- function(X, sigma, ...) {
@@ -48,7 +48,7 @@ rdiffuse.ppp <- function(X, sigma, ..., connect=8,
   xy <- rasterxy.im(Ximage)
   xyZ <- xy[Zf,]
   ## point pattern result
-  Z <- as.ppp(xyZ, W=Window(X))
+  Z <- as.ppp(xyZ, W=Window(X), checkdup=FALSE)
   ## de-discretise
   if(unround) {
     Z <- rUnround(Z, xstep=Ximage$xstep, ystep=Ximage$ystep)
