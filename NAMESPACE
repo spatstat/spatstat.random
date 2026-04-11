@@ -2,10 +2,9 @@
 
 ## ................  Import packages ..................
 
-import(stats,utils,methods)
+import(stats,utils,methods,Matrix)
 import(spatstat.utils,spatstat.data,spatstat.univar,spatstat.geom)
-
-# import(spatstat.sparse) not currently needed
+import(spatstat.sparse)
 
 importFrom("grDevices", "xy.coords")
 
@@ -94,12 +93,15 @@ export("rcell")
 export("rcellnumber")
 export("rclusterBKBC")
 export("rDGS")
+export("rdiffuse")
+export("rdiffuse.ppp")
 export("rDiggleGratton")
 export("reach")
 export("reach.clusterprocess")
 export("reach.rmhmodel")
 export("recipEnzpois")
 export("reheat")
+export("resolveHeatTransitions")
 export("resolve.vargamma.shape")
 export("retrieve.param")
 export("rGaussPoisson")
@@ -235,6 +237,7 @@ S3method("print", "rmhInfoList")
 S3method("print", "rmhmodel")
 S3method("print", "rmhstart")
 S3method("print", "summary.rmhexpand")
+S3method("rdiffuse", "ppp")
  S3method("reach", "clusterprocess")
   S3method("reach", "rmhmodel")
 S3method("rjitter", "psp")

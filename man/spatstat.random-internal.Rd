@@ -31,6 +31,7 @@
 \alias{print.rmhInfoList}
 \alias{print.summary.rmhexpand}
 \alias{reheat}
+\alias{resolveHeatTransitions}
 \alias{resolve.vargamma.shape}
 \alias{retrieve.param}
 \alias{rGRFcircembed}
@@ -112,6 +113,8 @@ optimalinflation(clusters, mod, rD)
 \method{print}{rmhInfoList}(x, \dots)
 \method{print}{summary.rmhexpand}(x, \dots)
 reheat(model, invtemp)
+resolveHeatTransitions(x, sigma, \dots, connect, symmetric,
+                       sigmaX, k, weights, verbose)
 resolve.vargamma.shape(\dots, nu.ker, nu.pcf, nu, allow.nu, allow.default)
 retrieve.param(desired, aliases, \dots, par)
 rGRFcircembed(W, mu, var, corrfun, \dots, nsim, drop)

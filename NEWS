@@ -1,11 +1,18 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-5.001
+        CHANGES IN spatstat.random VERSION 3.4-5.002
 
 OVERVIEW
 
-    o Random unrounding
+    o Random diffusion of points.
 
+    o Random unrounding.
+
+    o spatstat.random now imports the packages 'Matrix' and 'spatstat.sparse'.
+    
 NEW FUNCTIONS
+
+    o rdiffuse
+    Randomly perturb each point in a point pattern by diffusion.
 
     o rUnround, rUnround.ppp
     Random un-rounding of a discretised point pattern.
