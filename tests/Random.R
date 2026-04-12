@@ -14,7 +14,7 @@ cat(paste("--------- Executing",
           "test code -----------\n"))
 #'  tests/randoms.R
 #'   Further tests of random generation code
-#'  $Revision: 1.23 $ $Date: 2025/11/21 01:38:26 $
+#'  $Revision: 1.25 $ $Date: 2026/04/12 07:05:56 $
 
 
 local({
@@ -187,6 +187,51 @@ local({
                  win = ow, saveLambda=TRUE, eps=0.5, rule.eps="shrink.frame",
                  n.cond=256)
     }
+  }
+})
+
+local({
+  if(ALWAYS) {
+    #' test validity of truncated Poisson
+    xx <- 0:100
+    lam <- 3.5
+    eps <- sqrt(.Machine$double.eps)
+    dd <- dpoisnonzero(xx, lam)
+    pp <- ppoisnonzero(xx, lam)
+    hh <- ppoisnonzero(xx, lam, lower.tail=FALSE)
+    theomean <- lam/(1 - exp(-lam))
+    approxmean <- sum(xx * dd)
+    medianA <- xx[min(which(pp >= 0.5))]
+    medianB <- qpoisnonzero(0.5, lam)
+
+    if(abs(approxmean - theomean) > eps)
+      stop("Calculated mean of poisnonzero is not correct")
+    if(medianA != medianB)
+      stop("Discrepancy in median of poisnonzero")
+    if(max(abs(dd - diff(c(0,pp)))) > eps)
+      stop("Discrepancy between dpoisnonzero and ppoisnonzero")
+    if(max(abs(dd + diff(c(1,hh)))) > eps)
+      stop("Discrepancy between dpoisnonzero and ppoisnonzero(lower.tail=F)")
+
+    dd1 <- dpoistrunc(xx, lam, minimum=1)
+    pp1 <- ppoistrunc(xx, lam, minimum=1)
+    hh1 <- ppoistrunc(xx, lam, minimum=1, lower.tail=FALSE)
+    theomean1 <- lam/(1 - exp(-lam))
+    approxmean1 <- sum(xx * dd1)
+    medianA1 <- xx[min(which(pp1 >= 0.5))]
+    medianB1 <- qpoistrunc(0.5, lam, minimum=1)
+
+    if(max(abs(dd1 - dd)) > eps)
+      stop("Discrepancy between dpoisnonzero and dpoistrunc(minimum=1)")
+
+    if(abs(approxmean1 - theomean1) > eps)
+      stop("Calculated mean of poistrunc is not correct")
+    if(medianA1 != medianB1)
+      stop("Discrepancy in median of poistrunc")
+    if(max(abs(dd1 - diff(c(0,pp1)))) > eps)
+      stop("Discrepancy between dpoistrunc and ppoistrunc")
+    if(max(abs(dd + diff(c(1,hh)))) > eps)
+      stop("Discrepancy between dpoistrunc and ppoistrunc(lower.tail=F)")
   }
 })
 
