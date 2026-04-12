@@ -13,8 +13,8 @@
 \usage{
 rdiffuse(X, sigma, \dots)
 
-\method{rdiffuse}{ppp}(X, sigma, \dots, connect = 8,
-    method = c("C", "interpreted"), unround = TRUE)
+\method{rdiffuse}{ppp}(X, sigma, \dots, nsim=1, drop=TRUE,
+    connect = 8, method = c("C", "interpreted"), unround = TRUE)
 }
 \arguments{
   \item{X}{
@@ -29,6 +29,14 @@ rdiffuse(X, sigma, \dots)
   \item{\dots}{
     Arguments passed to \code{\link[spatstat.geom]{as.mask}}
     controlling the spatial resolution.
+  }
+  \item{nsim}{
+    Number of simulated realisations to be generated.
+  }
+  \item{drop}{
+    Logical. If \code{nsim=1} and \code{drop=TRUE} (the default), the
+    result will be a point pattern, rather than a list 
+    containing a point pattern.
   }
   \item{connect}{
     Pixel grid connectivity (4 or 8).
@@ -58,7 +66,8 @@ rdiffuse(X, sigma, \dots)
   is returned.
 }
 \value{
-  Another point pattern in the same window with the same number of
+  A point pattern or a list of point patterns.
+  Each point pattern has the same window as \code{X} and the same number of
   points as \code{X}.
 }
 \author{

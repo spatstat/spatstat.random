@@ -3,22 +3,31 @@
 #'
 #'  Random diffusion by random walk on raster
 #'
-#'  $Revision: 1.5 $ $Date: 2026/04/11 06:50:36 $
+#'  $Revision: 1.8 $ $Date: 2026/04/12 00:00:16 $
 #'
 
 rdiffuse <- function(X, sigma, ...) {
   UseMethod("rdiffuse")
 }
 
-rdiffuse.ppp <- function(X, sigma, ..., connect=8,
+rdiffuse.ppp <- function(X, sigma, ..., nsim=1, drop=TRUE,
+                         connect=8,
                          method=c("C", "interpreted"),
                          unround=TRUE) {
   stopifnot(is.ppp(X))
   method <- match.arg(method)
+  check.1.integer(nsim)
+  stopifnot(nsim >= 0)
+  if(npoints(X) == 0) {
+    ## empty patterns
+    result <- rep(list(X), nsim)
+    result <- simulationresult(result, nsim=nsim, drop=drop)
+    return(result)
+  }
   ## >>>>. construct transition matrix etc <<<<<<<<<<<<<<<<<<<<<<
   stuff <- resolveHeatTransitions(x=X, sigma=sigma, connect=connect, ...)
   if(!is.null(stuff$sigmaX))
-    stop("lagged arrivals are not yet implemented", call.=FALSE)
+    stop("lagged arrivals are not yet implemented in rdiffuse", call.=FALSE)
   ## discretised point pattern - determines the grid 
   Ximage <- stuff$Y
   ## position of each X[i] as serial number in grid
@@ -33,27 +42,38 @@ rdiffuse.ppp <- function(X, sigma, ..., connect=8,
   Nrump  <- stuff$Nrump
   ## map from serial numbers 'u' to grid positions (NULL if window is rectangle)
   backmap  <- stuff$backmap
+  ## order of points (if changed)
+  osx <- stuff$osx
   ## convert transition matrices to efficient row-major format
   P <- as(P, "RsparseMatrix")
   Pk <- as(Pk, "RsparseMatrix")
-  ## >>>>>>>>>>>>>   run parallel Markov chains <<<<<<<<<<<<<<<<<<<<<
-  Z0 <- Xpos
-  Zb <- runSparseMarkovChain(Pk, Z0, Nblock,
-                             result="last", check=FALSE, method=method)
-  Zf <- runSparseMarkovChain(P,  Zb, Nrump, 
-                             result="last", check=FALSE, method=method)
-  ## >>>>>>>>>>>>>  map pixel serial numbers to spatial positions <<<<<<<
-  if(!is.null(backmap))
-    Zf <- backmap[Zf]
-  xy <- rasterxy.im(Ximage)
-  xyZ <- xy[Zf,]
-  ## point pattern result
-  Z <- as.ppp(xyZ, W=Window(X), checkdup=FALSE)
-  ## de-discretise
-  if(unround) {
-    Z <- rUnround(Z, xstep=Ximage$xstep, ystep=Ximage$ystep)
+  ## >>>>>>>>>>>>>   generate simulated patterns <<<<<<<<<<<<<<<<<<<<
+  result <- vector(mode="list", length=nsim)
+  for(isim in 1:nsim) {
+    ## run discretised diffusion, independently for each data point
+    Z0 <- Xpos
+    Zb <- runSparseMarkovChain(Pk, Z0, Nblock,
+                               result="last", check=FALSE, method=method)
+    Zf <- runSparseMarkovChain(P,  Zb, Nrump, 
+                               result="last", check=FALSE, method=method)
+    ## map pixel serial numbers to spatial positions 
+    if(!is.null(backmap))
+      Zf <- backmap[Zf]
+    xy <- rasterxy.im(Ximage)
+    xyZ <- xy[Zf,]
+    ## point pattern result
+    Z <- as.ppp(xyZ, W=Window(X), checkdup=FALSE)
+    if(unround) {
+      ## de-discretise
+      Z <- rUnround(Z, xstep=Ximage$xstep, ystep=Ximage$ystep)
+    }
+    if(!is.null(osx)) {
+      ## reinstate original order
+      Z[osx] <- Z
+    }
+    result[[isim]] <- Z
   }
-  return(Z)
+  return(simulationresult(result, nsim=nsim, drop=drop))
 }
 
 resolveHeatTransitions <-  function(x, sigma=NULL, ..., connect=8,
@@ -74,7 +94,13 @@ resolveHeatTransitions <-  function(x, sigma=NULL, ..., connect=8,
     check.nvector(sigmaX, nX)
     stopifnot(all(is.finite(sigmaX)))
     stopifnot(all(sigmaX >= 0))
-    if(is.null(sigma)) sigma <- max(sigmaX) else check.1.real(sigma)
+    #' sigma must be a single number >= max(sigmaX)
+    if(is.null(sigma)) {
+      sigma <- max(sigmaX)
+    } else {
+      check.1.real(sigma)
+      stopifnot(sigma >= max(sigmaX))
+    }
     #' sort in decreasing order of bandwidth
     osx <- order(sigmaX, decreasing=TRUE)
     sigmaX <- sigmaX[osx]
@@ -88,10 +114,11 @@ resolveHeatTransitions <-  function(x, sigma=NULL, ..., connect=8,
     #' discretised coordinates
     Xpos <- nearest.valid.pixel(x$x, x$y, Y)
   } else {
-    #' pixellate pattern
+    #' initial state is pixellated pattern
     Y <- pixellate(x, ..., weights=weights, preserve=TRUE, savemap=TRUE)
     Xpos <- attr(Y, "map")
     osx <- NULL
+    if(is.null(sigma)) stop("Argument sigma is required", call.=FALSE)
   } 
 
   #' validate sigma
@@ -106,7 +133,8 @@ resolveHeatTransitions <-  function(x, sigma=NULL, ..., connect=8,
     sigma <- as.numeric(sigma)
     check.1.real(sigma)
   }
-
+  if(is.numeric(sigma)) stopifnot(sigma >= 0) else stopifnot(min(sigma) >= 0)
+  
   #' normalise as density 
   pixelarea <- with(Y, xstep * ystep)
   Y <- Y / pixelarea
