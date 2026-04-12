@@ -35,7 +35,7 @@ systematic random, stratified random,
 simple sequential inhibition, cell process),
 
 - randomised alteration of patterns (thinning,
-random shift, jittering),
+shifting, jittering, diffusion, relabelling, resampling),
 
 - generating simulated realisations of spatial point processes
 (Poisson processes, Matern inhibition models, Matern cluster processes,
@@ -58,6 +58,10 @@ Exceptions:
 - generation of determinantal point processes is provided in `spatstat.model`
 
 - generation of quasi-random patterns is provided in `spatstat.geom`
+
+- generation of patterns on a linear network is provided in `spatstat.linnet`
+
+- some very simple random generators are provided in `spatstat.geom`
 
 ___
 
@@ -134,7 +138,8 @@ ___
 #### probability distributions
 
 - theoretical distribution of nearest neighbour distance (`rknn`)
-- mixed Poisson distribution (`dmixpois`)
+- mixed Poisson distribution (`rmixpois`, `dmixpois`, `pmixpois`, `qmixpois`)
+- truncated Poisson distribution (`rpoistrunc`)
 
 ___
 
