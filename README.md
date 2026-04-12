@@ -55,6 +55,8 @@ alternating Gibbs sampler)
 
 - generating random patterns in three dimensions or higher dimensions
 
+- generating realisations of mixed Poisson or truncated Poisson random variables
+
 **Exceptions**:
 
 - generation of determinantal point processes is provided in `spatstat.model`
@@ -140,7 +142,7 @@ ___
 
 #### probability distributions
 
-- theoretical distribution of nearest neighbour distance (`rknn`)
+- theoretical distribution of nearest neighbour distance (`pknn`, `qknn`, `dknn`, `rknn`)
 - mixed Poisson distribution (`rmixpois`, `dmixpois`, `pmixpois`, `qmixpois`)
 - truncated Poisson distribution (`rpoistrunc`)
 
