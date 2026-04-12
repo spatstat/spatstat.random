@@ -80,6 +80,7 @@ ___
 - random shift (`rshift`)
 - random thinning (`rthin`)
 - random (re)labelling (`rlabel`)
+- random diffusion (`rdiffuse`)
 - block resampling (`quadratresample`)
 
 #### Clustered point processes
