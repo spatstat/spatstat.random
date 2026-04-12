@@ -1,19 +1,35 @@
 \name{rpoistrunc}
 \alias{rpoisnonzero}
+\alias{dpoisnonzero}
+\alias{ppoisnonzero}
+\alias{qpoisnonzero}
 \alias{rpoistrunc}
+\alias{dpoistrunc}
+\alias{ppoistrunc}
+\alias{qpoistrunc}
 \title{
-  Random Values from the Truncated Poisson Distribution
+  Truncated Poisson Distribution
 }
 \description{
-  Generate realisations of a Poisson random variable
-  which are truncated, that is, conditioned to be nonzero, or conditioned
-  to be at least a given number.
+  Generate random realisations, or calculate probability distribution or
+  quantiles, of a Poisson random variable which is conditioned to be nonzero,
+  or conditioned to be at least a given number.
 }
 \usage{
+dpoisnonzero(x, lambda, log=FALSE)
+ppoisnonzero(q, lambda, lower.tail=TRUE, log.p=FALSE)
+qpoisnonzero(p, lambda, lower.tail=TRUE, log.p=FALSE)
 rpoisnonzero(n, lambda, method=c("harding", "transform"), implem=c("R", "C"))
-rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R", "C"))
+
+dpoistrunc(x, lambda, minimum=1, log=FALSE)
+ppoistrunc(q, lambda, minimum=1, lower.tail=TRUE, log.p=FALSE)
+qpoistrunc(p, lambda, minimum=1, lower.tail=TRUE, log.p=FALSE)
+rpoistrunc(n, lambda, minimum=1, method=c("harding", "transform"), implem=c("R", "C"))
 }
 \arguments{
+  \item{x}{Vector of quantiles.}
+  \item{q}{Vector of quantiles.}
+  \item{p}{Vector of probabilities.}
   \item{n}{Number of random values to be generated.}
   \item{lambda}{
     Mean value of the un-truncated Poisson distribution.
@@ -22,6 +38,14 @@ rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R
   \item{minimum}{
     Minimum permitted value for the random variables.
     A nonnegative integer, or vector of nonnegative integers.
+  }
+  \item{lower.tail}{
+    Logical value. If \code{TRUE} (the default), probabilities are
+    \eqn{P[X <= x]}; otherwise probabilities are \eqn{P[X > x]}.
+  }
+  \item{log,log.p}{
+    Logical value. If \code{TRUE}, probabilities are given
+    as the natural logarithm \eqn{\log(p)}{log(p)}.
   }
   \item{method}{
     Character string (partially matched) specifying the simulation
@@ -38,6 +62,9 @@ rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R
   generates realisations of the
   Poisson distribution with mean \code{lambda}
   conditioned on the event that the values are not equal to zero.
+  The functions \code{dpoisnonzero}, \code{ppoisnonzero},
+  \code{qpoisnonzero} calculate the probability mass function,
+  cumulative distribution function, and quantile function, respectively.
 
   \code{rpoistrunc} 
   generates realisations of the
@@ -50,13 +77,17 @@ rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R
   The value \code{minimum=0} is equivalent to
   generating un-truncated Poisson random variables
   using \code{\link[stats]{rpois}}.
+  The functions \code{dpoistrunc}, \code{ppoistrunc},
+  \code{qpoistrunc} calculate the probability mass function,
+  cumulative distribution function, and quantile function, respectively.
 
   The arguments \code{lambda} and \code{minimum} can be
   vectors of length \code{n}, specifying different means
   for the un-truncated Poisson distribution, and different
   minimum values, for each of the \code{n} random output values.
 
-  If \code{method="transform"} the simulated values are generated
+  For the random generators, 
+  if \code{method="transform"} the simulated values are generated
   by transforming a uniform random variable using the quantile function
   of the Poisson distribution.
   If \code{method="harding"} (the default) the simulated values are
@@ -65,7 +96,7 @@ rpoistrunc(n, lambda, minimum = 1, method=c("harding", "transform"), implem=c("R
   to be faster.
 }
 \value{
-  An integer vector of length \code{n}.
+  Numerical vector.
 }
 \author{
   \adrian, after ideas of Ted Harding and Peter Dalgaard.

@@ -1,11 +1,13 @@
 
-        CHANGES IN spatstat.random VERSION 3.4-5.005
+        CHANGES IN spatstat.random VERSION 3.4-5.006
 
 OVERVIEW
 
     o Random diffusion of points.
 
     o Random unrounding.
+
+    o Truncated Poisson distribution.
 
     o spatstat.random now imports the packages 'Matrix' and 'spatstat.sparse'.
     
@@ -16,6 +18,14 @@ NEW FUNCTIONS
 
     o rUnround, rUnround.ppp
     Random un-rounding of a discretised point pattern.
+
+    o dpoisnonzero, ppoisnonzero, qpoisnonzero
+    Density, cumulative probability and quantile function for
+    a Poisson random variable conditioned to be nonzero.
+
+    o dpoistrunc, ppoistrunc, qpoistrunc
+    Density, cumulative probability and quantile function for
+    the truncated Poisson distribution.
 
         CHANGES IN spatstat.random VERSION 3.4-5
 

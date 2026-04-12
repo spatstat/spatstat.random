@@ -1,9 +1,64 @@
 #' Truncated Poisson random variables
 #'
-#'  $Revision: 1.5 $ $Date: 2023/02/13 10:57:29 $
+#'  $Revision: 1.8 $ $Date: 2026/04/12 06:23:47 $
 #' 
 #'   Copyright (C) Adrian Baddeley and Ya-Mei Chang 2022 
 #'   GNU Public Licence >= 2
+
+#' --------- Poisson X given X > 0 ------------------------
+
+dpoisnonzero <- function(x, lambda, log=FALSE) {
+  ## P(X = x)
+  f <- dpois(x=x, lambda=lambda, log=log)
+  ## P(X > 0) 
+  PG0 <- ppois(q=0, lambda=lambda, lower.tail=FALSE, log.p=log)
+  ## P(X = x | X > 0)
+  y <- if(log) f-PG0 else f/PG0
+  y[x == 0] <- if(log) -Inf else 0
+  return(y)
+}
+
+ppoisnonzero <- function(q, lambda, lower.tail=TRUE, log.p=FALSE) {
+  if(lower.tail) {
+    ## P(X <= q)
+    p  <- ppois(q=q, lambda=lambda, lower.tail=TRUE,  log.p=FALSE)
+    ## P(X = 0)
+    p0 <- dpois(x=0, lambda=lambda, log=FALSE)
+    ## P(X <= q | X > 0)
+    y <- (p - p0)/(1 - p0)
+    if(log.p) y <- log(y)
+  } else {
+    ## P(X > q)
+    p   <- ppois(q=q, lambda=lambda, lower.tail=FALSE, log.p=log.p)
+    ## P(X > 0)
+    PG0 <- ppois(q=0, lambda=lambda, lower.tail=FALSE, log.p=log.p)
+    ## P(X > q | X > 0)
+    y <- if(log.p) p - PG0 else p/PG0
+  }
+  return(y)
+}
+
+qpoisnonzero <- function(p, lambda, lower.tail=TRUE, log.p=FALSE) {
+  if(lower.tail) {
+    ## find x such that P(X <= x | X > 0) = p 
+    ## P(X = 0)
+    p0 <- dpois(x=0, lambda=lambda, log=FALSE)
+    ## P(X <= x) = P(X = 0) + P(X > 0) P(X <= x | X > 0)
+    pun <- p0 + (1-p0) * (if(log.p) exp(p) else p)
+    ## quantiles of Poisson
+    y <- qpois(p=pun, lambda, lower.tail=TRUE, log.p=FALSE)
+  } else {
+    ## find x such that P(X > x | X > 0) = p 
+    ## P(X > 0)
+    PG0 <- ppois(q=0, lambda=lambda, lower.tail=FALSE, log.p=log.p)
+    ## P(X > x) = P(X > 0) P(X > x | X > 0)
+    pun <- if(log.p) PG0 + p else PG0 * p
+    ## quantiles of Poisson
+    y <- qpois(p=pun, lambda, lower.tail=FALSE, log.p=log.p)
+  }
+  y[] <- pmax(y[], 1)
+  return(y)
+}
 
 rpoisnonzero <- function(n, lambda, method=c("harding", "transform"), implem=c("R", "C")) {
   ## Poisson random variable, conditioned to be nonzero
@@ -39,6 +94,63 @@ rpoisnonzero <- function(n, lambda, method=c("harding", "transform"), implem=c("
                                PACKAGE="spatstat.random")
                   })
          })
+  return(y)
+}
+
+#' --------- Poisson X given X >= minimum  ------------------------
+
+dpoistrunc <- function(x, lambda, minimum=1, log=FALSE) {
+  minimum <- as.integer(minimum)
+  ## P(X = x)
+  f <- dpois(x=x, lambda=lambda, log=log)
+  ## P(X >= m) 
+  PG <- ppois(q = minimum - 1, lambda=lambda, lower.tail=FALSE, log.p=log)
+  ## P(X = x | X >= m)
+  y <- if(log) f-PG else f/PG
+  y[x < minimum] <- if(log) -Inf else 0
+  return(y)
+}
+
+ppoistrunc <- function(q, lambda, minimum=1, lower.tail=TRUE, log.p=FALSE) {
+  if(lower.tail) {
+    ## P(X <= q)
+    p  <- ppois(q=q,         lambda=lambda, lower.tail=TRUE, log.p=FALSE)
+    ## P(X < m)
+    PL <- ppois(q=minimum-1, lambda=lambda, lower.tail=TRUE, log.p=FALSE)
+    ## P(X <= q | X >= m)
+    y <- (p - PL)/(1 - PL)
+    y[q < minimum] <- 0
+    if(log.p) y <- log(y)
+  } else {
+    ## P(X > q)
+    p   <- ppois(q=q, lambda=lambda, lower.tail=FALSE, log.p=log.p)
+    ## P(X >= m)
+    PG <- ppois(q = minimum - 1, lambda=lambda, lower.tail=FALSE, log.p=log)
+    ## P(X > q | X >= m)
+    y <- if(log.p) p - PG else p/PG
+  }
+  return(y)
+}
+
+qpoistrunc <- function(p, lambda, minimum=1, lower.tail=TRUE, log.p=FALSE) {
+  if(lower.tail) {
+    ## find x such that P(X <= x | X >= m) = p 
+    ## P(X < m)
+    PL <- ppois(q = minimum - 1, lambda=lambda, lower.tail=TRUE, log.p=log.p)
+    ## P(X <= x) = P(X < m) + P(X >= m) P(X <= x | X >= m)
+    pun <- PL + (1-PL) * (if(log.p) exp(p) else p)
+    ## quantiles of Poisson
+    y <- qpois(p=pun, lambda, lower.tail=TRUE, log.p=FALSE)
+  } else {
+    ## find x such that P(X > x | X >= m) = p 
+    ## P(X >= m)
+    PG <- ppois(q = minimum - 1, lambda=lambda, lower.tail=FALSE, log.p=log.p)
+    ## P(X > x) = P(X >= m) P(X > x | X >= m)
+    pun <- if(log.p) PG + p else PG * p
+    ## quantiles of Poisson
+    y <- qpois(p=pun, lambda, lower.tail=FALSE, log.p=log.p)
+  }
+  y[] <- pmax(y[], minimum)
   return(y)
 }
 
@@ -103,3 +215,6 @@ recipEnzpois <- function(mu, exact=TRUE) {
   }
   return(ans)
 }
+
+
+
