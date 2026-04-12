@@ -32,10 +32,10 @@ ___
 - generating random spatial patterns of points according to many simple rules
 (complete spatial randomness, binomial process, random grid,
 systematic random, stratified random, 
-simple sequential inhibition, cell process),
+simple sequential inhibition, cell process)
 
 - randomised alteration of patterns (thinning,
-shifting, jittering, diffusion, relabelling, resampling),
+shifting, jittering, diffusion, relabelling, resampling)
 
 - generating simulated realisations of spatial point processes
 (Poisson processes, Matern inhibition models, Matern cluster processes,
@@ -53,6 +53,8 @@ alternating Gibbs sampler)
 
 - generating random images (random noise, random mosaics).
 
+- generating random patterns in three dimensions or higher dimensions
+
 **Exceptions**:
 
 - generation of determinantal point processes is provided in `spatstat.model`
@@ -60,11 +62,6 @@ alternating Gibbs sampler)
 - generation of quasi-random patterns is provided in `spatstat.geom`
 
 - generation of patterns on a linear network is provided in `spatstat.linnet`
-
-- some very simple random generators for point patterns
-  are provided in `spatstat.geom` for technical reasons.
-  These are special cases of functions in `spatstat.random` so
-  they are rarely used explicitly.
 
 - generation of a real-valued random variable from a 
   kernel density estimate is provided in `spatstat.univar`
