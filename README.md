@@ -144,7 +144,7 @@ ___
 
 - theoretical distribution of nearest neighbour distance (`pknn`, `qknn`, `dknn`, `rknn`)
 - mixed Poisson distribution (`rmixpois`, `dmixpois`, `pmixpois`, `qmixpois`)
-- truncated Poisson distribution (`rpoistrunc`)
+- truncated Poisson distribution (`rpoistrunc`, `dpoistrunc` etc)
 
 ___
 
