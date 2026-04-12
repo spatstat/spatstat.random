@@ -53,7 +53,7 @@ alternating Gibbs sampler)
 
 - generating random images (random noise, random mosaics).
 
-Exceptions:
+**Exceptions**:
 
 - generation of determinantal point processes is provided in `spatstat.model`
 
@@ -61,7 +61,13 @@ Exceptions:
 
 - generation of patterns on a linear network is provided in `spatstat.linnet`
 
-- some very simple random generators are provided in `spatstat.geom`
+- some very simple random generators for point patterns
+  are provided in `spatstat.geom` for technical reasons.
+  These are special cases of functions in `spatstat.random` so
+  they are rarely used explicitly.
+
+- generation of a real-valued random variable from a 
+  kernel density estimate is provided in `spatstat.univar`
 
 ___
 
