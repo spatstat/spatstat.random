@@ -2,7 +2,7 @@
 #' 
 #'   Lookup table of information about cluster processes and Cox processes
 #'
-#'   $Revision: 1.76 $ $Date: 2025/11/21 02:05:24 $
+#'   $Revision: 1.78 $ $Date: 2026/05/04 06:35:23 $
 #'
 #'   Information is extracted by calling
 #'             spatstatClusterModelInfo(<name>)
@@ -35,13 +35,30 @@
 #'                       e.g. Thomas -> c('kappa', 'sigma2')
 #'                            MatClust -> c('kappa', 'R')
 #'
-#'                       **NOTE** that there are two parametrisations:
-#'                             - the 'GENERIC' parameters (e.g. 'kappa' and 'scale' for cluster models)
-#'                             - the 'NATIVE' parameters depend on the model.
-#' 
+#'       pn.generic      (Character vector of length 2)
+#'                       Names of the GENERIC cluster parameters
+#'
+#'       pn.canonical    (Character vector of length 2 or 0)
+#'                       Names of the CANONICAL cluster parameters
+#'                       for Neyman-Scott models only
+#'
+#'                       **NOTE** that there are THREE parametrisations:
+#'                             - the 'GENERIC' parameters
+#'                                    ('kappa' and 'scale' for Neyman-Scott cluster models)
+#'                                    ('var' and 'scale' for LGCP)
+#'                             - the 'NATIVE' parameters
+#'                                    (depend on the model)
+#'                             - the 'CANONICAL' parameters
+#'                                    ('strength' and 'scale' for Neyman-Scott cluster models only)
+#'
 #'                       The native parameters are designed to be a more efficient representation
-#'                       for internal use when fitting models. Starting values for the parameters
-#'                       are expected to be given in the native parametrisation.
+#'                       for internal computation when fitting the model.
+#'                       Starting values for the parameters are expected to be given
+#'                       in the native parametrisation.
+#'                       The generic parametrisation is a common parametrisation for all models
+#'                       The canonical parametrisation is theoretically derived re-parametrisation
+#'                       of cluster models that allows the Poisson process to be included
+#'                
 #'
 #'       shapenames      (Character vector)
 #'                       The names of any shape parameters of the kernel
@@ -73,11 +90,11 @@
 #' 
 #'       tocanonical     function(par, ..., model, margs)
 #'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
-#'                       Convert 'par' from native format to experimental 'canonical' format
+#'                       Convert 'par' from native format to 'canonical' format
 #'
 #'       tohuman         function(can, ..., model, margs)
 #'                       [DEFINED ONLY FOR POISSON CLUSTER PROCESSES]
-#'                       Convert from experimental 'canonical' format to 'native' par format
+#'                       Convert from 'canonical' format to 'native' par format
 #'
 #'   ................... Properties of the cluster mechanism . ..............
 #'   ................... [defined only for cluster processes] ...............
@@ -217,6 +234,8 @@ detect.par.format <- function(par, native, generic) {
   modelabbrev    = "Thomas process", # In fitted kppm obj.
   printmodelname = function(...) "Thomas process", # Used by print.kppm
   parnames       = c("kappa", "sigma2"),
+  pn.generic     = c("kappa", "scale"),
+  pn.canonical   = c("strength", "scale"),
   shapenames     = NULL,
   ## ............... Argument processing ................................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
@@ -247,7 +266,7 @@ detect.par.format <- function(par, native, generic) {
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ...) {
     ## 'par' is in native format
-    ## convert to experimental 'canonical' format
+    ## convert to 'canonical' format
     kappa <- par[[1L]]
     sigma2 <- par[[2L]]
     c(strength=1/(4 * pi * kappa * sigma2), scale=sqrt(sigma2))
@@ -408,6 +427,8 @@ detect.par.format <- function(par, native, generic) {
   modelabbrev    = "Matern cluster process", # In fitted obj.
   printmodelname = function(...) "Matern cluster process", # Used by print.kppm
   parnames       = c("kappa", "R"),
+  pn.generic     = c("kappa", "scale"),
+  pn.canonical   = c("strength", "scale"),
   shapenames     = NULL,
   ## ............ Argument processing ...........................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
@@ -429,7 +450,7 @@ detect.par.format <- function(par, native, generic) {
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ...) {
     ## 'par' is in native format
-    ## convert to experimental 'canonical' format
+    ## convert to  'canonical' format
     kappa <- par[[1L]]
     R <- par[[2L]]
     c(strength=1/(pi * kappa * R^2), scale=R)
@@ -546,6 +567,8 @@ detect.par.format <- function(par, native, generic) {
   modelabbrev    = "Cauchy process", # In fitted obj.
   printmodelname = function(...) "Cauchy process", # Used by print.kppm
   parnames       = c("kappa", "eta2"),
+  pn.generic     = c("kappa", "scale"),
+  pn.canonical   = c("strength", "scale"),
   shapenames     = NULL,
   ## .................. Argument processing ...................................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
@@ -578,7 +601,7 @@ detect.par.format <- function(par, native, generic) {
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ...) {
     ## 'par' is in native format
-    ## convert to experimental 'canonical' format
+    ## convert to 'canonical' format
     kappa <- par[[1L]]
     eta2 <- par[[2L]]
     c(strength=1/(2 * pi * kappa * eta2), scale=sqrt(eta2)/2)
@@ -770,6 +793,8 @@ resolve.vargamma.shape <- function(...,
            signif(obj$clustargs[["nu"]], 2), ")")
   },
   parnames = c("kappa", "eta"),
+  pn.generic     = c("kappa", "scale"),
+  pn.canonical   = c("strength", "scale"),
   shapenames     = "nu",
   ## ...................... Argument processing ...........................
   checkpar = function(par, native = old, ..., old = TRUE, strict=TRUE){
@@ -791,7 +816,7 @@ resolve.vargamma.shape <- function(...,
   ## Convert to/from canonical cluster parameters
   tocanonical = function(par, ..., margs) {
     ## 'par' is in native format
-    ## convert to experimental 'canonical' format
+    ## convert to 'canonical' format
     kappa <- par[[1L]]
     eta <- par[[2L]]
     nu.pcf <- margs$nu.pcf
@@ -1015,6 +1040,8 @@ resolve.vargamma.shape <- function(...,
   modelabbrev    = "log-Gaussian Cox process", # In fitted obj.
   printmodelname = function(...) "log-Gaussian Cox process", # Used by print.kppm
   parnames       = c("sigma2", "alpha"),
+  pn.generic     = c("var", "scale"),
+  pn.canonical   = character(0),
   shapenames     = "*",  # shape parameters are present but depend on the model
   ## ................. Argument handling ...........................
   checkpar = function(par, native = old, ..., old=TRUE, strict=TRUE){
@@ -1194,7 +1221,7 @@ spatstatClusterModelInfo <- function(name, onlyPCP = FALSE) {
     nama2 <- nama2[ok]
   } 
   if(!(name %in% nama2))
-    stop(paste(sQuote(name), "is not recognised;",
+    stop(paste("Cluster model", sQuote(name), "is not recognised;",
                "valid names are", commasep(sQuote(nama2))),
          call.=FALSE)
   out <- .Spatstat.ClusterModelInfoTable[[name]]

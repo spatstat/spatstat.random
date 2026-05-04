@@ -1,6 +1,6 @@
 Package: spatstat.random
-Version: 3.4-5.007
-Date: 2026-04-12
+Version: 3.4-5.008
+Date: 2026-05-04
 Title: Random Generation Functionality for the 'spatstat' Family
 Authors@R: c(person("Adrian", "Baddeley", 
                     role = c("aut", "cre", "cph"),
@@ -34,7 +34,7 @@ Authors@R: c(person("Adrian", "Baddeley",
 	            role = c("ctb", "cph")))
 Maintainer: Adrian Baddeley <Adrian.Baddeley@curtin.edu.au>
 Depends: R (>= 3.5.0), spatstat.data (>= 3.1-9), spatstat.univar (>= 3.1-6), spatstat.geom (>= 3.7-3.003), stats, utils, methods, grDevices
-Imports: Matrix, spatstat.utils (>= 3.2-2), spatstat.sparse (>= 3.1-0.002)
+Imports: Matrix, spatstat.utils (>= 3.2-2), spatstat.sparse (>= 3.1-0.011)
 Suggests: spatial, spatstat.linnet (>= 3.4), spatstat.explore, spatstat.model, spatstat (>= 3.5), gsl
 Description: Functionality for random generation of spatial data in the 'spatstat' family of packages.
 	     Generates random spatial patterns of points according to many simple rules (complete spatial randomness,
