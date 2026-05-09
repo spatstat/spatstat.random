@@ -59,14 +59,18 @@ alternating Gibbs sampler)
 
 **Exceptions**:
 
-- generation of determinantal point processes is provided in `spatstat.model`
+- generation of determinantal point processes is provided in
+  [`spatstat.model`](https://github.com/spatstat/spatstat.model)
 
-- generation of quasi-random patterns is provided in `spatstat.geom`
+- generation of quasi-random patterns is provided in 
+  [`spatstat.geom`](https://github.com/spatstat/spatstat.geom)
 
-- generation of patterns on a linear network is provided in `spatstat.linnet`
+- generation of patterns on a linear network is provided in
+  [`spatstat.linnet`](https://github.com/spatstat/spatstat.linnet)
 
 - generation of a real-valued random variable from a 
-  kernel density estimate is provided in `spatstat.univar`
+  kernel density estimate is provided in 
+  [`spatstat.univar`](https://github.com/spatstat/spatstat.univar)
 
 ___
 
