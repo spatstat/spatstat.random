@@ -72,6 +72,10 @@ alternating Gibbs sampler)
   kernel density estimate is provided in 
   [`spatstat.univar`](https://github.com/spatstat/spatstat.univar)
 
+- simulation of a Markov chain using a sparse representation of the
+  transition matrix is provided in 
+  [`spatstat.sparse`](https://github.com/spatstat/spatstat.sparse)
+
 ___
 
 ### <a name="detailed"></a> Detailed contents
