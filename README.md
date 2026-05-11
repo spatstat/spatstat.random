@@ -62,10 +62,10 @@ alternating Gibbs sampler)
 - generation of determinantal point processes is provided in
   [`spatstat.model`](https://github.com/spatstat/spatstat.model)
 
-- generation of quasi-random patterns is provided in 
+- generation of quasi-random point patterns is provided in 
   [`spatstat.geom`](https://github.com/spatstat/spatstat.geom)
 
-- generation of patterns on a linear network is provided in
+- generation of point patterns on a linear network is provided in
   [`spatstat.linnet`](https://github.com/spatstat/spatstat.linnet)
 
 - generation of a real-valued random variable from a 
