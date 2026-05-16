@@ -23,12 +23,11 @@
     generation of random spatial patterns of points
     according to many simple rules
     (completely random patterns, random grids, systematic random
-    points);
+    points, stratified random points, simple sequential inhibition,
+    cell process);
     \item
     randomised alteration of spatial patterns (thinning, random shifting,
-    jittering, random labelling);
-    \item
-    generation of quasirandom patterns;
+    jittering, resampling, relabelling, diffusion);
     \item
     direct simulation of random point processes
     (Poisson process, binomial process, cell process,
@@ -53,10 +52,30 @@
     \item
     generation of random tessellations;
     \item
-    generation of random images (random noise, random mosaics).
+    generation of random images (random noise, random mosaics);
+    \item
+    generation of realisations of mixed Poisson or truncated Poisson
+    random variables.
   }
-  (Functions for linear networks
-  are in the separate sub-package \pkg{spatstat.linnet}.)
+  There are some \bold{exceptions}:
+  \itemize{
+    \item
+    generation of quasi-random patterns
+    is provided in the \pkg{spatstat.geom} package;
+    \item
+    generation of determinantal point processes 
+    is provided in the \pkg{spatstat.model} package;
+    \item
+    generation of point patterns on a linear network
+    is provided in the \pkg{spatstat.linnet} package;
+    \item
+    generation of a real-valued random variable from a kernel density estimate
+    is provided in the \pkg{spatstat.univar} package;
+    \item
+    simulation of a Markov chain using a sparse representation of the
+    transition matrix 
+    is provided in the \pkg{spatstat.sparse} package.
+  }
 }
 \section{Structure of the spatstat family}{  
   The \pkg{spatstat} family of packages
