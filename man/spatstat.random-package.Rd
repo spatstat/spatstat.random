@@ -240,8 +240,10 @@
     An object of class \code{"tess"} represents a tessellation.
 
     \tabular{ll}{
-      \code{\link[spatstat.random]{rpoislinetess}} \tab generate tessellation using Poisson line
-      process 
+      \code{\link[spatstat.random]{rpoislinetess}} \tab
+      generate tessellation using Poisson line process \cr
+      \code{\link[spatstat.random]{rpoisDirichletTess}} \tab
+      generate Dirichlet tessellation of Poisson point process 
     }
 
     \bold{Three-dimensional point patterns}

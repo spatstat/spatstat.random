@@ -137,6 +137,7 @@ ___
 #### random tessellations
 
 - tessellation using Poisson line process (`rpoislinetess`)
+- Dirichlet tessellation of Poisson point process (`rpoisDirichletTess`)
 
 #### three-dimensional point patterns
 
