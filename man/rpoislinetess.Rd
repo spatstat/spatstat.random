@@ -2,8 +2,8 @@
 \alias{rpoislinetess}
 \title{Poisson Line Tessellation}
 \description{
-  Generate a tessellation delineated by the lines of
-  the Poisson line process
+  Generate a random tessellation delineated by the lines of
+  the Poisson line process.
 }
 \usage{
 rpoislinetess(lambda, win = owin())
@@ -45,6 +45,8 @@ rpoislinetess(lambda, win = owin())
 \seealso{
   \code{\link{rpoisline}}
   to generate the lines only.
+
+  \code{\link{rpoisDirichletTess}}
 }
 \examples{
  X <- rpoislinetess(3)

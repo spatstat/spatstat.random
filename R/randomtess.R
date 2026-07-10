@@ -3,13 +3,15 @@
 #
 # Random tessellations
 #
-# $Revision: 1.9 $  $Date: 2024/02/04 08:04:51 $
+# $Revision: 1.10 $  $Date: 2026/07/10 07:02:03 $
 #
 
 # Poisson line tessellation
 
 rpoislinetess <- function(lambda, win=owin()) {
   win <- as.owin(win)
+  check.1.real(lambda)
+  stopifnot(lambda >= 0)
   ## determine circumcircle
   xr <- win$xrange
   yr <- win$yrange
@@ -39,6 +41,40 @@ rpoislinetess <- function(lambda, win=owin()) {
   Z <- intersect.tess(Z, win)
   attr(Z, "lines") <- Y
   return(Z)
+}
+
+rpoisDirichletTess <- function(lambda, win=owin()) {
+  win <- as.owin(win)
+  B <- Frame(win)
+  X <- rpoispp(lambda, win=B)
+  nX <- npoints(X)
+  ## determine maximum possible distance from B at which
+  ## a random point outside B could affect the result inside B
+  if(nX == 0) {
+    dmax <- diameter(B)
+  } else {
+    A <- tiles(dirichlet(X))
+    dmax <- 0
+    for(i in 1:nX) 
+      dmax <- max(dmax, nncross(vertices(A[[i]]), X[i], what="dist"))
+  }
+  ## generate extended realisation of Poisson process
+  Bplus    <- grow.rectangle(B, dmax)
+  Boutside <- setminus.owin(Bplus, B)
+  Xoutside <- rpoispp(lambda, win=Boutside)
+  Xplus <- superimpose(X, Xoutside, W=Bplus)
+  ## now compute Dirichlet tessellation
+  Dplus <- dirichlet(Xplus)
+  ## finally clip it 
+  tilesDW <- tiles(intersect.tess(Dplus, win, keepempty=TRUE))
+  retain <- !sapply(tilesDW, is.empty)
+  Xplus <- Xplus[retain]
+  D <- tess(tiles=tilesDW[retain], window=win)
+  ## return with attributes
+  Xplus <- Xplus[ripras(Xplus, shape="rectangle")]
+  attr(D, "X") <- Xplus
+  attr(D, "dmax") <- dmax
+  return(D)
 }
 
 rMosaicSet <- function(X, p=0.5) {

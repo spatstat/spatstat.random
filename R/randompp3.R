@@ -7,7 +7,7 @@
 #'   rpoint3        i.i.d.
 #'   rpoispp3       Poisson (homogeneous or inhomogeneous)
 #' 
-#'   $Revision: 1.8 $ $Date: 2026/03/19 06:40:37 $
+#'   $Revision: 1.10 $ $Date: 2026/06/21 06:20:59 $
 #'
 #'   Copyright (c) Adrian Baddeley, Ege Ruba and Rolf Turner 1993-2026
 #'   GNU Public Licence (>= 2.0)

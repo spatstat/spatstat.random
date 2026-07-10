@@ -1,4 +1,16 @@
 
+        CHANGES IN spatstat.random VERSION 3.5-0.001
+
+OVERVIEW
+
+    o Random Dirichlet tessellation avoiding edge effects.
+
+NEW FUNCTIONS
+
+    o rpoisDirichletTess
+    Dirichlet tessellation induced by a Poisson process on the infinite
+    two-dimensional plane, avoiding edge effects.
+
         CHANGES IN spatstat.random VERSION 3.5-0
 
 OVERVIEW
