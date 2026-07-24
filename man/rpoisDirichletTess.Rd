@@ -2,7 +2,7 @@
 \alias{rpoisDirichletTess}
 \title{Poisson Dirichlet Tessellation}
 \description{
-  Divide a random tessellation of a given spatial region,
+  Generate a random tessellation of a given spatial region,
   using the Dirichlet tessellation defined by
   a Poisson point process on the infinite plane. 
 }
@@ -31,7 +31,9 @@ rpoisDirichletTess(lambda, win = owin())
   \code{function(x,y)}
   which can be evaluated at any spatial location \eqn{(x,y)}.
 
-  The algorithm first generates a realisation of the Poisson process
+  The algorithm is a modification of Algorithm \eqn{C_2}
+  of Hinde and Miles (1980).
+  It first generates a realisation of the Poisson process
   inside \code{win}, and computes the Dirichlet-Voronoi tessellation
   of this point pattern. Then in order to avoid edge effects,
   the algorithm calculates the
@@ -57,6 +59,13 @@ rpoisDirichletTess(lambda, win = owin())
 }
 \seealso{
   \code{\link{rpoislinetess}}
+}
+\references{
+  Hinde, A.L. and Miles, R.E. (1980)
+  Monte Carlo estimates of the distribution of the random
+  polygons of the Voronoi tessellation with respect to a
+  Poisson process.
+  \emph{J. Statist. Comput. Simul.} \bold{10}, 205--223.
 }
 \examples{
  A <- rpoisDirichletTess(10)
