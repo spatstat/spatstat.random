@@ -158,7 +158,7 @@ spatstatClusterSimModelMatch(name, verbose)
 spatstatRmhInfo(cifname)
 summarise.trend(trend, w, a)
 \method{summary}{rmhexpand}(object, \dots)
-thinjump(n, p)
+thinjump(n, p, allow.negative)
 thinParents(X, P, Pmax)
 \method{update}{rmhstart}(object, \dots)
 validate.kappa.mu(kappa, mu, kappamax, mumax,

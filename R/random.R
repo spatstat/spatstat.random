@@ -3,7 +3,7 @@
 ##
 ##    Functions for generating random point patterns
 ##
-##    $Revision: 4.132 $   $Date: 2026/04/10 04:47:36 $
+##    $Revision: 4.135 $   $Date: 2026/07/31 02:17:09 $
 ##
 ##    Copyright (c) Adrian Baddeley, Ege Rubak and Rolf Turner 1994-2026
 ##    GNU Public Licence (>= 2.0)
@@ -963,15 +963,17 @@ rcell <- function(win=square(1), nx=NULL, ny=nx, ...,
 }
 
 
-thinjump <- function(n, p) {
-  # equivalent to which(runif(n) < p) for constant p
+thinjump <- function(n, p, allow.negative=TRUE) {
+  ## equivalent to which(runif(n) < p) for constant p
   stopifnot(length(p) == 1)
   if(p <= 0) return(integer(0))
   if(p >= 1) return(seq_len(n))
   if(p > 0.5) {
-    #' for retention prob > 0.5 we find the ones to discard instead
+    #' for retention prob > 0.5 we find the entries to be discarded
     discard <- thinjump(n, 1-p)
-    retain <- if(length(discard)) -discard else seq_len(n)
+    #' allow.negative=TRUE gives permission to return negative indices
+    retain <- if(length(discard) == 0) seq_len(n) else
+              if(allow.negative) -discard else seq_len(n)[-discard]
     return(retain)
   }
   guessmaxlength <- ceiling(n * p + 2 * sqrt(n * p * (1-p)))
@@ -1033,11 +1035,11 @@ rthinEngine <- function(X, P, ..., nsim=1, drop=TRUE,
     switch(what,
            fate = {
              for(isim in seq_len(nsim)) 
-               result[[isim]] <- thinjump(nX, P)
+               result[[isim]] <- logicalIndex(thinjump(nX, P), NULL, nX)
            },
            objects = {
              for(isim in seq_len(nsim)) {
-               retain <- thinjump(nX, P)
+               retain <- thinjump(nX, P, allow.negative=TRUE)
                if(israwxy) {
                  Y <- list(x=xx[retain], y=yy[retain])
                } else {
