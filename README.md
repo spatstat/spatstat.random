@@ -4,6 +4,7 @@
 
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/spatstat.random)](http://CRAN.R-project.org/package=spatstat.random) 
 [![GitHub R package version](https://img.shields.io/github/r-package/v/spatstat/spatstat.random)](https://github.com/spatstat/spatstat.random)
+[![R-universe](https://spatstat.r-universe.dev/spatstat.random/badges/version)](https://spatstat.r-universe.dev/spatstat.random)
 
 The original `spatstat` package has been split into
 several sub-packages
