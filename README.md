@@ -16,7 +16,8 @@ and **simulation** of models.
 
 You are viewing the GitHub repository which holds
 the latest **development version** of `spatstat.random`.
-For the latest public release on CRAN, click the green badge above.
+For the latest public release on CRAN, 
+see the [CRAN page](https://CRAN.R-project.org/package=spatstat.random).
 
 Contents:
 
@@ -114,7 +115,7 @@ ___
 
 - perfect simulation algorithms for specific Gibbs models
 (`rHardcore`, `rStrauss`, `rStraussHard`, `rDiggleGratton`, `rDGS`,
-`rPenttinen`, 
+`rPenttinen`)
 - Metropolis-Hastings simulation algorithm for Gibbs models
 (`rmh`)
 - alternating Gibbs sampler for multitype Gibbs processes (`rags`,
@@ -155,6 +156,10 @@ ___
 - theoretical distribution of nearest neighbour distance (`pknn`, `qknn`, `dknn`, `rknn`)
 - mixed Poisson distribution (`rmixpois`, `dmixpois`, `pmixpois`, `qmixpois`)
 - truncated Poisson distribution (`rpoistrunc`, `dpoistrunc` etc)
+
+(Univariate probability distributions are mostly handled
+by the [`spatstat.univar`](https://github.com/spatstat/spatstat.univar)
+package.)
 
 ___
 
