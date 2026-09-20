@@ -82,11 +82,11 @@ ___
 
 ### <a name="detailed"></a> Detailed contents
 
-#### Generating random patterns
+#### Generating random point patterns
 
-- binomial random patterns (`runifpoint`, `rpoint`, `rmpoint`, `runifdisc`)
-- completely random patterns (`rpoispp`, `rmpoispp`)
-- systematic random patterns (`rstrat`, `rsyst`)
+- binomial random point patterns (`runifpoint`, `rpoint`, `rmpoint`, `runifdisc`)
+- completely random point patterns (`rpoispp`, `rmpoispp`)
+- systematic random point patterns (`rstrat`, `rsyst`)
 
 #### Point process models defined by simple constructions
 
@@ -116,7 +116,7 @@ ___
 - perfect simulation algorithms for specific Gibbs models
 (`rHardcore`, `rStrauss`, `rStraussHard`, `rDiggleGratton`, `rDGS`,
 `rPenttinen`)
-- Metropolis-Hastings simulation algorithm for Gibbs models
+- generic Metropolis-Hastings simulation algorithm for Gibbs models
 (`rmh`)
 - alternating Gibbs sampler for multitype Gibbs processes (`rags`,
 `ragsMultiHard`)
